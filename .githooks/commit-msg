@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+# Burp Remote —— Git 钩子 / 提交信息校验。
+#
+# 依据 .trae/rules.md §14「Git and workflow rules」校验提交信息：
+#
+#   1. 采用 Conventional Commits 形式：<类型>(<范围>): <描述>
+#   2. 范围只能取自 §14 列出的五个：plugins、client、protocol、docs、build
+#   3. 主题一行、描述非空、不以句号收尾
+#   4. 主题按字节计不超过 100
+#
+# 为什么把规范做成钩子而不是写成评审意见：格式问题应当在提交那一刻被拒绝，而不是等到评审
+# 时由人去数标点。评审的时间应该花在逻辑上，不该花在标点上。
+#
+# 安装：见 scripts/install-githooks.sh。
+#
+# @author 钟智强
+
+set -euo pipefail
+
+readonly commit_message_file_path="$1"
+
+# 取第一条非空、非注释行作为主题。
+#
+# 用 awk 而不是 grep 加 head：git 会把注释行（以 # 开头）以及 --verbose 时的整段 diff
+# 一并写进这个文件，因此不能简单取第一行；而 grep 在「一行都没匹配上」时返回非零，
+# 配合 set -e 会在打印出有用的错误信息之前就让脚本悄悄退出。
+subject_text="$(awk 'NF && $1 != "#" { print; exit }' "${commit_message_file_path}")"
+
+# git 自动生成的合并、回滚与修正信息不受人工规范约束，直接放行：为它们报错只会逼人使用
+# --no-verify，而一旦养成这个习惯，钩子对真正的提交也就失效了。
+case "${subject_text}" in
+    "Merge "* | "Revert "* | "fixup! "* | "squash! "*)
+        exit 0
+        ;;
+esac
+
+if [[ -z "${subject_text}" ]]; then
+    printf '提交被拒绝：提交信息为空。\n' >&2
+    printf '期望形式：feat(protocol): 用一句话说明这次改了什么\n' >&2
+    exit 1
+fi
+
+readonly allowed_scope_pattern="plugins|client|protocol|docs|build"
+readonly conventional_commit_pattern="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)\((${allowed_scope_pattern})\): .+"
+
+if ! printf '%s' "${subject_text}" | grep -Eq "${conventional_commit_pattern}"; then
+    printf '提交被拒绝：主题不符合 Conventional Commits 形式，或使用了未登记的范围。\n' >&2
+    printf '实际主题：%s\n' "${subject_text}" >&2
+    printf '期望形式：<类型>(<范围>): <描述>\n' >&2
+    printf '可用类型：feat fix docs style refactor perf test build ci chore revert\n' >&2
+    printf '可用范围：plugins client protocol docs build（见 rules.md §14）\n' >&2
+    printf '需要新增范围时，请同时修改 rules.md §14 与本钩子，两处必须一起改。\n' >&2
+    exit 1
+fi
+
+# 主题长度按字节计并放宽到 100，而不是英文习惯的 72：一个中文字符在 UTF-8 下占 3 字节，
+# 若按 72 字节限制，一个正常的中文主题（约 24 字）就会被误拒，然后所有人都会开始用
+# --no-verify。放宽之后的实际效果是「中文主题约 33 字、英文主题约 100 字符」。
+subject_byte_length="$(printf '%s' "${subject_text}" | wc -c | tr -d '[:space:]')"
+
+if (( subject_byte_length > 100 )); then
+    printf '提交被拒绝：主题过长（%s 字节，上限 100）。\n' "${subject_byte_length}" >&2
+    printf '过长的主题在 git log --oneline 里会被截断，请把细节移入正文。\n' >&2
+    exit 1
+fi
+
+if [[ "${subject_text}" == *. || "${subject_text}" == *。 ]]; then
+    printf '提交被拒绝：主题以句号收尾。主题是标题，不是句子。\n' >&2
+    exit 1
+fi
+
+exit 0
