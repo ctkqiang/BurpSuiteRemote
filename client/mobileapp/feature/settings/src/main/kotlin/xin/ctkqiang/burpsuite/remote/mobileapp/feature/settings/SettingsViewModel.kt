@@ -8,22 +8,24 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.SettingsRepository
-import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 
-/** 设置界面的状态持有者。写操作的唯一入口是 [selectThemeMode]，界面不直接碰仓库。 */
+/** 设置界面的状态持有者。写操作的唯一入口是 [handleIntent]，界面不直接碰仓库。 */
 class SettingsViewModel(private val settingsRepository: SettingsRepository) : ViewModel() {
-    val uiState: StateFlow<SettingsUiState> =
+    val uiState: StateFlow<SettingsUserInterfaceState> =
         settingsRepository
             .observeThemeMode()
-            .map { themeMode -> SettingsUiState(themeMode) }
+            .map { themeMode -> SettingsUserInterfaceState(themeMode) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLISECONDS),
-                initialValue = SettingsUiState(),
+                initialValue = SettingsUserInterfaceState(),
             )
 
-    fun selectThemeMode(themeMode: ThemeMode) {
-        viewModelScope.launch { settingsRepository.setThemeMode(themeMode) }
+    fun handleIntent(intent: SettingsUserInterfaceIntent) {
+        when (intent) {
+            is SettingsUserInterfaceIntent.SelectThemeMode ->
+                viewModelScope.launch { settingsRepository.setThemeMode(intent.themeMode) }
+        }
     }
 
     private companion object {
