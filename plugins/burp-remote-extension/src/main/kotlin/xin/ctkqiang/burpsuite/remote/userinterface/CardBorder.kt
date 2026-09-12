@@ -8,7 +8,8 @@ import java.awt.Insets
 import java.awt.RenderingHints
 import javax.swing.border.AbstractBorder
 
-// 只持有几何参数、不持有颜色：主题在组件构造之后才应用，颜色只能等绘制时从组件自身推导。
+// 不填充、只描边。卡片内部全是普通 JPanel，它们会用页面底色盖住任何卡面填充，最后只在圆角
+// 周围留下一圈色差，看着像个空心框；描边没有这个问题，也不会因为以后往卡片里加面板而复发。
 internal class CardBorder(
     private val padding: Int = CARD_PADDING,
 ) : AbstractBorder() {
@@ -37,19 +38,7 @@ internal class CardBorder(
         try {
             graphics2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
-            val surfaceColour = blend(component.background, component.foreground, SURFACE_ACCENT_WEIGHT)
-            graphics2d.color = surfaceColour
-            graphics2d.fillRoundRect(
-                borderX,
-                borderY,
-                borderWidth,
-                borderHeight,
-                CORNER_DIAMETER,
-                CORNER_DIAMETER,
-            )
-
-            val outlineColour = blend(component.background, component.foreground, OUTLINE_ACCENT_WEIGHT)
-            graphics2d.color = outlineColour
+            graphics2d.color = blend(component.background, component.foreground, OUTLINE_ACCENT_WEIGHT)
             // 描边收进一个像素：线宽 1 落在整数坐标上会跨在边界两侧，被裁掉一半后比设定更细、更模糊。
             graphics2d.drawRoundRect(
                 borderX,
@@ -64,7 +53,7 @@ internal class CardBorder(
         }
     }
 
-    // 不用 darker()/brighter()：那在深色主题下会把表面压成纯黑，浅色主题下又可能亮到看不见边界。
+    // 不用 darker()/brighter()：深色主题下会把颜色压成纯黑，浅色主题下又可能亮到看不见边界。
     private fun blend(
         baseColour: Color,
         accentColour: Color,
@@ -84,10 +73,7 @@ internal class CardBorder(
         // 克制些：过度圆角会让信息卡片看起来像按钮。
         private const val CORNER_DIAMETER = 12
 
-        // 轻到只与页面底色略作区分，不喧宾夺主。
-        private const val SURFACE_ACCENT_WEIGHT = 0.05f
-
-        // 比表面重，让卡片边界在两种主题下都清晰可辨。
+        // 描边取样比例：浅色主题下得到一条深一点的灰线，深色主题下得到浅一点的，两边都看得见边界。
         private const val OUTLINE_ACCENT_WEIGHT = 0.18f
     }
 }
