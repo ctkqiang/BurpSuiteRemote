@@ -1,0 +1,30 @@
+# Burp Remote —— 编辑器统一约定。
+#
+# 本文件是「格式」这件事的唯一事实来源：所有编辑器与 ktlint 都读取它。
+# 缩进、换行、编码出现争议时，以本文件为准，而不是以任何人的个人习惯为准。
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+max_line_length = 120
+
+[*.{kt,kts}]
+# Kotlin 源码使用四个空格缩进，与 ktlint 官方风格一致。
+indent_size = 4
+# 允许并鼓励尾随逗号：让新增参数时的差异只有一行。
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+[*.{xml,json,yml,yaml,toml}]
+# 声明式配置使用两个空格缩进，层级更深时仍能保持可读。
+indent_size = 2
+
+[*.md]
+# 文档里的行尾空格可能是换行语义，不做修剪。
+trim_trailing_whitespace = false

@@ -1,0 +1,134 @@
+# Burpsuite Remote — repository-wide ignore rules
+#
+# Products covered by this file:
+#   plugins/burp-remote-extension   Kotlin/JVM Burp Suite extension (Gradle)
+#   client/mobileapp                Kotlin/Compose Android application (Gradle)
+#
+# Never ignore .trae/ — plan.md and rules.md are the repository source of truth.
+# Never ignore the Gradle wrapper — it is what makes the build reproducible.
+
+# ---------------------------------------------------------------------------
+# Gradle
+# ---------------------------------------------------------------------------
+.gradle/
+**/.gradle/
+build/
+**/build/
+out/
+**/out/
+!**/src/**/build/
+gradle-app.setting
+.gradletasknamecache
+**/gradle-app.setting
+**/.gradletasknamecache
+
+# Gradle configuration cache and build cache
+local-build-cache/
+**/local-build-cache/
+
+# ---------------------------------------------------------------------------
+# Kotlin
+# ---------------------------------------------------------------------------
+.kotlin/
+**/.kotlin/
+*.kotlin_module
+
+# ---------------------------------------------------------------------------
+# Compiled output and packaging artefacts
+# ---------------------------------------------------------------------------
+*.class
+*.jar
+*.war
+*.ear
+*.dex
+*.apk
+*.aab
+*.ap_
+*.aar
+*.hprof
+*.jfr
+!gradle/wrapper/gradle-wrapper.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+
+# ---------------------------------------------------------------------------
+# Android
+# ---------------------------------------------------------------------------
+local.properties
+**/local.properties
+.cxx/
+**/.cxx/
+.externalNativeBuild/
+**/.externalNativeBuild/
+captures/
+**/captures/
+release/
+**/release/
+*.hprof
+profiles/
+**/profiles/
+
+# Android Studio / IntelliJ
+.idea/
+**/.idea/
+*.iml
+**/*.iml
+*.ipr
+*.iws
+
+# ---------------------------------------------------------------------------
+# Secrets, signing material and local pairing credentials — never commit these
+# ---------------------------------------------------------------------------
+*.keystore
+*.jks
+keystore.properties
+**/keystore.properties
+signing.properties
+**/signing.properties
+*.p12
+*.pfx
+*.jceks
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.csr
+secrets.properties
+**/secrets.properties
+.env
+.env.*
+**/.env
+**/.env.*
+
+# ---------------------------------------------------------------------------
+# Runtime output produced by either product
+# ---------------------------------------------------------------------------
+*.log
+**/*.log
+logs/
+**/logs/
+burp-remote-runtime/
+**/burp-remote-runtime/
+
+# ---------------------------------------------------------------------------
+# Operating system and editor noise
+# ---------------------------------------------------------------------------
+.DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+**/Thumbs.db
+desktop.ini
+**/desktop.ini
+.vscode/
+**/.vscode/
+.fleet/
+**/.fleet/
+*.swp
+**/*.swp
+*.swo
+**/*.swo
+*~
+**/*~
