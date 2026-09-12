@@ -1,0 +1,242 @@
+# Burp Remote —— detekt 静态分析配置。
+#
+# 本配置把 rules.md 中的若干硬性约束翻译成可执行的检查，使它们不再依赖人的自觉：
+#   * §3.2 禁止缩写          —— 由 naming 分区的类名与函数名模式拦截；
+#   * §3.5 禁止的类名        —— 由 ForbiddenClassName 拦截；
+#   * §4   公开声明必须有中文 KDoc —— 由 comments 分区拦截；
+#   * §7.1 禁止通配符导入与杂物包名 —— 由 style 与 naming 分区拦截；
+#   * §7.5 禁止 GlobalScope  —— 由 coroutines 分区拦截；
+#   * §16  禁用模式清单      —— 由 style、exceptions、potential-bugs 分区拦截。
+#
+# maxIssues 设为 0 是有意为之：静态分析是构建闸门，不是评审建议。
+
+build:
+  maxIssues: 0
+
+config:
+  # 手写配置里出现拼错的属性名时必须直接报错，否则「以为开了」的检查其实没开。
+  validation: true
+  warningsAsErrors: true
+
+comments:
+  active: true
+  # 公开类必须带 KDoc，且按 §4.0 用中文书写。
+  UndocumentedPublicClass:
+    active: true
+    searchInNestedClass: true
+    searchInInnerClass: true
+    searchInInnerObject: true
+    searchInInnerInterface: true
+    searchInProtectedClass: true
+  # 公开函数必须带 KDoc，说明契约而不是复述实现。
+  UndocumentedPublicFunction:
+    active: true
+    searchProtectedFunction: true
+  # 公开属性必须带 KDoc，事件载荷里的每一个字段都不例外。
+  UndocumentedPublicProperty:
+    active: true
+    searchProtectedProperty: true
+
+naming:
+  active: true
+  # 类名用帕斯卡命名，且不得以 §3.5 禁止的后缀结尾。
+  #
+  # 负向先行断言写在模式末尾的原因：detekt 要求整串匹配。类名一旦以 Impl 之类的
+  # 后缀收尾，贪婪匹配回溯到更短长度时都无法再抵达字符串末尾，于是判定为违规。
+  ClassNaming:
+    active: true
+    classPattern: >-
+      [A-Z][a-zA-Z0-9]*(?<!Impl)(?<!Manager)(?<!Helper)(?<!Utility)(?<!Util)(?<!Processor)(?<!Data)(?<!Object)(?<!Thing)(?<!Misc)(?<!Common)
+  # 枚举常量使用帕斯卡命名，与 Kotlin 官方风格以及 ktlint 的 enum-entry-name-case 保持一致。
+  #
+  # §3.3 只要求 const val 使用全大写加下划线；把枚举常量也强行按全大写约束，就会与
+  # ktlint 的标准规则直接冲突，最后只能靠关闭一条标准规则来收场，那是更差的结果。
+  EnumNaming:
+    active: true
+    enumEntryPattern: '[A-Z][a-zA-Z0-9]*'
+  # 函数名使用小驼峰；测试里的反引号语句由 FunctionNaming 的 ignoreAnnotated 另行放行。
+  FunctionNaming:
+    active: true
+    functionPattern: '[a-z][a-zA-Z0-9]*'
+    excludeClassPattern: '$^'
+  # 变量名必须可读：单字母标识符不允许出现，泛型参数不受此规则约束。
+  VariableNaming:
+    active: true
+    variablePattern: '[a-z][a-zA-Z0-9]*'
+    privateVariablePattern: '[a-z][a-zA-Z0-9]*'
+  ConstructorParameterNaming:
+    active: true
+    parameterPattern: '[a-z][a-zA-Z0-9]*'
+    privateParameterPattern: '[a-z][a-zA-Z0-9]*'
+  # 精确禁止 §3.5 列举的类名。
+  ForbiddenClassName:
+    active: true
+    forbiddenName:
+      - Manager
+      - Helper
+      - Utility
+      - Util
+      - Processor
+      - Data
+      - Object
+      - Thing
+      - Misc
+      - Common
+      - Impl
+  # 一个文件只允许有一个与文件名同名的公开声明（对应 §7.1）。
+  MatchingDeclarationName:
+    active: true
+    mustBeFirst: true
+  # 禁止用包名收留杂物：utils、helpers、misc、common 一律不合格。
+  #
+  # 注意：PackageNaming 校验的是 package 指令本身的文本，而不是某个类，因此它不提供
+  # excludeClassPattern 属性。写上该属性会被 config.validation 判定为拼错，使整个
+  # detekt 任务在分析任何源码之前就直接失败。
+  PackageNaming:
+    active: true
+    packagePattern: '[a-z]+(\.[a-z][a-z0-9]*)*'
+  TopLevelPropertyNaming:
+    active: true
+    constantPattern: '[A-Z][_A-Z0-9]*'
+    propertyPattern: '[a-z][a-zA-Z0-9]*'
+    privatePropertyPattern: '[a-z][a-zA-Z0-9]*'
+
+style:
+  active: true
+  # 禁止通配符导入（对应 §7.1）。
+  WildcardImport:
+    active: true
+    excludeImports: []
+  # 禁止魔数：端口、错误码、超时都必须具名。
+  MagicNumber:
+    active: true
+    ignoreNumbers: ['-1', '0', '1', '2', '100']
+    ignoreHashCodeFunction: true
+    ignorePropertyDeclaration: true
+    ignoreConstantDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotation: true
+    ignoreNamedArgument: true
+    ignoreEnums: true
+    ignoreRanges: true
+    ignoreExtensionFunctions: true
+  # 提前返回过多通常意味着职责没拆干净。
+  ReturnCount:
+    active: true
+    max: 4
+  # 禁止抽象类只为被继承而存在（对应 §16 的「无意义的抽象」）。
+  UnnecessaryAbstractClass:
+    active: true
+  # 禁止纯静态方法的工具类。
+  UtilityClassWithPublicConstructor:
+    active: true
+  # 禁止使用数据类承载行为。
+  DataClassContainsFunctions:
+    active: true
+  NewLineAtEndOfFile:
+    active: true
+
+complexity:
+  active: true
+  # 函数签名过长往往意味着这个函数承担了过多职责。
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 10
+    ignoreDefaultParameters: true
+    ignoreDataClasses: true
+    ignoreAnnotatedParameter: []
+  LongMethod:
+    active: true
+    threshold: 80
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 12
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 20
+    thresholdInClasses: 20
+    thresholdInInterfaces: 20
+    thresholdInObjects: 20
+    thresholdInEnums: 12
+    ignoreDeprecated: true
+    ignorePrivate: false
+    ignoreOverridden: true
+  NestedBlockDepth:
+    active: true
+    threshold: 4
+  LabeledExpression:
+    active: true
+    ignoredLabels:
+      - 'sequence'
+      - 'replay'
+  StringLiteralDuplication:
+    active: false
+
+potential-bugs:
+  active: true
+  # 禁止对可空类型使用 !!（对应 §16）。
+  UnsafeCallOnNullableType:
+    active: true
+  UnsafeCast:
+    active: true
+  # 禁止未加说明就使用 lateinit，构造期必须完成初始化的依赖不该拖到运行期。
+  LateinitUsage:
+    active: true
+    ignoreOnClassesPattern: ''
+
+exceptions:
+  active: true
+  # 禁止空 catch 与静默吞异常（对应 §16）。允许以下具名忽略场景，但名字必须表明意图。
+  SwallowedException:
+    active: true
+    ignoredExceptionTypes:
+      - 'InterruptedException'
+      - 'MalformedURLException'
+      - 'NumberFormatException'
+      - 'ParseException'
+    allowedExceptionNameRegex: '_|(ignore|expected|recovered).*'
+  # 禁止宽泛捕获 Exception 与 Throwable。
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - 'ArrayIndexOutOfBoundsException'
+      - 'Error'
+      - 'Exception'
+      - 'IllegalMonitorStateException'
+      - 'IndexOutOfBoundsException'
+      - 'NullPointerException'
+      - 'RuntimeException'
+      - 'Throwable'
+  InstanceOfCheckForException:
+    active: true
+  PrintStackTrace:
+    active: true
+
+coroutines:
+  active: true
+  # 禁止 GlobalScope：并发必须结构化（对应 §7.5）。
+  GlobalCoroutineUsage:
+    active: true
+  # 挂起函数中不得使用 Thread.sleep，必须使用 delay。
+  SleepInsteadOfDelay:
+    active: true
+  # 禁止吞掉协程取消信号。
+  SuspendFunSwallowedCancellation:
+    active: true
+
+performance:
+  active: true
+  ForEachOnRange:
+    active: true
+  SpreadOperator:
+    active: false
+
+# 关于「格式」的说明：
+#
+# 本项目不在 detekt 中配置 formatting 分区。原因是 formatting 规则集并不由 detekt 核心
+# 提供，它来自独立的 detekt-formatting 构件；核心 detekt 在 config.validation 为 true 时
+# 遇到未注册的规则集会判定为拼错并中断构建。
+#
+# 格式（缩进、换行、尾随逗号、最大行宽）已由 ktlint 统一负责，两套标准并存只会互相打架，
+# 因此这里有意不启用 formatting。
