@@ -1,0 +1,74 @@
+# Burp Remote —— 插件依赖版本目录。
+#
+# 插件侧所有依赖版本只在本文件声明一次，子工程通过别名引用。
+# 于是「升级一个库」这件事只会产生一处改动，评审范围也随之收敛到一处。
+
+[versions]
+# Kotlin 编译器与 Kotlin Gradle 插件，需与 Gradle 版本处于官方兼容区间。
+kotlin = "2.2.0"
+
+# 协程运行库：结构化并发与 Flow 的实现基础。
+kotlinxCoroutines = "1.10.2"
+
+# 序列化运行库：协议报文与事件日志唯一的序列化方案。
+kotlinxSerialization = "1.8.1"
+
+# Burp Suite 官方扩展 API。运行期由 Burp 自身提供，因此只参与编译不参与打包。
+montoyaApi = "2025.5"
+
+# 嵌入式 HTTP 与 WebSocket 服务器。
+# 本机网络被视作不可信，因此使用经过大规模验证的实现，而不是自行解析报文。
+ktor = "3.1.3"
+
+# 二维码编码。配对票据必须呈现为可被移动端扫描的图形（见 plan §55），
+# 而二维码的纠错、掩码与版本选择是规范定义的算法，自研等于把可扫描性押在自己的实现上。
+zxing = "3.5.3"
+
+# 格式化与静态分析插件。两者都是构建闸门：出现违规即构建失败。
+ktlintPlugin = "12.1.2"
+detektPlugin = "1.23.8"
+
+# 打包插件：把运行期依赖收进单个 JAR，便于 Burp 直接加载。
+shadowPlugin = "8.3.8"
+
+# 测试技术栈。
+junit = "5.11.4"
+junitPlatform = "1.11.4"
+turbine = "1.2.0"
+mockk = "1.13.16"
+
+[libraries]
+# —— 协程 ——
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+
+# —— 序列化 ——
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+# —— Burp 扩展 API ——
+montoya-api = { module = "net.portswigger.burp.extensions:montoya-api", version.ref = "montoyaApi" }
+
+# —— 传输层服务器 ——
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
+ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+
+# —— 二维码 ——
+# 只使用 core：它不携带任何传递依赖，因此不会把与二维码无关的类拖进最终 JAR。
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
+
+# —— 测试 ——
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintPlugin" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektPlugin" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadowPlugin" }
