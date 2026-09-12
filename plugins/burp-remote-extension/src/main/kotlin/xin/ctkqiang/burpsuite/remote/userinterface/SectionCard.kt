@@ -15,6 +15,8 @@ internal class SectionCard(
     sectionContent: JComponent,
 ) : JPanel(BorderLayout()) {
     init {
+        // 不透明的话 JPanel 会先铺满一个方角背景，而圆角表面盖不住四个角，四角会露出方色块。
+        isOpaque = false
         border = CardBorder()
 
         val cardBody = JPanel()
