@@ -14,13 +14,19 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryAdapter
+import xin.ctkqiang.burpsuite.remote.adapter.BurpProxyHistorySource
+import xin.ctkqiang.burpsuite.remote.adapter.StubProxyHistoryEntry
+import xin.ctkqiang.burpsuite.remote.adapter.StubProxyHistorySource
 import xin.ctkqiang.burpsuite.remote.protocol.DEFAULT_REMOTE_PORT
 import xin.ctkqiang.burpsuite.remote.protocol.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteProtocolJson
@@ -46,12 +52,69 @@ class RemoteHttpServerTest {
         }
 
     @Test
-    fun `history honestly reports that the burp adapter is not implemented`() =
+    fun `history returns the burp entries for a paired device`() =
         testApplication {
             application { createServer().installTo(this) }
 
             val response =
                 client.get(HISTORY_PATH) {
+                    header(DEVICE_IDENTIFIER_HEADER, PAIRED_DEVICE.value)
+                }
+
+            val historyItems = payloadOf(response.bodyAsText())?.get(HISTORY_ITEMS_FIELD)?.jsonArray
+            assertEquals(1, historyItems?.size)
+            assertEquals(StubProxyHistoryEntry.DEFAULT_PATH, historyItems?.get(0).textAt(PATH_FIELD))
+        }
+
+    @Test
+    fun `history is not readable without a paired device`() =
+        testApplication {
+            application { createServer().installTo(this) }
+
+            val response = client.get(HISTORY_PATH)
+
+            assertEquals(DEVICE_NOT_PAIRED_CODE, rejectionReasonOf(response.bodyAsText()))
+        }
+
+    @Test
+    fun `a history message is fetched in full by its identifier`() =
+        testApplication {
+            val historySource = StubProxyHistorySource()
+            historySource.appendEntry(StubProxyHistoryEntry())
+            application { createServer(historySource = historySource).installTo(this) }
+            val historyIdentifier = BurpHistoryAdapter(historySource).toHistoryIdentifier(StubProxyHistoryEntry())
+
+            val response =
+                client.get("$HISTORY_PATH/${historyIdentifier.value}") {
+                    header(DEVICE_IDENTIFIER_HEADER, PAIRED_DEVICE.value)
+                }
+
+            assertEquals(
+                StubProxyHistoryEntry.DEFAULT_RESPONSE_BODY_TEXT,
+                payloadOf(response.bodyAsText()).textAt(RESPONSE_BODY_FIELD),
+            )
+        }
+
+    @Test
+    fun `an unknown history identifier fails without inventing a record`() =
+        testApplication {
+            application { createServer().installTo(this) }
+
+            val response =
+                client.get("$HISTORY_PATH/$UNKNOWN_HISTORY_IDENTIFIER") {
+                    header(DEVICE_IDENTIFIER_HEADER, PAIRED_DEVICE.value)
+                }
+
+            assertEquals(BURP_RUNTIME_FAILURE_CODE, failureCodeOf(response.bodyAsText()))
+        }
+
+    @Test
+    fun `intercepts honestly report that the burp adapter is not implemented`() =
+        testApplication {
+            application { createServer().installTo(this) }
+
+            val response =
+                client.get(INTERCEPTS_PATH) {
                     header(DEVICE_IDENTIFIER_HEADER, PAIRED_DEVICE.value)
                 }
 
@@ -142,6 +205,7 @@ class RemoteHttpServerTest {
 
     private fun createServer(
         devicePairingService: DevicePairingService = createPairingService(),
+        historySource: BurpProxyHistorySource = StubProxyHistorySource(mutableListOf(StubProxyHistoryEntry())),
         remotePort: Int = DEFAULT_REMOTE_PORT,
         logSink: (String) -> Unit = {},
     ): RemoteHttpServer {
@@ -159,6 +223,7 @@ class RemoteHttpServerTest {
                 ),
             connectionRegistry = RemoteConnectionRegistry(),
             eventStream = InMemoryRemoteEventStream(),
+            historyAdapter = BurpHistoryAdapter(historySource),
             logSink = logSink,
             remotePort = remotePort,
         )
@@ -196,6 +261,11 @@ class RemoteHttpServerTest {
     private fun payloadOf(responseBody: String): JsonObject? =
         RemoteProtocolJson.instance.parseToJsonElement(responseBody).jsonObject["payload"]?.jsonObject
 
+    private fun JsonElement?.textAt(fieldName: String): String? =
+        this?.jsonObject?.get(
+            fieldName,
+        )?.jsonPrimitive?.content
+
     private companion object {
         private val TEST_INSTANT: Instant = Instant.parse("2026-01-01T00:00:00Z")
 
@@ -211,6 +281,16 @@ class RemoteHttpServerTest {
 
         private const val HISTORY_PATH = "/v1/history"
 
+        private const val INTERCEPTS_PATH = "/v1/intercepts"
+
+        private const val HISTORY_ITEMS_FIELD = "historyItems"
+
+        private const val PATH_FIELD = "path"
+
+        private const val RESPONSE_BODY_FIELD = "responseBody"
+
+        private const val UNKNOWN_HISTORY_IDENTIFIER = "history_ffffffffffffffff"
+
         private const val INTERCEPT_FORWARD_PATH = "/v1/intercepts/intercept_1/forward"
 
         private const val DEVICE_IDENTIFIER_HEADER = "X-Burp-Remote-Device-Identifier"
@@ -224,6 +304,8 @@ class RemoteHttpServerTest {
         private const val MISSING_OPERATION_IDENTIFIER_CODE = "missing_operation_identifier"
 
         private const val NOT_IMPLEMENTED_CODE = "not_implemented"
+
+        private const val BURP_RUNTIME_FAILURE_CODE = "burp_runtime_failure"
 
         private const val OCCUPIED_PORT_LOG_TEXT = "启动失败"
     }

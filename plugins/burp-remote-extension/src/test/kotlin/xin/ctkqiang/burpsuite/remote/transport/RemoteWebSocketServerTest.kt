@@ -30,6 +30,7 @@ import java.net.http.WebSocket
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
+import java.util.concurrent.CompletionException
 import java.util.concurrent.CompletionStage
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
@@ -259,6 +260,11 @@ private class JdkWebSocketProbe private constructor(
             webSocket.sendClose(WebSocket.NORMAL_CLOSURE, CLOSING_REASON).join()
         } catch (expectedClosedOutput: IOException) {
             // 服务端可能已先关闭（例如认证失败），此时关闭请求无处可发，测试不需要关心。
+        } catch (expectedClosedOutput: CompletionException) {
+            // join 把 sendClose 的失败裹成 CompletionException；只有底层是 IO 故障才是「对端已关」，其余照抛。
+            if (expectedClosedOutput.cause !is IOException) {
+                throw expectedClosedOutput
+            }
         }
     }
 

@@ -24,9 +24,11 @@ import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
+import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryAdapter
 import xin.ctkqiang.burpsuite.remote.protocol.CommandResult
 import xin.ctkqiang.burpsuite.remote.protocol.DEFAULT_REMOTE_PORT
 import xin.ctkqiang.burpsuite.remote.protocol.DeviceIdentifier
+import xin.ctkqiang.burpsuite.remote.protocol.HistoryIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.OperationIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.RejectionReason
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteClientMessage
@@ -46,8 +48,8 @@ import java.net.ServerSocket
 /**
  * 远程控制服务端。
  *
- * 监听端口只来自 [DEFAULT_REMOTE_PORT]，不写第二处字面量；涉及 Burp 运行时数据的端点一律返回「尚未实现」，
- * 因为适配层还没写，编造出来的历史记录比明确的失败更糟。
+ * 监听端口只来自 [DEFAULT_REMOTE_PORT]，不写第二处字面量；历史类端点读的是 Burp 真实产生的代理历史，
+ * 而拦截与 Repeater 在对应能力接入之前继续回「尚未实现」，编造出来的能力比明确的失败更糟。
  */
 class RemoteHttpServer(
     private val devicePairingService: DevicePairingService,
@@ -55,6 +57,7 @@ class RemoteHttpServer(
     private val controlGate: RemoteControlGate,
     private val connectionRegistry: RemoteConnectionRegistry,
     private val eventStream: RemoteEventStream,
+    private val historyAdapter: BurpHistoryAdapter,
     private val logSink: (String) -> Unit,
     private val remotePort: Int = DEFAULT_REMOTE_PORT,
 ) {
@@ -136,21 +139,32 @@ class RemoteHttpServer(
         webSocketServer.installTo(application)
         application.routing {
             get(STATUS_PATH) {
-                call.respondAuthenticatedQuery(RemoteMessageType.Query, buildRuntimeStatePayload())
+                call.respondAuthenticatedQuery(RemoteMessageType.Query) { buildRuntimeStatePayload() }
             }
             post(PAIR_PATH) {
                 call.respondPairing()
             }
             get(CAPABILITIES_PATH) {
-                call.respondAuthenticatedQuery(RemoteMessageType.Query, buildCapabilitiesPayload())
+                call.respondAuthenticatedQuery(RemoteMessageType.Query) { buildCapabilitiesPayload() }
             }
             get(SNAPSHOT_PATH) {
-                call.respondAuthenticatedQuery(RemoteMessageType.Snapshot, buildRuntimeStatePayload())
+                call.respondAuthenticatedQuery(RemoteMessageType.Snapshot) { buildRuntimeStatePayload() }
             }
 
-            // 以下端点全部依赖尚未实现的 Burp 适配层，因此只回「尚未实现」。
-            get(HISTORY_PATH) { call.respondAuthenticatedNotImplemented(RemoteMessageType.Query) }
-            get(HISTORY_ITEM_PATH) { call.respondAuthenticatedNotImplemented(RemoteMessageType.Query) }
+            // 历史类端点已接上 Burp 适配层：列表只回元数据，正文走按标识取回的那条。
+            get(HISTORY_PATH) {
+                call.respondAuthenticatedQuery(RemoteMessageType.Query) { historyAdapter.buildHistoryListPayload() }
+            }
+            get(HISTORY_ITEM_PATH) {
+                call.respondAuthenticatedQuery(RemoteMessageType.Query) {
+                    call.parameters[HISTORY_IDENTIFIER_ROUTE_PARAMETER]
+                        ?.let { identifierText ->
+                            historyAdapter.buildHistoryMessagePayload(HistoryIdentifier(identifierText))
+                        }
+                }
+            }
+
+            // 以下端点仍然依赖尚未实现的 Burp 能力（拦截队列、Repeater），因此只回「尚未实现」。
             get(INTERCEPTS_PATH) { call.respondAuthenticatedNotImplemented(RemoteMessageType.Query) }
             get(INTERCEPT_ITEM_PATH) { call.respondAuthenticatedNotImplemented(RemoteMessageType.Query) }
             post(INTERCEPT_MODIFY_PATH) { call.respondUnimplementedControl(COMMAND_TYPE_INTERCEPT_MODIFY) }
@@ -170,12 +184,19 @@ class RemoteHttpServer(
         ).start(wait = false)
 
     // 查询类端点同样要鉴权：局域网不等于可信网络，能读历史就等于能读凭证。
+    // 载荷延后到鉴权之后才计算：未配对的请求连一次 Burp 历史都不该读；载荷为 null 表示 Burp 已经拿不出这条记录了。
     private suspend fun ApplicationCall.respondAuthenticatedQuery(
         messageType: RemoteMessageType,
-        payload: JsonElement,
+        payloadSupplier: () -> JsonElement?,
     ) {
         if (controlGate.resolveAuthenticatedDevice(readDeviceIdentifier()) == null) {
             respondRejected(messageType, RejectionReason.DeviceNotPaired)
+            return
+        }
+        val payload = payloadSupplier()
+        if (payload == null) {
+            // 不新增错误码：错误码集合是跨端协议，新增一个会让尚未同步的客户端在解析应答时直接失败。
+            respondProtocolResult(messageType, failedResult(RemoteErrorCode.BurpRuntimeFailure, isRetryable = false))
             return
         }
         respond(
@@ -260,6 +281,7 @@ class RemoteHttpServer(
                 add(CAPABILITY_PAIRING)
                 add(CAPABILITY_EVENT_STREAM)
                 add(CAPABILITY_SNAPSHOT)
+                add(CAPABILITY_HISTORY)
             }
         }
 
@@ -346,6 +368,8 @@ class RemoteHttpServer(
 
         private const val HISTORY_ITEM_PATH = "/v1/history/{historyIdentifier}"
 
+        private const val HISTORY_IDENTIFIER_ROUTE_PARAMETER = "historyIdentifier"
+
         private const val INTERCEPTS_PATH = "/v1/intercepts"
 
         private const val INTERCEPT_ITEM_PATH = "/v1/intercepts/{interceptIdentifier}"
@@ -391,5 +415,7 @@ class RemoteHttpServer(
         private const val CAPABILITY_EVENT_STREAM = "event-stream"
 
         private const val CAPABILITY_SNAPSHOT = "snapshot"
+
+        private const val CAPABILITY_HISTORY = "history"
     }
 }

@@ -5,6 +5,14 @@ package xin.ctkqiang.burpsuite.remote
 import burp.api.montoya.BurpExtension
 import burp.api.montoya.MontoyaApi
 import burp.api.montoya.core.Registration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryAdapter
+import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryEventPublisher
+import xin.ctkqiang.burpsuite.remote.adapter.MontoyaProxyHistorySignalSource
+import xin.ctkqiang.burpsuite.remote.adapter.MontoyaProxyHistorySource
 import xin.ctkqiang.burpsuite.remote.protocol.DEFAULT_REMOTE_PORT
 import xin.ctkqiang.burpsuite.remote.security.DevicePairingService
 import xin.ctkqiang.burpsuite.remote.security.PairedDeviceRegistry
@@ -50,18 +58,38 @@ class BurpRemoteExtension : BurpExtension {
                 remotePort = DEFAULT_REMOTE_PORT,
             )
 
+        // 事件日志只建一次并交给发布者与传输层：各持一份的话，事件会写进没有人读的那一份。
+        val eventStream = InMemoryRemoteEventStream()
+
+        val historyAdapter = BurpHistoryAdapter(MontoyaProxyHistorySource(montoyaApi.proxy()))
+
+        // 兜底扫描需要自己的作用域：生命周期与扩展绑定，卸载时连同订阅一起取消。
+        val historySweepScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+        val historyEventPublisher =
+            BurpHistoryEventPublisher(
+                historyAdapter = historyAdapter,
+                historySignalSource = MontoyaProxyHistorySignalSource(montoyaApi.http()),
+                eventStream = eventStream,
+                sweepScope = historySweepScope,
+            )
+
         val remoteHttpServer =
             RemoteHttpServer(
                 devicePairingService = devicePairingService,
                 pairedDeviceRegistry = pairedDeviceRegistry,
                 controlGate = createControlGate(pairedDeviceRegistry, clock, montoyaApi),
                 connectionRegistry = RemoteConnectionRegistry(),
-                eventStream = InMemoryRemoteEventStream(),
+                eventStream = eventStream,
+                historyAdapter = historyAdapter,
                 logSink = montoyaApi.logging()::logToOutput,
             )
 
         // 先启动端点再建界面：界面要显示的是真实状态，晚一步启动会让它显示一瞬「未启动」。
         remoteHttpServer.start()
+
+        // 历史事件必须在端点之后订阅，但要在客户端连上来之前就绪，否则最早几条记录会从事件流里漏掉。
+        historyEventPublisher.start()
 
         val statusPanel =
             RemoteStatusPanel(
@@ -87,6 +115,9 @@ class BurpRemoteExtension : BurpExtension {
             montoyaApi.userInterface().registerSuiteTab(EXTENSION_NAME, statusPanel)
 
         montoyaApi.extension().registerUnloadingHandler {
+            // 先停历史事件：卸载后任何残留回调再去读代理历史，就会在已卸下扩展的 Burp 上抛错。
+            historyEventPublisher.stop()
+            historySweepScope.cancel()
             // 先停服务器：端口与线程不清干净时，重新加载扩展会因为端口仍被自己占用而启动失败。
             remoteHttpServer.stop()
             // 卸载时主动摘掉标签页：Burp 不替扩展回收组件，留着会残留界面，重载时还会叠出两个同名标签页。
