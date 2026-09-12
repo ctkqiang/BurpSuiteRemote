@@ -1,19 +1,33 @@
-# 客户端依赖版本目录。版本都对着 Google Maven 核过，并且都挑在 AGP 8.13.2（2025-12-11）之前发布：
-# 更新的 Compose 会要求 AGP 9.1 + compileSdk 37，而这台机器上只装到 android-36。
-# 要升到 AGP 9 时，这一组版本得一起动。
+# 客户端依赖版本目录。版本都对着 Google Maven / Maven Central 核过，不按记忆写。
+# 挑选规则：一律取「AGP 8.13.2（2025-12-11 发布）之前发布」的版本——更新的 Compose 会要求
+# AGP 9.1 + compileSdk 37，而这台机器只装到 android-36。要升 AGP 9 时这一组得一起动。
 
 [versions]
 agp = "8.13.2"
 kotlin = "2.2.0"
+
+# KSP 版本号的前段必须等于 Kotlin 版本，写错会直接编不过。
+ksp = "2.2.0-2.0.2"
+
+# 2025-11-19 发布，早于 AGP 8.13.2。
+room = "2.8.4"
+
 composeBom = "2025.11.00"
 activityCompose = "1.11.0"
 lifecycle = "2.9.4"
 datastore = "1.1.7"
 coreKtx = "1.17.0"
 
-# 与插件侧同版本，避免以后两端共享协议代码时被协程版本绊住。
+# 与插件侧同版本：两端共用一份线上契约，网络库版本不一致只会带来无谓的排查成本。
 coroutines = "1.10.2"
+serialization = "1.8.1"
+ktor = "3.1.3"
+
 junit = "4.13.2"
+junit5 = "5.11.4"
+junitPlatform = "1.11.4"
+turbine = "1.2.0"
+mockk = "1.13.16"
 ktlintPlugin = "12.1.2"
 
 [libraries]
@@ -22,6 +36,11 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 
 # Compose 各件由 BOM 定版，因此这里不写 version。
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
@@ -33,8 +52,21 @@ compose-material3 = { module = "androidx.compose.material3:material3" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -42,4 +74,6 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintPlugin" }

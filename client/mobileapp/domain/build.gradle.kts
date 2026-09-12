@@ -9,7 +9,17 @@ kotlin {
     jvmToolchain(17)
 }
 
+// rules.md §2 指定 JUnit 5，不用 JUnit 4。
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
-    testImplementation(libs.junit)
+
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.mockk)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
