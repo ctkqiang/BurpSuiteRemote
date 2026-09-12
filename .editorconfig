@@ -20,6 +20,8 @@ indent_size = 4
 # 允许并鼓励尾随逗号：让新增参数时的差异只有一行。
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
+# 组合函数用 PascalCase（rules.md §3.3），而 ktlint 默认要求小驼峰；带上这条 ktlint 才放行。
+ktlint_function_naming_ignore_when_annotated_with = Composable
 
 [*.{xml,json,yml,yaml,toml}]
 # 声明式配置使用两个空格缩进，层级更深时仍能保持可读。

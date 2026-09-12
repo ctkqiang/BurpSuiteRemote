@@ -15,38 +15,10 @@ readonly GRADLE_PROJECT_DIRECTORY="${REPOSITORY_ROOT_DIRECTORY}/plugins"
 # 产物目录被 plugins/build.gradle.kts 重定向过，路径得跟着它走，不然只会报「找不到产物」
 readonly EXTENSION_ARTIFACT_DIRECTORY="${REPOSITORY_ROOT_DIRECTORY}/build/plugins/burp-remote-extension/libs"
 
-# 优先认 JAVA_HOME_FOR_BUILD，CI 或多 JDK 机器能显式指定；下面那串路径只是兜底猜测
-locateJavaHomeForRequiredVersion() {
-    if [[ -n "${JAVA_HOME_FOR_BUILD:-}" && -x "${JAVA_HOME_FOR_BUILD}/bin/java" ]]; then
-        printf '%s\n' "${JAVA_HOME_FOR_BUILD}"
-        return 0
-    fi
+# JDK 解析放在 scripts/lib 里，客户端脚本共用同一份：两个产品都要求 17，各写一遍迟早漏更新一处。
+source "${SCRIPTS_DIRECTORY}/lib/resolve-java-home.sh"
 
-    local candidate
-    for candidate in \
-        "/Library/Java/JavaVirtualMachines/temurin-${REQUIRED_JAVA_SPECIFICATION_VERSION}.jdk/Contents/Home" \
-        "/Library/Java/JavaVirtualMachines"/*"${REQUIRED_JAVA_SPECIFICATION_VERSION}"*".jdk/Contents/Home" \
-        "/usr/lib/jvm/temurin-${REQUIRED_JAVA_SPECIFICATION_VERSION}-jdk-amd64" \
-        "/usr/lib/jvm/java-${REQUIRED_JAVA_SPECIFICATION_VERSION}-openjdk-amd64" \
-        "/usr/lib/jvm/java-${REQUIRED_JAVA_SPECIFICATION_VERSION}-openjdk" \
-        "${JAVA_HOME:-}"; do
-        if [[ -n "${candidate}" && -x "${candidate}/bin/java" ]]; then
-            printf '%s\n' "${candidate}"
-            return 0
-        fi
-    done
-
-    return 1
-}
-
-# 看 JDK 自报的主版本号，免得目录名带 17、实际却不是 17
-javaSpecificationVersionOf() {
-    "${1}/bin/java" -XshowSettings:properties -version 2>&1 \
-        | sed -n 's/^ *java\.specification\.version = //p' \
-        | head -n 1
-}
-
-resolvedJavaHome="$(locateJavaHomeForRequiredVersion || true)"
+resolvedJavaHome="$(locateJavaHomeForVersion "${REQUIRED_JAVA_SPECIFICATION_VERSION}" || true)"
 
 if [[ -z "${resolvedJavaHome}" ]]; then
     printf '错误：未在本机找到 JDK %s。\n' "${REQUIRED_JAVA_SPECIFICATION_VERSION}" >&2
