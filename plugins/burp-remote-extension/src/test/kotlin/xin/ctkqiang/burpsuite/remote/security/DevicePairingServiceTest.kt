@@ -1,10 +1,6 @@
 /**
- * Burp Remote —— 安全层 / 配对服务测试
- *
- * 验证配对服务的判定逻辑：票据内容、一次性消费、有效期、会话标识一致性与拒绝原因。
- * 用例不启动 Burp，也不触碰网络——网卡探测与时钟都是注入的，因此结果在任何机器上都一致。
- *
- * @author 钟智强
+ * 配对服务测试：票据内容、一次性消费、有效期、会话标识一致性与拒绝原因。
+ * 时钟与网卡地址都是注入的，用例不启动 Burp、不碰网络，跑哪台机器结果都一样。
  */
 
 package xin.ctkqiang.burpsuite.remote.security
@@ -169,12 +165,7 @@ class DevicePairingServiceTest {
         assertTrue(pairedDeviceRegistry.snapshot().isEmpty())
     }
 
-    /**
-     * 造出一个与给定配对码不同的配对码。
-     *
-     * 翻转首位字符而不是写死一个字面量：写死的取值一旦恰好等于随机结果，用例就会偶发失败，
-     * 而那种失败与本用例要验证的规则毫无关系。
-     */
+    // 翻转首位而不是写死字面量：写死的值撞上随机结果就是偶发失败
     private fun otherPairingCode(pairingCode: PairingCode): String {
         val characters = pairingCode.value.toCharArray()
         characters[0] = if (characters[0] == ALTERNATIVE_CHARACTER) ORIGINAL_CHARACTER else ALTERNATIVE_CHARACTER
@@ -200,19 +191,12 @@ class DevicePairingServiceTest {
 
         private val TEST_INSTANT: Instant = Instant.parse("2026-01-01T00:00:00Z")
 
-        /** 超出配对有效期，用于验证过期之后的拒绝行为。 */
+        // 超过有效期就行，整小时是随手挑的
         private val EXPIRED_BY: Duration = Duration.ofHours(1)
     }
 }
 
-/**
- * 可推进的测试时钟。
- *
- * 用例绝不能依赖真实时间：一旦依赖，验证过期的用例就只能真的等待五分钟，或者在某台机器上
- * 偶发失败，而失败原因与被测逻辑毫无关系。这里让时间由测试显式推进，判定因此完全确定。
- *
- * @param initialInstant 起始时间点。
- */
+// 时间交给用例显式推进，不然验证过期的用例要么真等五分钟，要么偶发失败
 private class AdjustableClock(private var initialInstant: Instant) : Clock() {
     override fun instant(): Instant = initialInstant
 
@@ -220,21 +204,12 @@ private class AdjustableClock(private var initialInstant: Instant) : Clock() {
 
     override fun withZone(zone: ZoneId): Clock = this
 
-    /**
-     * 把时钟向前推进指定时长。
-     *
-     * @param duration 推进的时长。
-     */
     fun advanceBy(duration: Duration) {
         initialInstant = initialInstant.plus(duration)
     }
 }
 
-/**
- * 返回固定地址的地址解析器，使配对逻辑不依赖运行测试那台机器的网卡状态。
- *
- * @param advertisedHostAddress 每次解析都返回的地址。
- */
+// 地址写死，用例就不会随跑测机器的网卡状态变化
 private class FixedLocalNetworkAddressResolver(private val advertisedHostAddress: String) :
     LocalNetworkAddressResolver {
     override fun resolveAdvertisedHostAddress(): String = advertisedHostAddress

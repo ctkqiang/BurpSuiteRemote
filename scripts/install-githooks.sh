@@ -1,18 +1,8 @@
 #!/usr/bin/env bash
 #
-# Burp Remote —— Git 钩子安装脚本。
-#
-# 把仓库内的 .githooks/ 复制到 .git/hooks/ 并赋予可执行权限。
-#
-# 为什么不改用 core.hooksPath 指向 .githooks/：那需要改写本机的 git 配置，而钩子本身
-# 并不需要配置就能生效。复制只有一个来源（.githooks/ 受版本控制），安装动作幂等，
-# 也不会在用户不知情时改动他的 git 环境。代价是钩子更新后需要重新执行一次本脚本，
-# 这一点写在下面的提示里。
-#
-# 用法：
-#   scripts/install-githooks.sh
-#
-# @author 钟智强
+# 把仓库内的 .githooks/ 复制到 .git/hooks/ 并加可执行权限。
+# 不改成 core.hooksPath：那要动用本机 git 配置，而复制是幂等的、不碰用户环境。
+# 代价是钩子源文件改动后得重跑一次本脚本。
 
 set -euo pipefail
 

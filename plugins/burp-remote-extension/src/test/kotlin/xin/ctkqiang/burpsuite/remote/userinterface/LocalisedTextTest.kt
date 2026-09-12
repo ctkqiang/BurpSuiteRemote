@@ -1,10 +1,6 @@
 /**
- * Burp Remote —— 界面层 / 本地化测试
- *
- * 验证三份资源束齐备、回落规则正确、编码按 UTF-8 解码，以及位置参数替换生效。用例不依赖
- * 运行测试那台机器的语言设置：语言全部显式传入，因此结果在任何机器上都一样。
- *
- * @author 钟智强
+ * 本地化测试：三份资源束的键集合、回落规则、UTF-8 解码与位置参数替换。
+ * 语言全部显式传入；ResourceBundle 会把 JVM 默认语言环境插进候选链，坑就在这。
  */
 
 package xin.ctkqiang.burpsuite.remote.userinterface
@@ -32,14 +28,6 @@ class LocalisedTextTest {
         assertEquals("Pairing code", unsupportedLocaleText.text(TextKey.PAIRING_CODE_CAPTION))
     }
 
-    /**
-     * 这条用例针对一个真实踩过的缺陷：`ResourceBundle` 默认会把 JVM 的默认语言环境插进候选链，
-     * 于是「请求英语」在系统语言为中文的机器上会命中中文资源——`messages_en` 并不存在，
-     * 候选链先撞上兜底语言，根本轮不到基础资源束。
-     *
-     * 用例显式把默认语言环境改成中文，正是为了让「解析结果与运行机器的语言无关」这件事
-     * 在中文、英文两种环境下都会被执行到。
-     */
     @Test
     fun `the resolution ignores the ambient default locale`() {
         val ambientLocale = Locale.getDefault()

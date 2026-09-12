@@ -1,28 +1,8 @@
 #!/usr/bin/env bash
 #
-# Burp Remote —— Git 钩子 / 提交前静态闸门。
-#
-# 依据 .trae/rules.md §15「Formatting and enforcement」在提交前运行静态闸门：
-#
-#   ./gradlew ktlintCheck detekt
-#
-# §15 的原话是「格式永远不是评审意见，而是构建闸门」。既然它是闸门，最合适的位置就是在
-# 代码进入历史之前——不合规的代码一旦提交，后面每个读历史的人都要多绕一次。
-#
-# 范围上的两个自觉取舍：
-#
-#   1. 暂存区里没有 Kotlin 源码或 Gradle 脚本时直接跳过。改文档、改资源也跑一遍完整构建，
-#      只会让人开始用 --no-verify。
-#   2. 不跑单元测试与打包。那两件事由 scripts/build-burp-extension.sh 在推送前承担；
-#      测试要等编译，而「一个改动一次提交」的节奏恰恰要求提交足够快。
-#
-# 钩子不自己解析 JDK：工具链版本由 Gradle 的 jvmToolchain 声明并自动定位。若本机找不到
-# JDK 17 而构建失败，请把 JAVA_HOME 指向它，或改用 scripts/build-burp-extension.sh 指定的
-# 环境变量方式（两者最终都是让 Gradle 用上 17）。
-#
-# 安装：见 scripts/install-githooks.sh。
-#
-# @author 钟智强
+# 提交前跑 ktlintCheck detekt（.trae/rules.md §15）：格式是构建闸门，要在代码进历史前拦掉。
+# 只在暂存区有 .kt/.kts 时才跑，改个文档也全量构建只会逼人用 --no-verify；测试与打包交给
+# scripts/build-burp-extension.sh。JDK 版本由 Gradle jvmToolchain 定位，本机没有 17 就把 JAVA_HOME 指过去。
 
 set -euo pipefail
 

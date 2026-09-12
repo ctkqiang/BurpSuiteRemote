@@ -1,11 +1,6 @@
 /**
- * Burp Remote —— 界面层 / 二维码渲染测试
- *
- * 验证二维码能把票据完整地编码进去、并原始地解码回来。只断言「矩阵非空」是不够的：一张
- * 结构错误或内容被截断的二维码同样是「生成了」，而它到真机上只会表现为扫不出来。
- * 因此这里把矩阵交回给解码器，要求它还原出与票据文本逐字节相同的字符串。
- *
- * @author 钟智强
+ * 二维码渲染测试：把矩阵交回解码器，要求还原出与票据文本逐字节相同的字符串。
+ * 只断言「矩阵非空」不够——结构错或内容被截断的二维码同样是「生成了」，到真机上只是扫不出来。
  */
 
 package xin.ctkqiang.burpsuite.remote.userinterface
@@ -42,19 +37,11 @@ class PairingQrCodeRendererTest {
         val qrCodeModules = PairingQrCodeRenderer.render(createPairingTicket())
 
         assertEquals(qrCodeModules.width, qrCodeModules.height)
-        // 二维码左上角必定是定位图案的深色角点。它一旦不是深色，就说明矩阵上游被补过边：
-        // 那样绘制层会再留一次静默区，图案因此变小，等于白白牺牲可扫描性。
+        // 左上角必然是深色角点；若不是，说明矩阵上游被补过边，绘制层会再补一次静默区、图案白变小
         assertTrue(qrCodeModules.get(0, 0))
     }
 
-    /**
-     * 把模块矩阵还原成扫描器真正看到的黑白位图并解码。
-     *
-     * 有两处必须按真机画面补齐，否则用例验证的就不是扫描器会遇到的那张图：
-     * 一是静默区——渲染器输出的矩阵刻意不含它，而绘制层会补上（见 `PairingQrCodeView`）；
-     * 二是模块尺寸——屏幕上每个模块占据多个物理像素，把「1 像素 1 模块」交给解码器，
-     * 等于要求它在远低于任何真实摄像头的分辨率下工作。
-     */
+    // 真机上前有静默区、每个模块占多个像素，不补齐就是拿远低于摄像头的分辨率去解码
     private fun decodeQrCode(qrCodeModules: BitMatrix): String {
         val whitePixel = Color.WHITE.rgb
         val blackPixel = Color.BLACK.rgb
@@ -74,15 +61,6 @@ class PairingQrCodeRendererTest {
         return QRCodeReader().decode(BinaryBitmap(HybridBinarizer(luminanceSource))).text
     }
 
-    /**
-     * 把其中一个模块涂成给定的像素值。
-     *
-     * @param pixels 目标像素缓冲区，按行优先排列。
-     * @param pixelSide 位图的边长，单位为像素。
-     * @param moduleRow 模块所在行。
-     * @param moduleColumn 模块所在列。
-     * @param modulePixel 该模块对应的像素值。
-     */
     private fun fillModule(
         pixels: IntArray,
         pixelSide: Int,
@@ -114,7 +92,7 @@ class PairingQrCodeRendererTest {
 
         private const val QUIET_ZONE_SIDES_PER_AXIS = 2
 
-        /** 每个模块在解码输入中占据的像素边长，用于模拟真机上的模块尺寸。 */
+        // 真机上模块占多个物理像素，给解码器「1 像素 1 模块」会解不出来
         private const val PIXELS_PER_MODULE = 4
     }
 }

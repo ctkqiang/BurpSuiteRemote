@@ -1,34 +1,18 @@
 #!/usr/bin/env bash
 #
-# Burp Remote —— Git 钩子 / 提交信息校验。
-#
-# 依据 .trae/rules.md §14「Git and workflow rules」校验提交信息：
-#
-#   1. 采用 Conventional Commits 形式：<类型>(<范围>): <描述>
-#   2. 范围只能取自 §14 列出的五个：plugins、client、protocol、docs、build
-#   3. 主题一行、描述非空、不以句号收尾
-#   4. 主题按字节计不超过 100
-#
-# 为什么把规范做成钩子而不是写成评审意见：格式问题应当在提交那一刻被拒绝，而不是等到评审
-# 时由人去数标点。评审的时间应该花在逻辑上，不该花在标点上。
-#
-# 安装：见 scripts/install-githooks.sh。
-#
-# @author 钟智强
+# 校验提交信息是否符合 .trae/rules.md §14：Conventional Commits 形式、范围限定在
+# plugins/client/protocol/docs/build、描述非空且不以句号收尾、主题按字节不超过 100。
+# 做成钩子是因为格式问题要在提交那一刻拦掉，别留到评审时让人去数标点。
 
 set -euo pipefail
 
 readonly commit_message_file_path="$1"
 
-# 取第一条非空、非注释行作为主题。
-#
-# 用 awk 而不是 grep 加 head：git 会把注释行（以 # 开头）以及 --verbose 时的整段 diff
-# 一并写进这个文件，因此不能简单取第一行；而 grep 在「一行都没匹配上」时返回非零，
-# 配合 set -e 会在打印出有用的错误信息之前就让脚本悄悄退出。
+# 取第一条非空非注释行；git 会把 # 注释和 --verbose 的 diff 一起写进这个文件，所以不能取第一行。
+# 用 awk 而非 grep：grep 一行都没匹配上时返回非零，配合 set -e 会静默退出。
 subject_text="$(awk 'NF && $1 != "#" { print; exit }' "${commit_message_file_path}")"
 
-# git 自动生成的合并、回滚与修正信息不受人工规范约束，直接放行：为它们报错只会逼人使用
-# --no-verify，而一旦养成这个习惯，钩子对真正的提交也就失效了。
+# git 自动生成的合并/回滚/fixup 消息直接放行，为它们报错只会逼人用 --no-verify
 case "${subject_text}" in
     "Merge "* | "Revert "* | "fixup! "* | "squash! "*)
         exit 0
@@ -54,9 +38,7 @@ if ! printf '%s' "${subject_text}" | grep -Eq "${conventional_commit_pattern}"; 
     exit 1
 fi
 
-# 主题长度按字节计并放宽到 100，而不是英文习惯的 72：一个中文字符在 UTF-8 下占 3 字节，
-# 若按 72 字节限制，一个正常的中文主题（约 24 字）就会被误拒，然后所有人都会开始用
-# --no-verify。放宽之后的实际效果是「中文主题约 33 字、英文主题约 100 字符」。
+# 按字节放宽到 100：中文一个字占 3 字节，卡 72 会误拒正常的中文主题
 subject_byte_length="$(printf '%s' "${subject_text}" | wc -c | tr -d '[:space:]')"
 
 if (( subject_byte_length > 100 )); then
