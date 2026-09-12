@@ -27,4 +27,20 @@ enum class RemoteMessageType {
     /** 断点续传消息。 */
     @SerialName("resume")
     Resume,
+
+    /** 建立连接消息，事件通道握手的第一步。 */
+    @SerialName("connect")
+    Connect,
+
+    /** 身份认证消息，事件通道握手的第二步。 */
+    @SerialName("authenticate")
+    Authenticate,
+
+    /** 设备配对消息。 */
+    @SerialName("pair")
+    Pair,
+
+    /** 传输层控制信号。 */
+    @SerialName("signal")
+    Signal,
 }

@@ -31,6 +31,7 @@ class RemoteStatusPanel(
     extensionName: String,
     private val clock: Clock,
     private val locale: Locale,
+    private val isRemoteServerRunning: () -> Boolean,
     private val pairingTicketSupplier: () -> PairingTicket,
     private val pairedDeviceSupplier: () -> List<PairedDevice>,
     private val pairedDeviceRevoker: (DeviceIdentifier) -> Unit,
@@ -60,6 +61,11 @@ class RemoteStatusPanel(
 
     // 初始为空，由 showFeedback 填入并在数秒后清空，不会长期占位。
     private val feedbackLabel = createSecondaryLabel()
+
+    // 服务已监听时这句「尚未开放」就不成立，因此它必须是一个可切换显示的字段，而不是构造期写死的一段文字。
+    private val pendingEndpointNoticeLabel = createSecondaryLabel(localisedText.text(TextKey.PENDING_ENDPOINT_NOTICE))
+
+    private val serverStatusValueLabel = JLabel()
 
     // 用 GridBagLayout：BorderLayout 会把子组件拉伸填满，二维码一旦不是正方形就扫不出来。
     private val qrCodeHolder = JPanel(GridBagLayout())
@@ -109,6 +115,7 @@ class RemoteStatusPanel(
 
         refreshPairingTicket()
         refreshPairedDevices()
+        refreshServerStatus()
     }
 
     // addNotify 是「已挂上显示树」的时机，在这里启动可以避免为从未显示过的面板空转定时器。
@@ -134,7 +141,7 @@ class RemoteStatusPanel(
 
         header.add(titleLabel)
         header.add(Box.createVerticalStrut(LINE_SPACING))
-        header.add(createSecondaryLabel(localisedText.text(TextKey.PENDING_ENDPOINT_NOTICE)))
+        header.add(pendingEndpointNoticeLabel)
         return header
     }
 
@@ -178,6 +185,7 @@ class RemoteStatusPanel(
             // 顺带刷新设备列表：这是当前唯一的人工刷新入口，设备能经网络配对后应改为由登记处主动通知。
             refreshPairingTicket()
             refreshPairedDevices()
+            refreshServerStatus()
         }
         actions.add(refreshButton)
         actions.add(Box.createHorizontalStrut(BUTTON_SPACING))
@@ -198,6 +206,8 @@ class RemoteStatusPanel(
         details.add(advertisedAddressValue)
         details.add(createSecondaryLabel(localisedText.text(TextKey.REMOTE_PORT_LABEL)))
         details.add(remotePortValueLabel)
+        details.add(createSecondaryLabel(localisedText.text(TextKey.SERVER_STATUS_LABEL)))
+        details.add(serverStatusValueLabel)
 
         // 钉在 WEST，宽度才收敛为两列的首选宽度；否则 BoxLayout 拉满后标签贴左、取值落到屏幕中央。
         val detailsRow = JPanel(BorderLayout())
@@ -208,6 +218,15 @@ class RemoteStatusPanel(
     // 排在运行参数之前：排错时「移除一台不该被信任的设备」比「端口是多少」紧迫。
     private fun buildPairedDeviceSection(): JPanel {
         return SectionCard(localisedText.text(TextKey.PAIRED_DEVICE_SECTION_HEADING), pairedDeviceRows)
+    }
+
+    // 读实时状态而不是构造期的快照：服务器可能在面板显示之后才启动或停止。
+    private fun refreshServerStatus() {
+        val isRunning = isRemoteServerRunning()
+        serverStatusValueLabel.text =
+            localisedText.text(if (isRunning) TextKey.SERVER_STATUS_RUNNING else TextKey.SERVER_STATUS_STOPPED)
+        // 服务已在监听时「尚未开放」已经不成立，留着只会把排查方向带到网络上。
+        pendingEndpointNoticeLabel.isVisible = !isRunning
     }
 
     // 读快照整体重建，界面不留本地副本：副本一旦与真实状态脱节，就会出现「已经踢掉的设备还列在表里」。

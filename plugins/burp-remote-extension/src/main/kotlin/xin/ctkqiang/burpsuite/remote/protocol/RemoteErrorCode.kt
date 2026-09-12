@@ -23,4 +23,12 @@ enum class RemoteErrorCode {
     /** 执行超时。 */
     @SerialName("timeout")
     Timeout,
+
+    /** 该操作尚未实现。诚实上报胜过编造数据，客户端据此得知能力缺口。 */
+    @SerialName("not_implemented")
+    NotImplemented,
+
+    /** 请求体超过允许的大小。 */
+    @SerialName("request_payload_too_large")
+    RequestPayloadTooLarge,
 }

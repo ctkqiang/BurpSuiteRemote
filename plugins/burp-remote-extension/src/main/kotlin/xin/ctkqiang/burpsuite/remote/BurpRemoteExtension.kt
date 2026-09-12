@@ -8,6 +8,13 @@ import burp.api.montoya.core.Registration
 import xin.ctkqiang.burpsuite.remote.protocol.DEFAULT_REMOTE_PORT
 import xin.ctkqiang.burpsuite.remote.security.DevicePairingService
 import xin.ctkqiang.burpsuite.remote.security.PairedDeviceRegistry
+import xin.ctkqiang.burpsuite.remote.transport.InMemoryRemoteEventStream
+import xin.ctkqiang.burpsuite.remote.transport.InMemoryRemoteOperationLog
+import xin.ctkqiang.burpsuite.remote.transport.RemoteAuditLogger
+import xin.ctkqiang.burpsuite.remote.transport.RemoteConnectionRegistry
+import xin.ctkqiang.burpsuite.remote.transport.RemoteControlGate
+import xin.ctkqiang.burpsuite.remote.transport.RemoteDeviceRateLimiter
+import xin.ctkqiang.burpsuite.remote.transport.RemoteHttpServer
 import xin.ctkqiang.burpsuite.remote.transport.SystemLocalNetworkAddressResolver
 import xin.ctkqiang.burpsuite.remote.userinterface.RemoteStatusPanel
 import java.time.Clock
@@ -22,14 +29,14 @@ class BurpRemoteExtension : BurpExtension {
     /**
      * 扩展初始化钩子，由 Burp 在加载完成后调用一次。
      *
-     * 声明名称、装配配对服务、注册标签页并登记卸载回调；卸载回调只能在仍是已加载状态时注册，所以注册句柄要一直存活。
+     * 装配远程端点、装配配对与安全闸门、注册标签页并登记卸载回调；卸载回调只能在仍是已加载状态时注册，所以注册句柄要一直存活。
      */
     override fun initialize(montoyaApi: MontoyaApi) {
         montoyaApi.extension().setName(EXTENSION_NAME)
         // 日志只记状态，不记配对码：Burp 输出面板常被整段复制进缺陷报告，凭证出现在那里就等于公开。
         montoyaApi.logging().logToOutput("Burp Remote 已加载：$EXTENSION_NAME")
 
-        // 时钟只建一次并注入各方：有效期由安全层判定、倒计时由界面展示，两者必须读同一个时间源。
+        // 时钟只建一次并注入各方：有效期由安全层判定、倒计时由界面展示、限流按它计算，三处必须读同一个时间源。
         val clock = Clock.systemUTC()
 
         // 登记处以同一个实例同时交给服务与界面：各持一份，界面就会显示与真实授权状态无关的列表。
@@ -43,12 +50,27 @@ class BurpRemoteExtension : BurpExtension {
                 remotePort = DEFAULT_REMOTE_PORT,
             )
 
+        val remoteHttpServer =
+            RemoteHttpServer(
+                devicePairingService = devicePairingService,
+                pairedDeviceRegistry = pairedDeviceRegistry,
+                controlGate = createControlGate(pairedDeviceRegistry, clock, montoyaApi),
+                connectionRegistry = RemoteConnectionRegistry(),
+                eventStream = InMemoryRemoteEventStream(),
+                logSink = montoyaApi.logging()::logToOutput,
+            )
+
+        // 先启动端点再建界面：界面要显示的是真实状态，晚一步启动会让它显示一瞬「未启动」。
+        remoteHttpServer.start()
+
         val statusPanel =
             RemoteStatusPanel(
                 extensionName = EXTENSION_NAME,
                 clock = clock,
                 // 语言在这里解析一次再注入，控件内部不读环境，于是它成了可替换的输入而不是隐式依赖。
                 locale = Locale.getDefault(),
+                // 界面每次刷新都现读，服务真被端口占用而没起来时，界面不会替它说谎。
+                isRemoteServerRunning = remoteHttpServer::isRunning,
                 pairingTicketSupplier = devicePairingService::openPairingSession,
                 pairedDeviceSupplier = pairedDeviceRegistry::snapshot,
                 // 用 lambda 而不是方法引用：移除方法返回是否命中，而面板只关心请求已发出、随后重读列表。
@@ -65,12 +87,27 @@ class BurpRemoteExtension : BurpExtension {
             montoyaApi.userInterface().registerSuiteTab(EXTENSION_NAME, statusPanel)
 
         montoyaApi.extension().registerUnloadingHandler {
+            // 先停服务器：端口与线程不清干净时，重新加载扩展会因为端口仍被自己占用而启动失败。
+            remoteHttpServer.stop()
             // 卸载时主动摘掉标签页：Burp 不替扩展回收组件，留着会残留界面，重载时还会叠出两个同名标签页。
             suiteTabRegistration.deregister()
 
             montoyaApi.logging().logToOutput("Burp Remote 正在卸载：$EXTENSION_NAME")
         }
     }
+
+    // 审计与限流只在这里装配：安全闸门要的是一个能写日志、能计时的实例，而不是让传输层自己去取 Burp API。
+    private fun createControlGate(
+        pairedDeviceRegistry: PairedDeviceRegistry,
+        clock: Clock,
+        montoyaApi: MontoyaApi,
+    ): RemoteControlGate =
+        RemoteControlGate(
+            pairedDeviceRegistry = pairedDeviceRegistry,
+            operationLog = InMemoryRemoteOperationLog(),
+            rateLimiter = RemoteDeviceRateLimiter(clock),
+            auditLogger = RemoteAuditLogger(montoyaApi.logging()::logToOutput),
+        )
 
     private companion object {
         // 产品名不参与本地化，Burp 的扩展列表只有英文，改名会和支持工单里记的扩展名对不上。

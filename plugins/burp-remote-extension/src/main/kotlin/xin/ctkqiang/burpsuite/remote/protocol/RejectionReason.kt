@@ -39,4 +39,8 @@ enum class RejectionReason {
     /** 配对码不匹配。 */
     @SerialName("pairing_code_mismatch")
     PairingCodeMismatch,
+
+    /** 控制命令缺少操作标识。没有它就无法保证幂等，因此直接拒绝而不是放行。 */
+    @SerialName("missing_operation_identifier")
+    MissingOperationIdentifier,
 }

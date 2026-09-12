@@ -46,6 +46,12 @@ internal object TextKey {
 
     const val REMOTE_PORT_LABEL = "remote_port_label"
 
+    const val SERVER_STATUS_LABEL = "server_status_label"
+
+    const val SERVER_STATUS_RUNNING = "server_status_running"
+
+    const val SERVER_STATUS_STOPPED = "server_status_stopped"
+
     // 操作反馈。
     const val COPY_SUCCEEDED_NOTICE = "copy_succeeded_notice"
 
