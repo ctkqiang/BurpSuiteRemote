@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  只用平台主题，不引 AppCompat 或 Material 组件库：界面全部是 Compose，不需要那套 XML 主题体系。
+  深浅两套在 values-night 里分开放，避免深色模式下先闪一帧浅色窗口背景。
+-->
+<resources>
+    <style name="Theme.BurpsuiteRemote" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
