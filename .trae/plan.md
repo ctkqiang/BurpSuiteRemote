@@ -178,8 +178,6 @@ UI state
 connection configuration
 ```
 
-This separation is critical.
-
 ```text
 BURP
   │
@@ -271,7 +269,7 @@ Offline-first
 
 # 4. Why Event Sourcing?
 
-Event sourcing is useful here because Burp Remote needs to understand **what happened**, not merely the current state.
+Event sourcing fits here: Burp Remote needs **what happened**, not just current state.
 
 Example:
 
@@ -515,7 +513,7 @@ Event envelope:
 }
 ```
 
-The sequence is essential for synchronization.
+Synchronization depends on the sequence number.
 
 ---
 
@@ -806,8 +804,6 @@ This enables idempotency.
 
 # 16. Idempotency
 
-This is extremely important.
-
 Suppose Android sends:
 
 ```text
@@ -1015,13 +1011,9 @@ User taps item
 Load full message
 ```
 
-This is critical for memory and performance.
-
 ---
 
 # 21. Local Saved History
-
-This is one of the application's major differentiators.
 
 The user can save Burp traffic locally:
 
@@ -1849,8 +1841,6 @@ sealed interface HistoryUserInterfaceIntent {
 }
 ```
 
-This matches Compose's state-driven architecture and unidirectional flow.
-
 ---
 
 # 42. UI State
@@ -2216,8 +2206,6 @@ Identifier and declaration names in the extension follow the same long-form, acr
 
 # 53. Burp Adapter Layer
 
-The adapter layer is extremely important.
-
 ```text
 Montoya
    │
@@ -2241,7 +2229,7 @@ JSON serializer
 Android
 ```
 
-That creates catastrophic coupling.
+That couples the wire format to Burp internals.
 
 ---
 
@@ -2355,7 +2343,7 @@ ADMIN
 
 # 57. Sensitive Data
 
-The application handles extremely sensitive material.
+The application handles sensitive material.
 
 Potential data:
 
@@ -2803,8 +2791,6 @@ Bookmark added
 Screenshot created
 ```
 
-This is where Event Sourcing becomes genuinely valuable.
-
 ---
 
 # 70. Timeline Projection
@@ -2872,8 +2858,6 @@ Investigation: API Authorization Test
 ├── Screenshot #2
 └── Notes
 ```
-
-This is significantly more useful than simply cloning Burp's tabs.
 
 ---
 
@@ -3589,8 +3573,6 @@ The resulting system should look like this:
 
 # 90. Architectural Rule
 
-The single most important rule for the entire project:
-
 > **Burp executes. Events describe what happened. CQRS separates intent from observation. Room stores local projections and archived history. Compose renders state.**
 
 Do not allow the Android application to become a second Burp.
@@ -3608,5 +3590,3 @@ INVESTIGATION WORKSPACE
 +
 SHARING / PRESENTATION TOOL
 ```
-
-That is what makes this project substantially more interesting than simply cloning the Burp UI onto Android.

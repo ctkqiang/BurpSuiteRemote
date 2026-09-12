@@ -6,9 +6,8 @@
 **License:** free and open source
 **Status:** binding. These rules override personal preference.
 
-> If a rule in this document conflicts with the illustrative pseudo-code in
-> `.trae/plan.md`, **this document wins**. `plan.md` describes *what* we build;
-> `rules.md` describes *how* we are allowed to write it.
+> If a rule here conflicts with the illustrative pseudo-code in `.trae/plan.md`,
+> **this document wins**.
 
 ---
 
@@ -54,7 +53,7 @@ BurpsuiteRemote/
 └── .trae/       # plan.md and rules.md
 ```
 
-### 1.2 Responsibility split — this is the single most important boundary
+### 1.2 Responsibility split
 
 ```text
 Burp Suite            executes HTTP, owns proxy history, owns intercept queue
@@ -66,8 +65,8 @@ client/               observes events, stores a local event journal, rebuilds
                       projections, renders state
 ```
 
-**The client must never behave as a second Burp.** It does not implement a proxy.
-It does not invent facts about Burp. It only projects facts that Burp produced.
+**The client must never behave as a second Burp.** No proxy, no invented facts
+about Burp — it projects only what Burp produced.
 
 ---
 
@@ -91,8 +90,8 @@ convention set in this repository.
 | Tests | JUnit 5, `kotlinx-coroutines-test`, Turbine, MockK, Room test helpers |
 
 **`plugins/` uses Kotlin to talk to the Montoya API.** Montoya is a Java API, and
-Kotlin on the JVM is fully interoperable with it. Use Kotlin, not Java, so that
-naming, comment and event-sourcing rules apply uniformly everywhere.
+Kotlin on the JVM interoperates with it directly. Use Kotlin, not Java, so the
+naming, comment and event-sourcing rules apply everywhere.
 
 **Must not** introduce Java sources. **Must not** mix Groovy `build.gradle` with
 Kotlin DSL.
@@ -511,8 +510,8 @@ interface BurpRemoteGateway {
 - `domain` → `data`
 - `domain` → `android` / `compose` / `room` / `okhttp` / `montoya`
 - a Composable → a Room `@Dao`
-- a Montoya type → a JSON serializer → the client (this creates catastrophic
-  protocol coupling; always map Montoya objects through an adapter first)
+- a Montoya type → a JSON serializer → the client (this couples the wire format
+  to Burp internals; map Montoya objects through an adapter first)
 
 ---
 
