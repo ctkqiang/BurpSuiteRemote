@@ -15,6 +15,9 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    // 用 api：领域模型公开的属性带着身份值类型，藏起来会让使用方拿到模型却读不到身份值。
+    api(project(":core:model"))
+
     implementation(libs.kotlinx.coroutines.core)
 
     testImplementation(libs.junit.jupiter)
