@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    // 远程层要按线上契约声明报文 DTO，序列化器由编译期生成，因此需要这个插件。
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
 }
 
@@ -23,8 +26,38 @@ kotlin {
     jvmToolchain(17)
 }
 
+// rules.md §2 指定 JUnit 5。安卓单元测试任务同样是 Test，因此这一条对它们一并生效。
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation(project(":domain"))
-    implementation(libs.androidx.datastore.preferences)
+
+    // 线上事件信封与机器码住在协议层，适配层只做「线上类型 → 领域类型」的翻译。
+    implementation(project(":core:protocol"))
+
     implementation(libs.kotlinx.coroutines.android)
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.datastore.preferences)
+
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.websockets)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.json)
+    implementation(libs.kotlinx.serialization.json)
+
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.mockk)
+
+    // REST 的用例用 MockEngine 驱动，不必起真插件；WebSocket 那部分没有替身，改测抽出来的纯判定。
+    testImplementation(libs.ktor.client.mock)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

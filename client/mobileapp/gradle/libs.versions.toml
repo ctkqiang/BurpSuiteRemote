@@ -15,6 +15,15 @@ room = "2.8.4"
 composeBom = "2025.11.00"
 activityCompose = "1.11.0"
 lifecycle = "2.9.4"
+
+# 2025-11-05 发布（Google Maven 上该 POM 的 Last-Modified），早于 AGP 8.13.2 的 2025-12-11；
+# 与 lifecycle 同走 2.9 线，底栏与各屏的返回栈都由它管。
+navigation = "2.9.6"
+
+# 1.6.2 是 camera 1.6 线在 Google Maven 上发布的稳定版，早于 AGP 8.13.2。
+camerax = "1.6.2"
+# 条码识别 17.3.0：模型随 APK 打包，不依赖设备上的 Play 服务。
+mlkitBarcodeScanning = "17.3.0"
 datastore = "1.1.7"
 coreKtx = "1.17.0"
 
@@ -35,7 +44,17 @@ androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx"
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+# 相机四件套：core 是抽象 API，camera2 是设备后端，lifecycle 让会话跟随界面生命周期，
+# view 提供承载预览的 PreviewView。
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
+# 二维码识别。配对票据是二维码里的 JSON 文本，解成 PairingTicket 由 core:protocol 负责。
+mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkitBarcodeScanning" }
 
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
@@ -49,6 +68,8 @@ compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-material3 = { module = "androidx.compose.material3:material3" }
+# 底栏的 NavigationBarItem 必须给 icon；核心图标集随 BOM 定版，不单独挑版本。
+compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
@@ -61,6 +82,9 @@ ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.re
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+# REST 命令与查询的单元测试用 MockEngine 驱动，不必起真服务器。WebSocket 那部分没有对应替身，
+# 握手与续传逻辑按纯函数测，端到端留给真机验证。
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }

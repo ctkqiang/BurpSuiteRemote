@@ -1,0 +1,304 @@
+package xin.ctkqiang.burpsuite.remote.mobileapp.data.remote
+
+import io.ktor.client.HttpClient
+import io.ktor.client.request.header
+import io.ktor.client.request.request
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
+import io.ktor.http.contentType
+import io.ktor.http.encodeURLPathPart
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.withTimeout
+import kotlinx.serialization.json.JsonElement
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.InterceptIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.OperationIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.RepeaterRequestIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.RemoteProtocolVersion
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.PairingAttempt
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteConnectionConfiguration
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteFailure
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemotePayload
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteResult
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteRuntimeState
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteTimeouts
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.ServerCapabilities
+import java.io.IOException
+import java.net.ConnectException
+import java.net.UnknownHostException
+
+/**
+ * REST 客户端：把插件端点翻译成领域调用。
+ *
+ * 只承载插件真实提供的东西：查询端点原样取回载荷，命令端点带上操作标识并把插件结局翻译成领域结果；
+ * 插件回「尚未实现」时如实映射成 [RemoteFailure.ActionNotSupported]，界面才知道该说「服务端还没做」。
+ */
+class RemoteRestClient(
+    private val httpClient: HttpClient,
+    private val deviceIdentifierProvider: RemoteDeviceIdentifierProvider,
+    private val timeouts: RemoteTimeouts,
+    private val operationIdentifierGenerator: OperationIdentifierGenerator = OperationIdentifierGenerator.random(),
+) : RemoteSnapshotSource {
+    /** 配对：把票据里的一次性配对码换成设备身份，对应 POST /v1/pair。 */
+    suspend fun pair(pairingAttempt: PairingAttempt): RemoteResult<DeviceIdentifier> {
+        val requestBody =
+            RemoteWireJson.instance.encodeToString(
+                RemoteClientMessage.serializer(),
+                RemoteClientMessage(
+                    protocolVersion = RemoteProtocolVersion.CURRENT_PROTOCOL_VERSION,
+                    messageType = RemoteClientMessageType.Pair,
+                    challengeIdentifier = pairingAttempt.challengeIdentifier,
+                    pairingCode = pairingAttempt.pairingCode,
+                ),
+            )
+        return when (
+            val payloadResult =
+                requestPayload(
+                    host = pairingAttempt.host,
+                    port = pairingAttempt.port,
+                    isTlsEnabled = pairingAttempt.isTlsEnabled,
+                    httpMethod = HttpMethod.Post,
+                    path = RemoteEndpointPath.PAIR,
+                    requestBody = requestBody,
+                )
+        ) {
+            is RemoteResult.Failed -> payloadResult
+            is RemoteResult.Succeeded -> RemoteResponseDecoder.decodePairingIdentity(payloadResult.value)
+        }
+    }
+
+    /** 读取插件运行态，对应 GET /v1/status。 */
+    suspend fun readRuntimeState(configuration: RemoteConnectionConfiguration): RemoteResult<RemoteRuntimeState> =
+        readQuery(configuration, RemoteEndpointPath.STATUS, RemoteResponseDecoder::decodeRuntimeState)
+
+    /** 读取插件自报能力，对应 GET /v1/capabilities。 */
+    suspend fun readCapabilities(configuration: RemoteConnectionConfiguration): RemoteResult<ServerCapabilities> =
+        readQuery(configuration, RemoteEndpointPath.CAPABILITIES, RemoteResponseDecoder::decodeCapabilities)
+
+    /** 取当前状态快照，对应 GET /v1/snapshot。 */
+    override suspend fun requestSnapshot(
+        configuration: RemoteConnectionConfiguration,
+    ): RemoteResult<RemoteRuntimeState> =
+        readQuery(configuration, RemoteEndpointPath.SNAPSHOT, RemoteResponseDecoder::decodeRuntimeState)
+
+    /** 读取远端历史列表原文，对应 GET /v1/history。 */
+    suspend fun readRemoteHistory(configuration: RemoteConnectionConfiguration): RemoteResult<RemotePayload> =
+        readQuery(configuration, RemoteEndpointPath.HISTORY, RemoteResponseDecoder::decodeHistoryPayload)
+
+    /** 按标识读取远端历史记录原文，对应 GET /v1/history/{historyIdentifier}。 */
+    suspend fun readRemoteHistoryMessage(
+        configuration: RemoteConnectionConfiguration,
+        historyIdentifier: HistoryIdentifier,
+    ): RemoteResult<RemotePayload> =
+        readQuery(
+            configuration,
+            RemoteEndpointPath.HISTORY + "/" + historyIdentifier.value.encodeURLPathPart(),
+            RemoteResponseDecoder::decodeHistoryPayload,
+        )
+
+    /** 放行一条被拦截的报文，对应 POST /v1/intercepts/{interceptIdentifier}/forward。 */
+    suspend fun forwardIntercept(
+        configuration: RemoteConnectionConfiguration,
+        interceptIdentifier: InterceptIdentifier,
+    ): RemoteResult<Unit> =
+        executeControlCommand(
+            configuration,
+            interceptPath(interceptIdentifier, RemoteEndpointPath.INTERCEPT_FORWARD_SUFFIX),
+        )
+
+    /** 丢弃一条被拦截的报文，对应 POST /v1/intercepts/{interceptIdentifier}/drop。 */
+    suspend fun dropIntercept(
+        configuration: RemoteConnectionConfiguration,
+        interceptIdentifier: InterceptIdentifier,
+    ): RemoteResult<Unit> =
+        executeControlCommand(
+            configuration,
+            interceptPath(interceptIdentifier, RemoteEndpointPath.INTERCEPT_DROP_SUFFIX),
+        )
+
+    /** 执行一条 Repeater 请求，对应 POST /v1/repeater/{repeaterRequestIdentifier}/execute。 */
+    suspend fun executeRepeater(
+        configuration: RemoteConnectionConfiguration,
+        repeaterRequestIdentifier: RepeaterRequestIdentifier,
+    ): RemoteResult<Unit> =
+        executeControlCommand(
+            configuration,
+            RemoteEndpointPath.REPEATER + "/" + repeaterRequestIdentifier.value.encodeURLPathPart() +
+                RemoteEndpointPath.REPEATER_EXECUTE_SUFFIX,
+        )
+
+    private suspend fun <Value> readQuery(
+        configuration: RemoteConnectionConfiguration,
+        path: String,
+        decode: (JsonElement) -> RemoteResult<Value>,
+    ): RemoteResult<Value> =
+        when (
+            val payloadResult =
+                requestPayload(
+                    host = configuration.host,
+                    port = configuration.port,
+                    isTlsEnabled = configuration.isTlsEnabled,
+                    httpMethod = HttpMethod.Get,
+                    path = path,
+                )
+        ) {
+            is RemoteResult.Failed -> payloadResult
+            is RemoteResult.Succeeded -> decode(payloadResult.value)
+        }
+
+    // 一次调用的完整链路：HTTP → 状态码 → 应答信封 → 版本校验 → 载荷。
+    private suspend fun requestPayload(
+        host: String,
+        port: Int,
+        isTlsEnabled: Boolean,
+        httpMethod: HttpMethod,
+        path: String,
+        requestBody: String? = null,
+    ): RemoteResult<JsonElement> {
+        val envelope =
+            when (
+                val envelopeResult =
+                    requestEnvelope(
+                        host = host,
+                        port = port,
+                        isTlsEnabled = isTlsEnabled,
+                        httpMethod = httpMethod,
+                        path = path,
+                        operationIdentifier = null,
+                        requestBody = requestBody,
+                    )
+            ) {
+                is RemoteResult.Failed -> return envelopeResult
+                is RemoteResult.Succeeded -> envelopeResult.value
+            }
+        RemoteResponseDecoder.decodeFailure(envelope)?.let { failure -> return RemoteResult.Failed(failure) }
+        val payload = envelope.payload
+        return if (payload == null) {
+            RemoteResult.Failed(RemoteFailure.MalformedServerResponse)
+        } else {
+            RemoteResult.Succeeded(payload)
+        }
+    }
+
+    // 命令类端点只多两样东西：操作标识请求头，以及「成功不带载荷」的结局判定。
+    private suspend fun executeControlCommand(
+        configuration: RemoteConnectionConfiguration,
+        path: String,
+    ): RemoteResult<Unit> =
+        when (
+            val envelopeResult =
+                requestEnvelope(
+                    host = configuration.host,
+                    port = configuration.port,
+                    isTlsEnabled = configuration.isTlsEnabled,
+                    httpMethod = HttpMethod.Post,
+                    path = path,
+                    operationIdentifier = operationIdentifierGenerator.generate(),
+                )
+        ) {
+            is RemoteResult.Failed -> envelopeResult
+            is RemoteResult.Succeeded -> RemoteResponseDecoder.decodeCommandOutcome(envelopeResult.value)
+        }
+
+    private suspend fun requestEnvelope(
+        host: String,
+        port: Int,
+        isTlsEnabled: Boolean,
+        httpMethod: HttpMethod,
+        path: String,
+        operationIdentifier: OperationIdentifier?,
+        requestBody: String? = null,
+    ): RemoteResult<RemoteResponseEnvelope> {
+        val bodyText =
+            when (
+                val bodyResult =
+                    sendRequest(restUrl(host, port, isTlsEnabled, path), httpMethod, operationIdentifier, requestBody)
+            ) {
+                is RemoteResult.Failed -> return bodyResult
+                is RemoteResult.Succeeded -> bodyResult.value
+            }
+        val envelope =
+            try {
+                RemoteWireJson.instance.decodeFromString(RemoteResponseEnvelope.serializer(), bodyText)
+            } catch (malformedResponse: IllegalArgumentException) {
+                return RemoteResult.Failed(RemoteFailure.MalformedServerResponse)
+            }
+        if (envelope.protocolVersion != RemoteProtocolVersion.CURRENT_PROTOCOL_VERSION) {
+            return RemoteResult.Failed(RemoteFailure.ProtocolVersionUnsupported)
+        }
+        return RemoteResult.Succeeded(envelope)
+    }
+
+    private suspend fun sendRequest(
+        url: String,
+        httpMethod: HttpMethod,
+        operationIdentifier: OperationIdentifier?,
+        requestBody: String?,
+    ): RemoteResult<String> =
+        try {
+            withTimeout(timeouts.requestMilliseconds) {
+                val deviceIdentifier = deviceIdentifierProvider.currentDeviceIdentifier()
+                val response =
+                    httpClient.request(url) {
+                        method = httpMethod
+                        deviceIdentifier?.let { identifier -> header(DEVICE_IDENTIFIER_HEADER, identifier.value) }
+                        operationIdentifier?.let { identifier ->
+                            header(OPERATION_IDENTIFIER_HEADER, identifier.value)
+                        }
+                        if (requestBody != null) {
+                            contentType(ContentType.Application.Json)
+                            setBody(requestBody)
+                        }
+                    }
+                val bodyText = response.bodyAsText()
+                if (response.status.isSuccess()) {
+                    RemoteResult.Succeeded(bodyText)
+                } else {
+                    RemoteResult.Failed(RemoteFailureMapper.fromHttpStatusCode(response.status.value))
+                }
+            }
+        } catch (requestTimeout: TimeoutCancellationException) {
+            RemoteResult.Failed(RemoteFailure.TimedOut)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (unreachableServer: ConnectException) {
+            RemoteResult.Failed(RemoteFailure.ServerUnavailable)
+        } catch (unresolvableHost: UnknownHostException) {
+            RemoteResult.Failed(RemoteFailure.ServerUnavailable)
+        } catch (transportFailure: IOException) {
+            RemoteResult.Failed(RemoteFailure.TransportFailure)
+        } catch (unexpectedFailure: Exception) {
+            RemoteResult.Failed(RemoteFailure.TransportFailure)
+        }
+
+    private fun interceptPath(
+        interceptIdentifier: InterceptIdentifier,
+        actionSuffix: String,
+    ): String = RemoteEndpointPath.INTERCEPTS + "/" + interceptIdentifier.value.encodeURLPathPart() + actionSuffix
+
+    private fun restUrl(
+        host: String,
+        port: Int,
+        isTlsEnabled: Boolean,
+        path: String,
+    ): String {
+        val scheme = if (isTlsEnabled) HTTPS_SCHEME else HTTP_SCHEME
+        return "$scheme://$host:$port$path"
+    }
+
+    private companion object {
+        // 身份走请求头；操作标识只有控制命令用得到，查询端点不带它。
+        const val DEVICE_IDENTIFIER_HEADER = "X-Burp-Remote-Device-Identifier"
+
+        const val OPERATION_IDENTIFIER_HEADER = "X-Burp-Remote-Operation-Identifier"
+
+        // 插件侧目前只提供明文传输；打开 TLS 只是改用加密方案，不代表链路已经加密。
+        const val HTTP_SCHEME = "http"
+        const val HTTPS_SCHEME = "https"
+    }
+}
