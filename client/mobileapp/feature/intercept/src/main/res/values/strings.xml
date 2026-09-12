@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intercept_title">Intercept queue</string>
+    <string name="intercept_empty">Nothing is waiting in the intercept queue.</string>
+    <string name="intercept_absent_value">—</string>
+
+    <string name="intercept_state_pending">Pending</string>
+    <string name="intercept_state_modified">Modified</string>
+    <string name="intercept_state_forwarded">Forwarded</string>
+    <string name="intercept_state_dropped">Dropped</string>
+
+    <string name="intercept_detail_title">Intercept item</string>
+    <string name="intercept_detail_loading">Loading this intercept item…</string>
+    <string name="intercept_detail_not_found">This intercept item is not in the local projection any more.</string>
+
+    <string name="intercept_detail_request_heading">Request</string>
+    <string name="intercept_detail_request_line_label">Request line</string>
+    <string name="intercept_detail_host_label">Host</string>
+    <string name="intercept_detail_state_label">Queue state</string>
+    <string name="intercept_detail_sequence_number_label">Event sequence number</string>
+    <string name="intercept_detail_created_at_label">Created at</string>
+    <string name="intercept_detail_updated_at_label">Last changed at</string>
+
+    <string name="intercept_detail_editor_heading">Modify</string>
+    <string name="intercept_detail_request_headers_label">Request headers</string>
+    <string name="intercept_detail_editor_local_only">These edits stay on this device: the plug-in has no intercept endpoint yet, so nothing is submitted.</string>
+
+    <string name="intercept_detail_actions_heading">Actions</string>
+    <string name="intercept_detail_action_submit">Apply modification</string>
+    <string name="intercept_detail_action_forward">Forward</string>
+    <string name="intercept_detail_action_drop">Drop</string>
+    <string name="intercept_detail_reason_command">the plug-in answers not_implemented for the intercept endpoints, and the client has no command port for them</string>
+</resources>

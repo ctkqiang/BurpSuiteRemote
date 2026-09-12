@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_title">Settings</string>
+    <string name="settings_appearance_title">Appearance</string>
     <string name="settings_theme_heading">Theme</string>
     <string name="settings_theme_automatic">Follow system</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
+
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_heading">Interface language</string>
+    <string name="settings_language_automatic">Follow system</string>
+    <!-- 语言名按各自的语言书写，三种语言里都一样。 -->
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_chinese">简体中文</string>
+    <string name="settings_language_german">Deutsch</string>
+
+    <string name="settings_security_title">Security</string>
+    <string name="settings_security_redaction_heading">Redaction</string>
+    <string name="settings_security_redaction_body">Sensitive values are masked in exported copies only. The archived original is never rewritten.</string>
+    <string name="settings_security_logging_heading">Logging</string>
+    <string name="settings_security_logging_body">Request and response bodies, cookies, Authorization headers and tokens are never written to the log.</string>
+    <string name="settings_security_pairing_heading">Pairing</string>
+    <string name="settings_security_pairing_body">A device must be paired before any control command is accepted. The local network is treated as untrusted.</string>
+    <string name="settings_security_reason">configurable redaction defaults need a settings port that does not exist yet</string>
+
+    <string name="settings_storage_title">Storage</string>
+    <string name="settings_storage_database_heading">Local database</string>
+    <string name="settings_storage_database_body">The event journal and its projections live in the private storage of this application. Nothing is written to shared storage.</string>
+    <string name="settings_storage_export_heading">Exports</string>
+    <string name="settings_storage_export_body">Export bundles are written only to the location you pick in the system file picker; this app keeps no second copy.</string>
+    <string name="settings_storage_reason">clearing and migrating local data need storage ports that do not exist yet</string>
 </resources>

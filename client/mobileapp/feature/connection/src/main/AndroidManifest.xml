@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  相机权限由库模块声明，最终会合并进应用清单；放在这里是因为只有这一屏用得到相机，
+  哪天扫码屏拆走，权限也跟着走。
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- 没有相机的设备（平板、模拟器）也要能装：扫码入口在那种设备上会说明原因并让用户手输配对码。 -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+</manifest>

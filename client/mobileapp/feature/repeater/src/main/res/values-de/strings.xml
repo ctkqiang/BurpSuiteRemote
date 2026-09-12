@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="repeater_title">Repeater</string>
+
+    <string name="repeater_request_list_heading">Anfragen</string>
+    <string name="repeater_request_list_empty">Auf diesem Gerät sind keine Repeater-Anfragen gespeichert.</string>
+    <string name="repeater_action_create">Neue Anfrage</string>
+    <string name="repeater_reason_request_list">der Client hat noch keinen Port für Repeater-Anfragen</string>
+
+    <string name="repeater_execution_heading">Ausführung</string>
+    <string name="repeater_execution_empty">Es wurde noch nichts ausgeführt.</string>
+    <string name="repeater_action_execute">Ausführen</string>
+    <string name="repeater_reason_execute">das Plug-in antwortet auf den Repeater-Endpunkten mit not_implemented, und der Client hat keinen Befehlskanal dafür</string>
+</resources>

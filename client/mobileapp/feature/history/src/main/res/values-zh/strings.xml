@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">实时历史</string>
+    <string name="history_empty_message">还没有观测到任何请求。连接 Burp 之后这里会实时出现。</string>
+    <string name="history_absent_value">—</string>
+    <string name="history_response_length_value">%1$d 字节</string>
+
+    <string name="history_detail_title">请求详情</string>
+    <string name="history_detail_loading">正在读取这条记录……</string>
+    <string name="history_detail_not_found">本地投影里已经没有这条记录了。</string>
+    <string name="history_detail_value_yes">是</string>
+    <string name="history_detail_value_no">否</string>
+
+    <string name="history_detail_request_heading">请求</string>
+    <string name="history_detail_request_line_label">请求行</string>
+    <string name="history_detail_host_label">主机</string>
+    <string name="history_detail_scheme_label">协议方案</string>
+    <string name="history_detail_tls_label">TLS</string>
+    <string name="history_detail_destination_address_label">目标地址</string>
+    <string name="history_detail_listener_port_label">监听端口</string>
+
+    <string name="history_detail_response_heading">响应</string>
+    <string name="history_detail_status_code_label">状态码</string>
+    <string name="history_detail_mime_type_label">MIME 类型</string>
+    <string name="history_detail_response_length_label">响应长度</string>
+    <string name="history_detail_duration_label">耗时</string>
+    <string name="history_detail_duration_value">%1$d 毫秒</string>
+
+    <string name="history_detail_record_heading">本地记录</string>
+    <string name="history_detail_archive_state_label">归档状态</string>
+    <string name="history_detail_archive_state_live">实时</string>
+    <string name="history_detail_archive_state_archived">已归档</string>
+    <string name="history_detail_saved_at_label">归档时刻</string>
+    <string name="history_detail_annotation_count_label">注解条数</string>
+    <string name="history_detail_last_annotated_at_label">最后一条注解</string>
+    <string name="history_detail_title_label">标题</string>
+    <string name="history_detail_edited_label">是否改写</string>
+
+    <string name="history_detail_timeline_heading">时间线</string>
+    <string name="history_detail_sequence_number_label">事件序号</string>
+    <string name="history_detail_occurred_at_label">观测时刻</string>
+
+    <string name="history_detail_message_heading">报文</string>
+    <string name="history_detail_message_unavailable">本地没有捕获这条请求与响应的报文本体。</string>
+    <string name="history_detail_reason_message">客户端还没有报文本体的读取端口</string>
+
+    <string name="history_detail_action_share">分享或导出</string>
+    <string name="history_detail_action_send_to_repeater">发送到重放</string>
+    <string name="history_detail_reason_send_to_repeater">客户端还没有重放命令端口</string>
+</resources>

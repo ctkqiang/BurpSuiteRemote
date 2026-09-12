@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sharing_title">Teilen oder exportieren</string>
+    <string name="sharing_absent_value">—</string>
+    <string name="sharing_loading">Datensatz wird geladen…</string>
+    <string name="sharing_not_found">Dieser Datensatz ist nicht mehr in der lokalen Projektion.</string>
+
+    <string name="sharing_request_line_label">Anfragezeile</string>
+    <string name="sharing_host_label">Host</string>
+
+    <string name="sharing_scope_heading">Exportumfang</string>
+    <string name="sharing_scope_note">Exportiert wird nur, was auf diesem Gerät liegt. Anfrage- und Antwortbytes werden noch nicht erfasst; der Export enthält daher Metadaten, das Manifest und diesen Redaktionsbericht.</string>
+
+    <string name="sharing_scan_heading">Scan auf sensible Daten</string>
+    <string name="sharing_scan_summary">%1$d Zeilen wurden auf Zugangsdaten-Header, Bearer-Token, JSON Web Tokens und E-Mail-Adressen geprüft.</string>
+    <string name="sharing_scan_empty">In den geprüften Feldern fand sich nichts Sensibles.</string>
+    <string name="sharing_scan_finding">Zeile %1$d: %2$s</string>
+
+    <string name="sharing_kind_authorization_header">Authorization-Header</string>
+    <string name="sharing_kind_cookie_header">Cookie-Header</string>
+    <string name="sharing_kind_set_cookie_header">Set-Cookie-Header</string>
+    <string name="sharing_kind_api_key_header">API-Schlüssel-Header</string>
+    <string name="sharing_kind_bearer_token">Bearer-Token</string>
+    <string name="sharing_kind_json_web_token">JSON Web Token</string>
+    <string name="sharing_kind_email_address">E-Mail-Adresse</string>
+
+    <string name="sharing_preview_heading">Redigierte Vorschau</string>
+    <string name="sharing_preview_note">Die Redaktion gilt nur für diese Exportkopie. Das archivierte Original bleibt bytegenau und wird nie überschrieben.</string>
+
+    <string name="sharing_confirm_action">Bestätigen und exportieren</string>
+    <string name="sharing_exported">Das Exportpaket wurde am gewählten Ort geschrieben.</string>
+    <string name="sharing_export_failed">Das Exportpaket konnte nicht geschrieben werden. Versuche einen anderen Ort.</string>
+
+    <!-- 写进导出包 notice.txt 的说明；导出文件是给用户看的，因此文案同样走资源。 -->
+    <string name="sharing_export_notice">Burp Remote Exportpaket\n\nDieses Archiv wurde vom Burp Remote Mobile-Client erzeugt.\nEs enthält manifest.json, redaction-report.json und diesen Hinweis.\n\nUmfang: enthalten sind nur die auf dem Gerät gespeicherten Felder. Anfrage- und\nAntwortbytes werden von diesem Client noch nicht erfasst und sind daher nicht\nTeil des Exports.\n\nRedaktion: sensible Werte wurden nur in dieser Exportkopie maskiert. Das\narchivierte Original wurde nicht verändert.</string>
+</resources>

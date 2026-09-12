@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intercept_title">Intercept-Warteschlange</string>
+    <string name="intercept_empty">In der Intercept-Warteschlange wartet nichts.</string>
+    <string name="intercept_absent_value">—</string>
+
+    <string name="intercept_state_pending">Ausstehend</string>
+    <string name="intercept_state_modified">Bearbeitet</string>
+    <string name="intercept_state_forwarded">Weitergeleitet</string>
+    <string name="intercept_state_dropped">Verworfen</string>
+
+    <string name="intercept_detail_title">Intercept-Eintrag</string>
+    <string name="intercept_detail_loading">Eintrag wird geladen…</string>
+    <string name="intercept_detail_not_found">Dieser Eintrag ist nicht mehr in der lokalen Projektion.</string>
+
+    <string name="intercept_detail_request_heading">Anfrage</string>
+    <string name="intercept_detail_request_line_label">Anfragezeile</string>
+    <string name="intercept_detail_host_label">Host</string>
+    <string name="intercept_detail_state_label">Warteschlangenstatus</string>
+    <string name="intercept_detail_sequence_number_label">Ereignissequenznummer</string>
+    <string name="intercept_detail_created_at_label">Erstellt am</string>
+    <string name="intercept_detail_updated_at_label">Zuletzt geändert am</string>
+
+    <string name="intercept_detail_editor_heading">Bearbeiten</string>
+    <string name="intercept_detail_request_headers_label">Anfrage-Header</string>
+    <string name="intercept_detail_editor_local_only">Diese Änderungen bleiben auf diesem Gerät: das Plug-in hat noch keinen Intercept-Endpunkt, es wird nichts übermittelt.</string>
+
+    <string name="intercept_detail_actions_heading">Aktionen</string>
+    <string name="intercept_detail_action_submit">Änderung anwenden</string>
+    <string name="intercept_detail_action_forward">Weiterleiten</string>
+    <string name="intercept_detail_action_drop">Verwerfen</string>
+    <string name="intercept_detail_reason_command">das Plug-in antwortet auf den Intercept-Endpunkten mit not_implemented, und der Client hat keinen Befehlskanal dafür</string>
+</resources>

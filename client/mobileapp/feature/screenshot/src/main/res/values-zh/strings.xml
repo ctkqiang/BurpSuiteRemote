@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screenshot_title">截图</string>
+
+    <string name="screenshot_pipeline_heading">处理流程</string>
+    <string name="screenshot_pipeline_note">导入的图片按下面的阶段走一遍。原始图永远不会被覆盖。</string>
+    <string name="screenshot_stage_imported">1. 已导入</string>
+    <string name="screenshot_stage_analyzing">2. 正在分析版面</string>
+    <string name="screenshot_stage_detected">3. 已识别内容区域</string>
+    <string name="screenshot_stage_beautifying">4. 正在美化</string>
+    <string name="screenshot_stage_ready">5. 就绪</string>
+    <string name="screenshot_stage_failed">处理失败——原始图仍然完好</string>
+
+    <string name="screenshot_stored_heading">已存截图</string>
+    <string name="screenshot_stored_empty">这台设备上还没有截图。</string>
+    <string name="screenshot_reason_import">客户端还没有截图端口，无法导入</string>
+    <string name="screenshot_action_import">导入截图</string>
+</resources>

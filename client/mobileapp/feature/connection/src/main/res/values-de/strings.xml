@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connection_title">Burp-Verbindung</string>
+    <string name="connection_status_heading">Verbindungsstatus</string>
+    <string name="connection_server_address_label">Serveradresse</string>
+    <string name="connection_server_address_absent">Nicht konfiguriert</string>
+    <string name="connection_server_port_label">Port</string>
+
+    <string name="connection_scan_pairing_title">Pairing-Code scannen</string>
+    <string name="connection_scan_pairing_action">Scanner öffnen</string>
+    <string name="connection_scanner_close_action">Scanner schließen</string>
+    <string name="connection_scanner_permission_pending">Kameraberechtigung wird angefragt…</string>
+    <string name="connection_scanner_permission_denied">Der Kamerazugriff ist verweigert, daher kann der Pairing-QR-Code nicht gelesen werden. Erteile die Berechtigung erneut oder nutze die manuelle Eingabe unten. Falls Android die Abfrage nicht mehr zeigt, aktiviere die Kameraberechtigung in den Systemeinstellungen.</string>
+    <string name="connection_scanner_permission_request_action">Kamerazugriff erneut anfragen</string>
+
+    <string name="connection_ticket_heading">Pairing-Ticket</string>
+    <string name="connection_ticket_host_label">Host</string>
+    <string name="connection_ticket_port_label">Port</string>
+    <string name="connection_ticket_protocol_version_label">Protokollversion</string>
+    <string name="connection_ticket_expires_at_label">Gültig bis</string>
+    <string name="connection_ticket_expired">Dieses Ticket ist bereits abgelaufen. Erzeuge in Burp ein neues.</string>
+    <string name="connection_ticket_undecodable">Dieser QR-Code ist kein Pairing-Ticket. Scanne den Code im Burp-Remote-Tab.</string>
+
+    <string name="connection_manual_pairing_title">Pairing-Code manuell eingeben</string>
+    <string name="connection_manual_pairing_hint">Der Pairing-Code gehört zum Ticket, daher zuerst einmal scannen; was hier steht, ersetzt den Code aus dem Ticket.</string>
+    <string name="connection_manual_pairing_code_label">Pairing-Code</string>
+    <string name="connection_manual_pairing_action">Koppeln</string>
+
+    <string name="connection_retry_heading">Verbindung</string>
+    <string name="connection_retry_action">Verbindung erneut versuchen</string>
+
+    <string name="connection_pairing_succeeded">Das Plug-in hat dieses Gerät akzeptiert.</string>
+    <string name="connection_pairing_rejected">Das Plug-in hat den Pairing-Versuch abgelehnt. Scanne einen neuen Code.</string>
+
+    <string name="connection_reason_no_transport">der Remote-Transport ist noch nicht angeschlossen</string>
+    <string name="connection_reason_no_ticket">zuerst den Pairing-Code scannen</string>
+</resources>

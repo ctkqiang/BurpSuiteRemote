@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intercept_title">拦截队列</string>
+    <string name="intercept_empty">拦截队列里现在没有等待处理的请求。</string>
+    <string name="intercept_absent_value">—</string>
+
+    <string name="intercept_state_pending">待处理</string>
+    <string name="intercept_state_modified">已修改</string>
+    <string name="intercept_state_forwarded">已放行</string>
+    <string name="intercept_state_dropped">已丢弃</string>
+
+    <string name="intercept_detail_title">拦截项</string>
+    <string name="intercept_detail_loading">正在读取这条拦截项……</string>
+    <string name="intercept_detail_not_found">本地投影里已经没有这条拦截项了。</string>
+
+    <string name="intercept_detail_request_heading">请求</string>
+    <string name="intercept_detail_request_line_label">请求行</string>
+    <string name="intercept_detail_host_label">主机</string>
+    <string name="intercept_detail_state_label">队列状态</string>
+    <string name="intercept_detail_sequence_number_label">事件序号</string>
+    <string name="intercept_detail_created_at_label">产生时刻</string>
+    <string name="intercept_detail_updated_at_label">最后变更时刻</string>
+
+    <string name="intercept_detail_editor_heading">修改</string>
+    <string name="intercept_detail_request_headers_label">请求头</string>
+    <string name="intercept_detail_editor_local_only">这些编辑只留在本机：插件还没有拦截端点，因此不会提交任何改动。</string>
+
+    <string name="intercept_detail_actions_heading">动作</string>
+    <string name="intercept_detail_action_submit">提交修改</string>
+    <string name="intercept_detail_action_forward">放行</string>
+    <string name="intercept_detail_action_drop">丢弃</string>
+    <string name="intercept_detail_reason_command">插件对拦截端点回 not_implemented，客户端也还没有对应的命令端口</string>
+</resources>

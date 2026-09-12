@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screenshot_title">Screenshots</string>
+
+    <string name="screenshot_pipeline_heading">Verarbeitungskette</string>
+    <string name="screenshot_pipeline_note">Ein importiertes Bild durchläuft die folgenden Stufen. Das Original wird nie überschrieben.</string>
+    <string name="screenshot_stage_imported">1. Importiert</string>
+    <string name="screenshot_stage_analyzing">2. Layout wird analysiert</string>
+    <string name="screenshot_stage_detected">3. Inhaltsbereich erkannt</string>
+    <string name="screenshot_stage_beautifying">4. Wird aufbereitet</string>
+    <string name="screenshot_stage_ready">5. Fertig</string>
+    <string name="screenshot_stage_failed">Fehlgeschlagen — das Original ist unversehrt</string>
+
+    <string name="screenshot_stored_heading">Gespeicherte Screenshots</string>
+    <string name="screenshot_stored_empty">Auf diesem Gerät sind keine Screenshots gespeichert.</string>
+    <string name="screenshot_reason_import">der Client hat noch keinen Screenshot-Port, es kann nichts importiert werden</string>
+    <string name="screenshot_action_import">Screenshot importieren</string>
+</resources>

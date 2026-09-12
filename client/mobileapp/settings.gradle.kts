@@ -7,6 +7,7 @@ pluginManagement {
 }
 
 // AndroidX 与 AGP 只在 Google 仓库有，Maven Central 上找不到，两个都得列。
+// ML Kit 的条码识别也只发在 Google 仓库。
 dependencyResolutionManagement {
     repositories {
         google()
@@ -23,3 +24,11 @@ include(":domain")
 include(":data")
 include(":ui")
 include(":feature:settings")
+include(":feature:dashboard")
+include(":feature:history")
+include(":feature:connection")
+include(":feature:intercept")
+include(":feature:repeater")
+include(":feature:archive")
+include(":feature:screenshot")
+include(":feature:sharing")

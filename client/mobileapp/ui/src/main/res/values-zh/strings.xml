@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="components_not_implemented_reason">尚未实现：%1$s</string>
+    <string name="components_unavailable_reason">不可用：%1$s</string>
+    <string name="components_absent_value">—</string>
+
+    <!-- 实时与离线是全局口径（plan §59），因此写作固定词形，三种语言都不翻译。 -->
+    <string name="components_mode_live">LIVE</string>
+    <string name="components_mode_offline">OFFLINE</string>
+
+    <string name="navigation_section_dashboard">主面板</string>
+    <string name="navigation_section_live">实时</string>
+    <string name="navigation_section_archive">归档</string>
+    <string name="navigation_section_settings">设置</string>
+
+    <string name="navigation_entry_live_history">历史</string>
+    <string name="navigation_entry_live_intercept">拦截</string>
+    <string name="navigation_entry_live_repeater">重放</string>
+    <string name="navigation_entry_settings_burp_connection">Burp 连接</string>
+    <string name="navigation_entry_settings_appearance">外观</string>
+    <string name="navigation_entry_settings_language">语言</string>
+    <string name="navigation_entry_settings_security">安全</string>
+    <string name="navigation_entry_settings_storage">存储</string>
+
+    <string name="connection_state_disconnected">未连接</string>
+    <string name="connection_state_discovering">正在发现</string>
+    <string name="connection_state_connecting">正在连接</string>
+    <string name="connection_state_authenticating">正在认证</string>
+    <string name="connection_state_synchronising">正在同步</string>
+    <string name="connection_state_connected">已连接</string>
+    <string name="connection_state_reconnecting">正在重连</string>
+    <string name="connection_state_resynchronisation_required">需要重新同步</string>
+    <string name="connection_state_authentication_failed">认证失败</string>
+    <string name="connection_state_protocol_error">协议错误</string>
+    <string name="connection_state_timed_out">超时</string>
+    <string name="connection_state_server_unavailable">服务器不可达</string>
+</resources>

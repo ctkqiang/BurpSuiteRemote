@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screenshot_title">Screenshots</string>
+
+    <string name="screenshot_pipeline_heading">Processing pipeline</string>
+    <string name="screenshot_pipeline_note">An imported picture moves through the stages below. The original is never overwritten.</string>
+    <string name="screenshot_stage_imported">1. Imported</string>
+    <string name="screenshot_stage_analyzing">2. Analysing the layout</string>
+    <string name="screenshot_stage_detected">3. Content region detected</string>
+    <string name="screenshot_stage_beautifying">4. Beautifying</string>
+    <string name="screenshot_stage_ready">5. Ready</string>
+    <string name="screenshot_stage_failed">Failed — the original is still intact</string>
+
+    <string name="screenshot_stored_heading">Stored screenshots</string>
+    <string name="screenshot_stored_empty">No screenshots are stored on this device.</string>
+    <string name="screenshot_reason_import">the client has no screenshot port yet, so nothing can be imported</string>
+    <string name="screenshot_action_import">Import a screenshot</string>
+</resources>

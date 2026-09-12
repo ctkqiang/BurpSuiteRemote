@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">Live history</string>
+    <string name="history_empty_message">No requests observed yet. Connect Burp to see them here.</string>
+    <string name="history_absent_value">—</string>
+    <string name="history_response_length_value">%1$d B</string>
+
+    <string name="history_detail_title">Request detail</string>
+    <string name="history_detail_loading">Loading this record…</string>
+    <string name="history_detail_not_found">This record is not in the local projection any more.</string>
+    <string name="history_detail_value_yes">Yes</string>
+    <string name="history_detail_value_no">No</string>
+
+    <string name="history_detail_request_heading">Request</string>
+    <string name="history_detail_request_line_label">Request line</string>
+    <string name="history_detail_host_label">Host</string>
+    <string name="history_detail_scheme_label">Scheme</string>
+    <string name="history_detail_tls_label">TLS</string>
+    <string name="history_detail_destination_address_label">Destination address</string>
+    <string name="history_detail_listener_port_label">Listener port</string>
+
+    <string name="history_detail_response_heading">Response</string>
+    <string name="history_detail_status_code_label">Status code</string>
+    <string name="history_detail_mime_type_label">MIME type</string>
+    <string name="history_detail_response_length_label">Response length</string>
+    <string name="history_detail_duration_label">Duration</string>
+    <string name="history_detail_duration_value">%1$d ms</string>
+
+    <string name="history_detail_record_heading">Local record</string>
+    <string name="history_detail_archive_state_label">Archive state</string>
+    <string name="history_detail_archive_state_live">Live</string>
+    <string name="history_detail_archive_state_archived">Archived</string>
+    <string name="history_detail_saved_at_label">Saved at</string>
+    <string name="history_detail_annotation_count_label">Annotations</string>
+    <string name="history_detail_last_annotated_at_label">Last annotation</string>
+    <string name="history_detail_title_label">Title</string>
+    <string name="history_detail_edited_label">Edited</string>
+
+    <string name="history_detail_timeline_heading">Timeline</string>
+    <string name="history_detail_sequence_number_label">Event sequence number</string>
+    <string name="history_detail_occurred_at_label">Observed at</string>
+
+    <string name="history_detail_message_heading">Message</string>
+    <string name="history_detail_message_unavailable">The request and response bytes are not captured locally.</string>
+    <string name="history_detail_reason_message">the client has no message-body port yet</string>
+
+    <string name="history_detail_action_share">Share or export</string>
+    <string name="history_detail_action_send_to_repeater">Send to Repeater</string>
+    <string name="history_detail_reason_send_to_repeater">the client has no repeater-command port yet</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard_title">Burp Remote</string>
+    <string name="dashboard_target_host_label">Recent target host</string>
+    <string name="dashboard_absent_value">—</string>
+
+    <string name="dashboard_live_request_label">Live requests</string>
+    <string name="dashboard_intercepted_label">Intercepted</string>
+    <string name="dashboard_saved_label">Saved</string>
+
+    <string name="dashboard_entry_history">History</string>
+    <string name="dashboard_entry_intercept">Intercept</string>
+    <string name="dashboard_entry_repeater">Repeater</string>
+
+    <string name="dashboard_recent_heading">Recent</string>
+    <string name="dashboard_recent_empty">No requests observed yet. Connect Burp to see them here.</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard_title">Burp Remote</string>
+    <string name="dashboard_target_host_label">最近目标主机</string>
+    <string name="dashboard_absent_value">—</string>
+
+    <string name="dashboard_live_request_label">实时请求</string>
+    <string name="dashboard_intercepted_label">已拦截</string>
+    <string name="dashboard_saved_label">已保存</string>
+
+    <string name="dashboard_entry_history">历史</string>
+    <string name="dashboard_entry_intercept">拦截</string>
+    <string name="dashboard_entry_repeater">重放</string>
+
+    <string name="dashboard_recent_heading">最近</string>
+    <string name="dashboard_recent_empty">还没有观测到任何请求。连接 Burp 之后这里会实时出现。</string>
+</resources>

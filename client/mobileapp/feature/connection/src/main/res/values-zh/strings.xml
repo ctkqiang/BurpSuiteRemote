@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connection_title">Burp 连接</string>
+    <string name="connection_status_heading">连接状态</string>
+    <string name="connection_server_address_label">服务器地址</string>
+    <string name="connection_server_address_absent">尚未配置</string>
+    <string name="connection_server_port_label">端口</string>
+
+    <string name="connection_scan_pairing_title">扫码配对</string>
+    <string name="connection_scan_pairing_action">打开扫码</string>
+    <string name="connection_scanner_close_action">关闭扫码</string>
+    <string name="connection_scanner_permission_pending">正在等待相机权限……</string>
+    <string name="connection_scanner_permission_denied">相机权限被拒绝了，读不到配对二维码。可以再授权一次，或者用下面的手动入口。如果系统不再弹出授权框，请到系统设置里为本应用打开相机权限。</string>
+    <string name="connection_scanner_permission_request_action">重新申请相机权限</string>
+
+    <string name="connection_ticket_heading">配对票据</string>
+    <string name="connection_ticket_host_label">主机</string>
+    <string name="connection_ticket_port_label">端口</string>
+    <string name="connection_ticket_protocol_version_label">协议版本</string>
+    <string name="connection_ticket_expires_at_label">有效至</string>
+    <string name="connection_ticket_expired">这张票据已经过期了，请在 Burp 里重新生成一张。</string>
+    <string name="connection_ticket_undecodable">这个二维码不是配对票据。请扫 Burp Remote 标签页里显示的那一张。</string>
+
+    <string name="connection_manual_pairing_title">手动输入配对码</string>
+    <string name="connection_manual_pairing_hint">配对码是票据的一部分，所以要先扫码一次；这里填的码会覆盖票据里的那一个。</string>
+    <string name="connection_manual_pairing_code_label">配对码</string>
+    <string name="connection_manual_pairing_action">配对</string>
+
+    <string name="connection_retry_heading">连接</string>
+    <string name="connection_retry_action">重试连接</string>
+
+    <string name="connection_pairing_succeeded">插件已经接受了这台设备。</string>
+    <string name="connection_pairing_rejected">插件拒绝了这次配对。重新扫一张票据再试。</string>
+
+    <string name="connection_reason_no_transport">远程传输层尚未接通</string>
+    <string name="connection_reason_no_ticket">请先扫码取得配对票据</string>
+</resources>

@@ -38,7 +38,7 @@ fun SettingsScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize().padding(HORIZONTAL_PADDING)) {
             Text(
-                text = stringResource(R.string.settings_title),
+                text = stringResource(R.string.settings_appearance_title),
                 style = MaterialTheme.typography.headlineSmall,
             )
             Spacer(modifier = Modifier.height(SECTION_SPACING))

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="archive_title">Archive</string>
+    <string name="archive_absent_value">—</string>
+
+    <string name="archive_tab_saved_history">Saved history</string>
+    <string name="archive_tab_bookmarks">Bookmarks</string>
+    <string name="archive_tab_screenshots">Screenshots</string>
+
+    <string name="archive_saved_history_empty">Nothing has been saved yet. Saving is a control command, so it needs a live connection.</string>
+    <string name="archive_action_share">Share or export</string>
+
+    <string name="archive_bookmarks_empty">No bookmarked history is stored on this device.</string>
+    <string name="archive_reason_bookmarks">the client has no bookmark-projection port yet</string>
+
+    <string name="archive_screenshots_empty">No screenshots are stored on this device.</string>
+    <string name="archive_reason_screenshots">the client has no screenshot-port yet, and the image pipeline still lives in the data layer</string>
+    <string name="archive_screenshots_open_action">Open screenshot workspace</string>
+</resources>

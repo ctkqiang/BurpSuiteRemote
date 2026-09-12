@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="repeater_title">重放</string>
+
+    <string name="repeater_request_list_heading">请求列表</string>
+    <string name="repeater_request_list_empty">这台设备上还没有重放请求。</string>
+    <string name="repeater_action_create">新建请求</string>
+    <string name="repeater_reason_request_list">客户端还没有重放请求的读端口</string>
+
+    <string name="repeater_execution_heading">执行</string>
+    <string name="repeater_execution_empty">还没有执行过任何请求。</string>
+    <string name="repeater_action_execute">执行</string>
+    <string name="repeater_reason_execute">插件对重放端点回 not_implemented，客户端也还没有对应的命令端口</string>
+</resources>

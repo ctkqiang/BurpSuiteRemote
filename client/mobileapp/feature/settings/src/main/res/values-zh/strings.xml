@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_title">设置</string>
+    <string name="settings_appearance_title">外观</string>
     <string name="settings_theme_heading">主题</string>
     <string name="settings_theme_automatic">跟随系统</string>
     <string name="settings_theme_light">浅色</string>
     <string name="settings_theme_dark">深色</string>
+
+    <string name="settings_language_title">语言</string>
+    <string name="settings_language_heading">界面语言</string>
+    <string name="settings_language_automatic">跟随系统</string>
+    <!-- 语言名按各自的语言书写，三种语言里都一样。 -->
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_chinese">简体中文</string>
+    <string name="settings_language_german">Deutsch</string>
+
+    <string name="settings_security_title">安全</string>
+    <string name="settings_security_redaction_heading">脱敏</string>
+    <string name="settings_security_redaction_body">敏感值只在导出的副本里被打码，归档原件永远不会被改写。</string>
+    <string name="settings_security_logging_heading">日志</string>
+    <string name="settings_security_logging_body">请求与响应的报文本体、Cookie、Authorization 头与各类令牌都不会写进日志。</string>
+    <string name="settings_security_pairing_heading">配对</string>
+    <string name="settings_security_pairing_body">任何控制命令被接受之前，设备必须先完成配对。局域网按不可信网络对待。</string>
+    <string name="settings_security_reason">可配置的脱敏默认值需要一个目前还不存在的设置端口</string>
+
+    <string name="settings_storage_title">存储</string>
+    <string name="settings_storage_database_heading">本地数据库</string>
+    <string name="settings_storage_database_body">事件日志与它的投影放在本应用的私有目录里，不往共享存储写任何东西。</string>
+    <string name="settings_storage_export_heading">导出</string>
+    <string name="settings_storage_export_body">导出包只写进你在系统文件选择器里指定的位置，本应用不会另留一份。</string>
+    <string name="settings_storage_reason">清空与迁移本地数据需要目前还不存在的存储端口</string>
 </resources>

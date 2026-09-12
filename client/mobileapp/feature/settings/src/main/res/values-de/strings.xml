@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_title">Einstellungen</string>
+    <string name="settings_appearance_title">Darstellung</string>
     <string name="settings_theme_heading">Design</string>
     <string name="settings_theme_automatic">Systemeinstellung folgen</string>
     <string name="settings_theme_light">Hell</string>
     <string name="settings_theme_dark">Dunkel</string>
+
+    <string name="settings_language_title">Sprache</string>
+    <string name="settings_language_heading">Sprache der Oberfläche</string>
+    <string name="settings_language_automatic">Systemeinstellung folgen</string>
+    <!-- 语言名按各自的语言书写，三种语言里都一样。 -->
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_chinese">简体中文</string>
+    <string name="settings_language_german">Deutsch</string>
+
+    <string name="settings_security_title">Sicherheit</string>
+    <string name="settings_security_redaction_heading">Redaktion</string>
+    <string name="settings_security_redaction_body">Sensible Werte werden nur in exportierten Kopien maskiert. Das archivierte Original wird nie überschrieben.</string>
+    <string name="settings_security_logging_heading">Protokollierung</string>
+    <string name="settings_security_logging_body">Anfrage- und Antwortbytes, Cookies, Authorization-Header und Token landen nie im Protokoll.</string>
+    <string name="settings_security_pairing_heading">Kopplung</string>
+    <string name="settings_security_pairing_body">Bevor ein Steuerbefehl akzeptiert wird, muss das Gerät gekoppelt sein. Das lokale Netz gilt als nicht vertrauenswürdig.</string>
+    <string name="settings_security_reason">konfigurierbare Redaktionsvorgaben brauchen einen Port, den es noch nicht gibt</string>
+
+    <string name="settings_storage_title">Speicher</string>
+    <string name="settings_storage_database_heading">Lokale Datenbank</string>
+    <string name="settings_storage_database_body">Ereignisjournal und Projektionen liegen im privaten Speicher dieser App. In gemeinsamen Speicher wird nichts geschrieben.</string>
+    <string name="settings_storage_export_heading">Exporte</string>
+    <string name="settings_storage_export_body">Exportpakete werden nur an den im Systemdialog gewählten Ort geschrieben; diese App behält keine zweite Kopie.</string>
+    <string name="settings_storage_reason">Löschen und Migrieren lokaler Daten brauchen Speicher-Ports, die es noch nicht gibt</string>
 </resources>
