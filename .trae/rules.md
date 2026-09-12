@@ -299,123 +299,65 @@ value class DeviceIdentifier(val value: String)
 
 ## 4. Comment and documentation rules
 
-Comments are **comprehensive and mandatory**. They are not optional decoration;
-they are part of the deliverable.
+Comments are short, and they exist for one reason: to say something the code
+cannot say. A reason, a constraint, a trap. Everything else gets deleted.
 
-### 4.0 Language of comments
+### 4.0 Language
 
-**All comments, KDoc blocks and file headers must be written in Chinese
-(简体中文).** This applies to `plugins/`, `client/` and any Kotlin file in the
-repository.
+Prose is Chinese. Identifiers, wire strings and type names stay English.
 
-Rationale: the author and the primary reviewers operate in Chinese, and a
-comment that the reader cannot skim at full speed is a comment that will not be
-read. Identifier names stay in English (see §3) so the code remains greppable
-and interoperable; the *prose around* the code is Chinese.
+### 4.1 Where KDoc is required
 
-- KDoc `@param` / `@return` / `@throws` / `@property` tags keep their English
-  tag keywords, because those are parsed by tooling. The text after the tag is
-  Chinese.
-- Wire identifiers, type strings, file names and identifiers are never
-  translated. `intercept.forwarded` stays `intercept.forwarded`.
-- Chinese comments must not smuggle in abbreviations that §3.2 bans from code.
-  Write 「拦截项标识符」, not 「拦截ID」.
-
-### 4.1 Every public declaration has KDoc
-
-Public classes, interfaces, functions, properties and value classes **must**
-carry KDoc. KDoc **must** document:
-
-1. **What** the declaration is, in one sentence.
-2. **Why** it exists and which architectural role it plays.
-3. **Contract**: valid inputs, invariants, units, nullability, thread-safety.
-4. **Failure mode**: when it throws or returns a failure.
+- **Public** declarations carry one or two lines of KDoc. detekt's
+  `UndocumentedPublic*` rules enforce this, so a missing block fails the build.
+- **Internal and private** declarations carry no KDoc. Add one inline comment
+  only when the reason is invisible from the code.
+- No `@param`, `@return`, `@property`, `@throws` or `@author` tags. The signature
+  already says all of that, and a tag that repeats it is noise.
+- No file header block. At most one `//` line at the top saying what lives there.
+- Two places are forced by the gate even when the name looks obvious: every enum
+  entry, and every constructor property of a public data or value class. Keep each
+  to a few words (`/** 设备聚合。 */`, `@property value 文本取值`). For a wire enum
+  that one-liner is the only place the entry's meaning is written down.
 
 ```kotlin
-/**
- * 向本地只追加事件日志批量写入事件。
- *
- * 实现必须保证「整批写入」与「一条不写」二者之一成立，绝不出现写一半的中间态。
- * 事件一经写入不可修改、不可删除：日志是唯一事实来源，所有投影都由它重建。
- *
- * 本函数可从任意协程调度器调用，实现自行负责切换调度器，绝不阻塞调用方线程。
- *
- * @param events 待写入的事件列表，必须按 sequenceNumber 升序排列。
- * @throws EventStoreFailure 底层事务提交失败时抛出。
- */
-suspend fun appendEvents(events: List<StoredEvent>)
+/** 设备身份。授权判断与审计追溯都拿它当主键。 */
+@JvmInline
+@Serializable
+value class DeviceIdentifier(val value: String)
 ```
 
-### 4.2 File header
-
-Every non-trivial Kotlin file **must** start with a header block stating the
-module, the architectural layer and the reason the file exists.
+### 4.2 Reasons, not narration
 
 ```kotlin
-/**
- * Burp Remote —— 协议层 / 事件
- *
- * 声明与历史记录相关的事实类型全集。这些类型是 Burp 插件与移动端之间的线上契约，
- * 因此除非提升协议版本号，任何 @SerialName 都不允许改动。
- *
- * @author 钟智强
- */
+// 不接受匿名访问：局域网不等于可信网络
+if (deviceIdentifier == null) return RejectionReason.DeviceNotPaired
+
+// 每 200 条刷一次盘，逐条 fsync 会让导入慢一个数量级
+if (pendingCount % 200 == 0) flush(pendingCount)
 ```
 
-### 4.3 Comments explain *why*, never *what*
+Never: restatements of the code (`// 遍历数组`, `// 返回结果`), commented-out
+code, banner art, section dividers, or a `TODO` without an owner and an issue.
+
+### 4.3 Security comments name the threat
+
+Say what the attack is and what stops it. 「注意存在安全风险」 is not a comment.
 
 ```kotlin
-// 禁止——只是复述代码，且会随代码腐化
-// 计数器加一
-counter += 1
-
-// 正确——记录后来者无法从代码推断出的隐含约束
-// 检查点必须与投影更新放在同一个事务里推进。若进程在两者之间崩溃，
-// 检查点会声称投影已推进而实际没有，事件将被静默丢弃。
-projectionCheckpointDao.updateCheckpoint(projectionName, sequenceNumber)
+// 恒定时间比较：普通 == 在第一个不同字符处就返回，能被逐位试探出来
+MessageDigest.isEqual(expected, submitted)
 ```
 
-### 4.4 Domain events are documented as facts
+### 4.4 Long explanations belong in a document
 
-Every event type **must** document the fact it records and the moment it
-occurred, so that a reviewer can order it on the timeline without reading code.
+Rationale that needs a paragraph goes into `plan.md` or the commit message.
+A comment that outgrows two lines is a design note sitting in the wrong file.
 
-```kotlin
-/**
- * 记录 Burp 已将某个被拦截的请求放行至目标服务器这一事实。
- *
- * 这是「事实」而非「请求」：客户端绝不能乐观地自行产生该事件。只有当 Montoya
- * 运行时确认放行成功后，插件才发布它。
- *
- * @property interceptIdentifier 本次被放行的拦截项。
- * @property occurredAt Burp 实际执行放行的时刻。
- */
-data class InterceptForwarded(
-    val interceptIdentifier: InterceptIdentifier,
-    val occurredAt: Instant,
-) : InterceptEvent
-```
+### 4.5 Events state the fact they record
 
-### 4.5 Security-sensitive code must say so
-
-Any code that touches credentials, tokens, request bodies or the local database
-**must** carry a comment naming the threat it mitigates.
-
-```kotlin
-// 脱敏只作用于「导出副本」。已归档的原始报文永不改写——即使用户已执行分享，
-// 其证据链仍须保持逐字节精确。见 SECURITY.md「敏感数据处理」。
-val redactedExportPayload = sensitiveDataRedactor.redact(exportPayload)
-```
-
-### 4.6 Forbidden comments
-
-- Commented-out code. Delete it; version control remembers.
-- Redundant restatements of the declaration name.
-- `TODO` without an owner and a tracking reference. Use
-  `// TODO(钟智强): <待办动作> —— <issue 链接>`.
-- Banner art, ASCII dividers, emoji decorations.
-- Comments that describe a plan instead of the code that exists.
-- Comments written in any language other than Chinese (see §4.0).
+An event's one-line KDoc says what happened; `occurredAt` is when it happened,
+not when the record was written.
 
 ---
 
