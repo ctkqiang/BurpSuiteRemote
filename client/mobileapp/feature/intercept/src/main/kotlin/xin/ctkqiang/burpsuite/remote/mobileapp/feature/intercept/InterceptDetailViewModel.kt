@@ -8,6 +8,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.InterceptIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.InterceptRecord
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.InterceptRepository
@@ -21,6 +25,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.InterceptReposi
 class InterceptDetailViewModel(
     interceptIdentifier: String,
     interceptRepository: InterceptRepository,
+    private val technicalLog: TechnicalLog = SilentTechnicalLog,
 ) : ViewModel() {
     private val draft = MutableStateFlow(RequestDraft())
 
@@ -37,11 +42,16 @@ class InterceptDetailViewModel(
 
     fun handleIntent(intent: InterceptDetailUserInterfaceIntent) {
         when (intent) {
-            is InterceptDetailUserInterfaceIntent.UpdateRequestLineInput ->
+            is InterceptDetailUserInterfaceIntent.UpdateRequestLineInput -> {
+                // 只记「改过请求行」，不记改成了什么：请求头里可能有凭据（rules.md §12）。
+                record(message = "请求行草稿变更")
                 draft.update { currentDraft -> currentDraft.copy(requestLineInput = intent.requestLineInput) }
+            }
 
-            is InterceptDetailUserInterfaceIntent.UpdateRequestHeadersInput ->
+            is InterceptDetailUserInterfaceIntent.UpdateRequestHeadersInput -> {
+                record(message = "请求头草稿变更")
                 draft.update { currentDraft -> currentDraft.copy(requestHeadersInput = intent.requestHeadersInput) }
+            }
         }
     }
 
@@ -58,6 +68,12 @@ class InterceptDetailViewModel(
             // 放行、丢弃、提交修改都要发控制命令，客户端现在没有这条通路。
             canSendCommand = false,
         )
+
+    private fun record(message: String) {
+        technicalLog.record(
+            TechnicalLogEvent(category = TechnicalLogCategory.UserInterface, message = message),
+        )
+    }
 
     private data class RequestDraft(
         val requestLineInput: String = "",

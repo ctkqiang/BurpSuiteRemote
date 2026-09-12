@@ -1,37 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="connection_title">Burp Connection</string>
+    <string name="connection_absent_value">—</string>
+    <string name="connection_mode_live">LIVE</string>
+    <string name="connection_mode_offline">OFFLINE</string>
+
     <string name="connection_status_heading">Connection status</string>
     <string name="connection_server_address_label">Server address</string>
     <string name="connection_server_address_absent">Not configured</string>
     <string name="connection_server_port_label">Port</string>
 
-    <string name="connection_scan_pairing_title">Scan pairing code</string>
-    <string name="connection_scan_pairing_action">Open scanner</string>
+    <string name="connection_state_disconnected">Disconnected</string>
+    <string name="connection_state_discovering">Discovering</string>
+    <string name="connection_state_connecting">Connecting</string>
+    <string name="connection_state_authenticating">Authenticating</string>
+    <string name="connection_state_synchronising">Synchronising</string>
+    <string name="connection_state_connected">Connected</string>
+    <string name="connection_state_reconnecting">Reconnecting</string>
+    <string name="connection_state_resynchronisation_required">Resynchronisation required</string>
+    <string name="connection_state_authentication_failed">Authentication failed</string>
+    <string name="connection_state_protocol_error">Protocol error</string>
+    <string name="connection_state_timed_out">Timed out</string>
+    <string name="connection_state_server_unavailable">Server unavailable</string>
+
+    <string name="connection_scan_heading">Scan pairing code</string>
+    <string name="connection_scan_headline">Point the camera at the QR code</string>
+    <string name="connection_scan_detail">Generate the code in the Burp Remote tab of the extension, then scan it. The code carries the address, the port and a one-time pairing code, so it is the only way to configure this device.</string>
+    <string name="connection_scan_action">Open scanner</string>
+
+    <string name="connection_scanner_status_searching">Looking for the QR code…</string>
+    <string name="connection_scanner_status_pending">Waiting for the camera permission…</string>
+    <string name="connection_scanner_status_permission_denied">Camera access is denied</string>
+    <string name="connection_scanner_status_undecodable">That code is not a pairing ticket</string>
+    <string name="connection_scanner_status_expired">That ticket has expired</string>
+    <string name="connection_scanner_status_protocol">Protocol version mismatch</string>
     <string name="connection_scanner_close_action">Close scanner</string>
-    <string name="connection_scanner_permission_pending">Waiting for the camera permission…</string>
-    <string name="connection_scanner_permission_denied">Camera access is denied, so the pairing QR code cannot be read. Grant the permission to scan, or use the manual entry below. If Android no longer shows the prompt, enable the camera permission for this app in system settings.</string>
+
+    <string name="connection_scanner_mode_camera">Camera</string>
+    <string name="connection_scanner_mode_manual">Pairing text</string>
+    <string name="connection_scanner_manual_headline">Scanning is not an option?</string>
+    <string name="connection_scanner_manual_detail">Paste the pairing text the extension shows next to the QR code. It goes through exactly the same validation and the same pairing request as a scanned code.</string>
+
+    <string name="connection_scanner_permission_denied_headline">Camera access is denied</string>
+    <string name="connection_scanner_permission_denied_detail">Without the camera the QR code cannot be read, and this device cannot be configured. Grant the permission to scan. If Android no longer shows the prompt, enable the camera permission for this app in system settings.</string>
     <string name="connection_scanner_permission_request_action">Grant camera access</string>
+    <string name="connection_scanner_permission_pending_headline">Waiting for the camera permission</string>
+    <string name="connection_scanner_permission_pending_detail">Android is asking for the camera permission. Once it is granted the viewfinder opens here.</string>
 
     <string name="connection_ticket_heading">Pairing ticket</string>
     <string name="connection_ticket_host_label">Host</string>
     <string name="connection_ticket_port_label">Port</string>
-    <string name="connection_ticket_protocol_version_label">Protocol version</string>
+    <string name="connection_ticket_protocol_version_label">Ticket protocol version</string>
     <string name="connection_ticket_expires_at_label">Valid until</string>
-    <string name="connection_ticket_expired">This ticket has already expired. Generate a new one in Burp.</string>
-    <string name="connection_ticket_undecodable">That QR code is not a pairing ticket. Scan the code shown in the Burp Remote tab.</string>
+    <string name="connection_ticket_absent_headline">No ticket scanned yet</string>
+    <string name="connection_ticket_absent_detail">Nothing has been scanned on this device, so there is no address, port or one-time code to pair with yet.</string>
 
-    <string name="connection_manual_pairing_title">Enter pairing code manually</string>
-    <string name="connection_manual_pairing_hint">The pairing code belongs to the scanned ticket, so scan once first; whatever you type here is used instead of the code inside the ticket.</string>
-    <string name="connection_manual_pairing_code_label">Pairing code</string>
+    <string name="connection_ticket_rejection_undecodable_headline">That QR code is not a pairing ticket</string>
+    <string name="connection_ticket_rejection_undecodable_detail">The code was read, but its content does not match the pairing-ticket contract. Scan the code shown in the Burp Remote tab of the extension.</string>
+    <string name="connection_ticket_rejection_expired_headline">This ticket has already expired</string>
+    <string name="connection_ticket_rejection_expired_detail">It was valid until %1$s. Generate a new code in the extension and scan it.</string>
+    <string name="connection_ticket_rejection_protocol_headline">Protocol version not supported</string>
+    <string name="connection_ticket_rejection_protocol_detail">The ticket declares protocol version %1$d; this client speaks version %2$d. Update whichever side is older and generate a new code.</string>
+
+    <string name="connection_manual_pairing_heading">Enter the pairing text by hand</string>
+    <string name="connection_manual_pairing_headline">Fallback when the code cannot be scanned</string>
+    <string name="connection_manual_pairing_hint">Paste the pairing text the extension shows next to the QR code. It goes through exactly the same pipeline as a scanned code, so both routes end in the same pairing request.</string>
+    <string name="connection_manual_pairing_text_label">Pairing text</string>
     <string name="connection_manual_pairing_action">Pair</string>
 
-    <string name="connection_retry_heading">Connection</string>
+    <string name="connection_pairing_result_heading">Pairing result</string>
+    <string name="connection_pairing_succeeded_headline">The plug-in accepted this device</string>
+    <string name="connection_pairing_succeeded_detail">The credential is stored on this device. Connection can now continue in the background.</string>
+    <string name="connection_pairing_rejection_code">the pairing code did not match the one the plug-in issued</string>
+    <string name="connection_pairing_rejection_session_expired">the pairing session already expired; generate a new code</string>
+    <string name="connection_pairing_rejection_session_unavailable">the plug-in does not know this pairing session any more; scan a fresh code</string>
+    <string name="connection_pairing_rejection_protocol">the two sides disagree on the protocol version</string>
+    <string name="connection_pairing_rejection_authentication">this device identity was refused</string>
+    <string name="connection_pairing_rejection_unreachable">the plug-in could not be reached; check the address, the port and that Burp is running</string>
+    <string name="connection_pairing_rejection_not_supported">the plug-in has not implemented this endpoint yet</string>
+    <string name="connection_pairing_rejection_unknown">the plug-in answered with a failure this client does not recognise</string>
+    <string name="connection_pairing_in_flight">Pairing…</string>
+
+    <string name="connection_unavailable_headline">This action is not available yet</string>
+    <string name="connection_reason_no_transport">the remote transport is not wired up yet in this build</string>
+    <string name="connection_reason_no_ticket">scan a pairing ticket first, or paste the pairing text into the field above</string>
+    <string name="connection_reason_ticket_unusable">the scanned ticket cannot be used as it stands; the reason is written above</string>
+
+    <string name="connection_paired_heading">Paired device</string>
+    <string name="connection_paired_state_paired">PAIRED</string>
+    <string name="connection_paired_state_unpaired">NOT PAIRED</string>
+    <string name="connection_paired_headline">Pairing is stored on this device</string>
+    <string name="connection_paired_detail_paired">The address and the port below come from the scanned ticket. Pair again to replace the credential, or clear the pairing to forget this device on both sides.</string>
+    <string name="connection_paired_detail_unpaired">No credential is stored yet. Scan a ticket to pair; the address and the port are written from it.</string>
+    <string name="connection_paired_host_label">Paired host</string>
+    <string name="connection_paired_port_label">Paired port</string>
+    <string name="connection_paired_re_pair_action">Pair again</string>
+    <string name="connection_paired_clear_action">Clear pairing</string>
+
+    <string name="connection_endpoint_heading">Server address and port</string>
+    <string name="connection_endpoint_headline">Where the plug-in listens</string>
+    <string name="connection_endpoint_detail">The default port is %1$d. Pairing writes these two values from the ticket; edit them here to point at a different host, then save.</string>
+    <string name="connection_endpoint_host_label">Host</string>
+    <string name="connection_endpoint_port_label">Port</string>
+    <string name="connection_endpoint_save_action">Save</string>
+
+    <string name="connection_retry_heading">Connect</string>
+    <string name="connection_retry_headline">Open the session to Burp</string>
+    <string name="connection_retry_detail">Connecting keeps a session open and streams events into the local journal. Pull down on the dashboard, or retry here after a failure.</string>
     <string name="connection_retry_action">Retry connection</string>
-
-    <string name="connection_pairing_succeeded">The plug-in accepted this device.</string>
-    <string name="connection_pairing_rejected">The plug-in rejected the pairing attempt. Scan a fresh code and try again.</string>
-
-    <string name="connection_reason_no_transport">the remote transport is not wired up yet</string>
-    <string name="connection_reason_no_ticket">scan the pairing code first</string>
 </resources>

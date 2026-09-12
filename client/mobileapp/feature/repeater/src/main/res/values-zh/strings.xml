@@ -1,14 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="repeater_title">重放</string>
+    <string name="repeater_subtitle">需要一条实时会话，以及一个执行端口</string>
+    <string name="repeater_mode_live">LIVE</string>
+    <string name="repeater_mode_offline">OFFLINE</string>
 
-    <string name="repeater_request_list_heading">请求列表</string>
-    <string name="repeater_request_list_empty">这台设备上还没有重放请求。</string>
-    <string name="repeater_action_create">新建请求</string>
-    <string name="repeater_reason_request_list">客户端还没有重放请求的读端口</string>
+    <string name="repeater_connection_heading">连接</string>
+    <string name="repeater_connection_state_label">会话状态</string>
+    <string name="repeater_connection_state_disconnected">未连接</string>
+    <string name="repeater_connection_state_discovering">正在发现插件</string>
+    <string name="repeater_connection_state_connecting">正在建立连接</string>
+    <string name="repeater_connection_state_authenticating">正在认证设备</string>
+    <string name="repeater_connection_state_synchronising">正在补齐事件</string>
+    <string name="repeater_connection_state_connected">已连接</string>
+    <string name="repeater_connection_state_reconnecting">正在重连</string>
+    <string name="repeater_connection_state_resynchronisation_required">需要重新取快照</string>
+    <string name="repeater_connection_state_authentication_failed">认证被拒绝</string>
+    <string name="repeater_connection_state_protocol_error">协议不一致</string>
+    <string name="repeater_connection_state_timed_out">握手超时</string>
+    <string name="repeater_connection_state_server_unavailable">插件不可达</string>
+
+    <string name="repeater_loading_headline">正在读取会话状态</string>
+    <string name="repeater_loading_detail">正在从本机投影里读会话状态。</string>
+    <string name="repeater_error_headline">会话状态读取失败</string>
+    <string name="repeater_error_read_failed">本机读不出会话状态</string>
+    <string name="repeater_error_action">重试</string>
+
+    <string name="repeater_request_list_heading">已保存的重放请求</string>
+    <string name="repeater_request_list_empty_headline">还没有任何重放请求</string>
+    <string name="repeater_request_list_empty_detail">本机还没有存过重放请求，空缺就是空缺，不会拿示例条目填上。</string>
 
     <string name="repeater_execution_heading">执行</string>
-    <string name="repeater_execution_empty">还没有执行过任何请求。</string>
+    <string name="repeater_execution_empty_headline">还没有执行过</string>
+    <string name="repeater_execution_empty_detail">执行结果本应来自插件；在这条通路存在之前，这一屏只显示会话状态，别的不显示。</string>
+
+    <string name="repeater_reason_headline">缺什么</string>
+    <string name="repeater_reason_request_list">客户端还没有重放投影的读端口</string>
+    <string name="repeater_reason_execute">客户端还没有重放命令端口</string>
+    <string name="repeater_action_create">新建重放请求</string>
     <string name="repeater_action_execute">执行</string>
-    <string name="repeater_reason_execute">插件对重放端点回 not_implemented，客户端也还没有对应的命令端口</string>
 </resources>

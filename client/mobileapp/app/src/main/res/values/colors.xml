@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  窗口底色：界面画出来之前只有它可见，因此它必须与主题的 background 是同一个值——两处不一致时，
+  冷启动会先闪一下另一种底色。设计令牌在 ui/theme 里，这两份资源是平台层的对应物。
+-->
+<resources>
+    <color name="window_background">#FFFFFFFF</color>
+</resources>

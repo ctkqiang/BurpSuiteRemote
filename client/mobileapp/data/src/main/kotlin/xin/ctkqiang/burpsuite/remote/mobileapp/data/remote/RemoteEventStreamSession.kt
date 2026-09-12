@@ -10,6 +10,10 @@ import io.ktor.websocket.readText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.EventEnvelope
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.RemoteProtocolVersion
@@ -34,6 +38,7 @@ internal class RemoteEventStreamSession(
     private val timeouts: RemoteTimeouts,
     private val onEventReceived: (JournalEvent) -> Unit,
     private val onConnectionStateChanged: (ConnectionState) -> Unit,
+    private val technicalLog: TechnicalLog = SilentTechnicalLog,
 ) {
     /**
      * 跑完一条会话；返回即表示这条会话已经结束，由调用方决定重连还是上报故障。
@@ -42,6 +47,28 @@ internal class RemoteEventStreamSession(
      * 提前发 RESUME 只会被当成一次顺序错误的握手。
      */
     suspend fun stream(
+        configuration: RemoteConnectionConfiguration,
+        deviceIdentifier: DeviceIdentifier,
+    ): RemoteSessionEnd {
+        technicalLog.record(
+            TechnicalLogEvent(
+                category = TechnicalLogCategory.EventStream,
+                message = "打开事件通道",
+                attributes = mapOf("host" to configuration.host, "port" to configuration.port.toString()),
+            ),
+        )
+        val sessionEnd = runSession(configuration, deviceIdentifier)
+        technicalLog.record(
+            TechnicalLogEvent(
+                category = TechnicalLogCategory.EventStream,
+                message = "事件通道会话结束",
+                attributes = mapOf("reason" to sessionEnd.name),
+            ),
+        )
+        return sessionEnd
+    }
+
+    private suspend fun runSession(
         configuration: RemoteConnectionConfiguration,
         deviceIdentifier: DeviceIdentifier,
     ): RemoteSessionEnd {
@@ -158,7 +185,15 @@ internal class RemoteEventStreamSession(
     }
 
     private suspend fun DefaultClientWebSocketSession.sendResume() {
-        sendMessage(RemoteResumeRequest.build(resumptionSequenceNumberProvider.currentSequenceNumber()))
+        val resumeAfterSequenceNumber = resumptionSequenceNumberProvider.currentSequenceNumber()
+        technicalLog.record(
+            TechnicalLogEvent(
+                category = TechnicalLogCategory.EventStream,
+                message = "提交续传基准",
+                attributes = mapOf("resumeAfterSequenceNumber" to resumeAfterSequenceNumber.toString()),
+            ),
+        )
+        sendMessage(RemoteResumeRequest.build(resumeAfterSequenceNumber))
     }
 
     private suspend fun DefaultClientWebSocketSession.sendMessage(message: RemoteClientMessage) {

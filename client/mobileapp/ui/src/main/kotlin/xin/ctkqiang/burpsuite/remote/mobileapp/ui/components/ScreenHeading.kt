@@ -1,15 +1,15 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.ui.components
 
 import androidx.annotation.StringRes
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.R
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
 /** 屏幕标题。各屏统一用它，免得同一层级的标题在不同屏上字号不一。 */
 @Composable
@@ -17,22 +17,11 @@ fun ScreenHeading(
     @StringRes titleResource: Int,
     modifier: Modifier = Modifier,
 ) {
-    Text(
+    val tokens = LocalBurpRemoteDesignTokens.current
+    BurpRemoteText(
         text = stringResource(titleResource),
-        style = MaterialTheme.typography.headlineSmall,
-        modifier = modifier,
-    )
-}
-
-/** 段落标题，比屏幕标题低一级。 */
-@Composable
-fun SectionHeading(
-    @StringRes titleResource: Int,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = stringResource(titleResource),
-        style = MaterialTheme.typography.titleMedium,
+        style = tokens.typography.display,
+        colour = tokens.colourScheme.contentPrimary,
         modifier = modifier,
     )
 }

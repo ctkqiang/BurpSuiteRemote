@@ -1,14 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="repeater_title">Repeater</string>
+    <string name="repeater_subtitle">Braucht eine laufende Sitzung und einen Ausführungskanal</string>
+    <string name="repeater_mode_live">LIVE</string>
+    <string name="repeater_mode_offline">OFFLINE</string>
 
-    <string name="repeater_request_list_heading">Anfragen</string>
-    <string name="repeater_request_list_empty">Auf diesem Gerät sind keine Repeater-Anfragen gespeichert.</string>
-    <string name="repeater_action_create">Neue Anfrage</string>
-    <string name="repeater_reason_request_list">der Client hat noch keinen Port für Repeater-Anfragen</string>
+    <string name="repeater_connection_heading">Verbindung</string>
+    <string name="repeater_connection_state_label">Sitzungszustand</string>
+    <string name="repeater_connection_state_disconnected">Nicht verbunden</string>
+    <string name="repeater_connection_state_discovering">Plug-in wird gesucht</string>
+    <string name="repeater_connection_state_connecting">Verbindung wird aufgebaut</string>
+    <string name="repeater_connection_state_authenticating">Gerät wird authentifiziert</string>
+    <string name="repeater_connection_state_synchronising">Ereignisse werden nachgeladen</string>
+    <string name="repeater_connection_state_connected">Verbunden</string>
+    <string name="repeater_connection_state_reconnecting">Neuverbindung läuft</string>
+    <string name="repeater_connection_state_resynchronisation_required">Neuer Snapshot erforderlich</string>
+    <string name="repeater_connection_state_authentication_failed">Authentifizierung abgelehnt</string>
+    <string name="repeater_connection_state_protocol_error">Protokollfehler</string>
+    <string name="repeater_connection_state_timed_out">Zeitüberschreitung</string>
+    <string name="repeater_connection_state_server_unavailable">Plug-in nicht erreichbar</string>
+
+    <string name="repeater_loading_headline">Sitzungszustand wird gelesen</string>
+    <string name="repeater_loading_detail">Der Sitzungszustand wird aus der lokalen Projektion gelesen.</string>
+    <string name="repeater_error_headline">Der Sitzungszustand konnte nicht gelesen werden</string>
+    <string name="repeater_error_read_failed">der Sitzungszustand ließ sich auf diesem Gerät nicht lesen</string>
+    <string name="repeater_error_action">Erneut versuchen</string>
+
+    <string name="repeater_request_list_heading">Gespeicherte Anfragen</string>
+    <string name="repeater_request_list_empty_headline">Es gibt keine Repeater-Anfrage</string>
+    <string name="repeater_request_list_empty_detail">Repeater-Anfragen werden auf diesem Gerät noch nicht gespeichert, und es wird nichts erfunden, um die Lücke zu füllen.</string>
 
     <string name="repeater_execution_heading">Ausführung</string>
-    <string name="repeater_execution_empty">Es wurde noch nichts ausgeführt.</string>
+    <string name="repeater_execution_empty_headline">Nichts wurde ausgeführt</string>
+    <string name="repeater_execution_empty_detail">Ausführungsergebnisse kämen vom Plug-in. Solange dieser Weg fehlt, zeigt diese Ansicht nur den Sitzungszustand.</string>
+
+    <string name="repeater_reason_headline">Was fehlt</string>
+    <string name="repeater_reason_request_list">dem Client fehlt noch ein Port für die Repeater-Projektion</string>
+    <string name="repeater_reason_execute">dem Client fehlt noch ein Repeater-Befehlskanal</string>
+    <string name="repeater_action_create">Neue Repeater-Anfrage</string>
     <string name="repeater_action_execute">Ausführen</string>
-    <string name="repeater_reason_execute">das Plug-in antwortet auf den Repeater-Endpunkten mit not_implemented, und der Client hat keinen Befehlskanal dafür</string>
 </resources>

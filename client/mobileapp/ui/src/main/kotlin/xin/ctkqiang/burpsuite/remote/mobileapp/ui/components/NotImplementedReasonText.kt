@@ -1,12 +1,12 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.ui.components
 
 import androidx.annotation.StringRes
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.R
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
 /**
  * 「尚未实现」的说明文案。
@@ -18,10 +18,11 @@ fun NotImplementedReasonText(
     @StringRes reasonResource: Int,
     modifier: Modifier = Modifier,
 ) {
-    Text(
+    val tokens = LocalBurpRemoteDesignTokens.current
+    BurpRemoteText(
         text = stringResource(R.string.components_not_implemented_reason, stringResource(reasonResource)),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = tokens.typography.label,
+        colour = tokens.colourScheme.contentSecondary,
         modifier = modifier,
     )
 }

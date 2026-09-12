@@ -1,47 +1,46 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation
 
-import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
-/** 分区索引屏：把 plan §43 里某个分区的子屏列出来。无状态，点哪一行由装配层决定。 */
+/**
+ * 分区索引屏：把 plan §43 里某个分区的子屏列出来。无状态，点哪一行由装配层决定。
+ *
+ * 这一屏不画标题：标题归外壳那一块唯一的顶栏，同层级再画一次等于一屏两个标题。
+ */
 @Composable
 fun SectionMenuScreen(
-    @StringRes titleResource: Int,
     entries: List<SectionMenuEntry>,
     onOpenRoute: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
+    Column(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    horizontal = BurpRemoteSpacing.Large,
+                    vertical = BurpRemoteSpacing.ExtraLarge,
+                ),
+        verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium),
     ) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = HORIZONTAL_PADDING, vertical = VERTICAL_PADDING),
-        ) {
-            Text(text = stringResource(titleResource), style = MaterialTheme.typography.headlineSmall)
-            Column(modifier = Modifier.padding(top = SECTION_SPACING)) {
-                entries.forEach { entry -> SectionMenuEntryRow(entry = entry, onOpenRoute = onOpenRoute) }
-            }
+        entries.forEach { entry ->
+            SectionMenuEntryRow(entry = entry, onOpenRoute = onOpenRoute)
         }
     }
 }
@@ -51,14 +50,17 @@ private fun SectionMenuEntryRow(
     entry: SectionMenuEntry,
     onOpenRoute: (String) -> Unit,
 ) {
-    Text(
-        text = stringResource(entry.labelResource),
-        style = MaterialTheme.typography.bodyLarge,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable { onOpenRoute(entry.route) }
-                .padding(vertical = ROW_PADDING),
+    val tokens = LocalBurpRemoteDesignTokens.current
+    BurpRemoteCard(
+        isInteractive = true,
+        onClick = { onOpenRoute(entry.route) },
+        content = {
+            BurpRemoteText(
+                text = stringResource(entry.labelResource),
+                style = tokens.typography.body,
+                colour = tokens.colourScheme.contentPrimary,
+            )
+        },
     )
 }
 
@@ -68,7 +70,6 @@ private fun SectionMenuEntryRow(
 private fun SectionMenuScreenLightPreview() {
     BurpsuiteRemoteTheme(themeMode = ThemeMode.Light) {
         SectionMenuScreen(
-            titleResource = TopLevelSection.Live.labelResource,
             entries = TopLevelSection.Live.indexEntries,
             onOpenRoute = {},
         )
@@ -80,14 +81,8 @@ private fun SectionMenuScreenLightPreview() {
 private fun SectionMenuScreenDarkPreview() {
     BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
         SectionMenuScreen(
-            titleResource = TopLevelSection.Live.labelResource,
             entries = TopLevelSection.Live.indexEntries,
             onOpenRoute = {},
         )
     }
 }
-
-private val HORIZONTAL_PADDING = 24.dp
-private val VERTICAL_PADDING = 24.dp
-private val SECTION_SPACING = 16.dp
-private val ROW_PADDING = 12.dp

@@ -36,6 +36,8 @@ dependencies {
 
     // 线上事件信封与机器码住在协议层，适配层只做「线上类型 → 领域类型」的翻译。
     implementation(project(":core:protocol"))
+    // 传输、事件通道与事件摄入都要按 rules.md §12 记结构化技术日志，端口由 core:common 提供。
+    implementation(project(":core:common"))
 
     implementation(libs.kotlinx.coroutines.android)
 

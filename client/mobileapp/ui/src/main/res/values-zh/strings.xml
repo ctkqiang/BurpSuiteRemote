@@ -3,6 +3,8 @@
     <string name="components_not_implemented_reason">尚未实现：%1$s</string>
     <string name="components_unavailable_reason">不可用：%1$s</string>
     <string name="components_absent_value">—</string>
+    <string name="components_navigate_back">返回</string>
+    <string name="components_scanner_toggle_torch">切换手电筒</string>
 
     <!-- 实时与离线是全局口径（plan §59），因此写作固定词形，三种语言都不翻译。 -->
     <string name="components_mode_live">LIVE</string>
@@ -34,4 +36,15 @@
     <string name="connection_state_protocol_error">协议错误</string>
     <string name="connection_state_timed_out">超时</string>
     <string name="connection_state_server_unavailable">服务器不可达</string>
+
+    <!-- 配对结论逐条分开写：每一种都对应不同的下一步，合并成一句等于让用户自己猜。 -->
+    <string name="pairing_conclusion_succeeded">配对成功，正在连接 Burp……</string>
+    <string name="pairing_conclusion_malformed_ticket">这段内容不是 Burp Remote 的配对票据。</string>
+    <string name="pairing_conclusion_ticket_expired">这张配对票据已经过期，请重新扫一张。</string>
+    <string name="pairing_conclusion_protocol_version_unsupported">协议版本不一致，请升级 Burp Remote 或插件。</string>
+    <string name="pairing_conclusion_device_not_paired">插件不认这台设备，请先在插件面板发起配对。</string>
+    <string name="pairing_conclusion_pairing_code_mismatch">配对码不匹配，请核对后重试。</string>
+    <string name="pairing_conclusion_pairing_session_expired">插件侧的配对会话已过期，请重新扫一张票据。</string>
+    <string name="pairing_conclusion_unreachable">插件不可达，请检查地址、端口与网络。</string>
+    <string name="pairing_conclusion_failed">配对失败，具体原因见技术日志。</string>
 </resources>

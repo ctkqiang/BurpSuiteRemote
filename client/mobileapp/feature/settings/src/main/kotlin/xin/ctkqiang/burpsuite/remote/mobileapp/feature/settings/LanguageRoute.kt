@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
 
 /**
  * 装配层：把语言端口交给 ViewModel，把状态与意图处理交给无状态的界面。
@@ -15,9 +17,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
  * 换语言要重建 Activity 才生效；重建是界面层的事（ViewModel 不该碰 Activity），因此效果在这里落地。
  */
 @Composable
-fun LanguageRoute(modifier: Modifier = Modifier) {
+fun LanguageRoute(
+    modifier: Modifier = Modifier,
+    technicalLog: TechnicalLog = SilentTechnicalLog,
+) {
     val languagePreferenceRepository = LocalLanguagePreferenceRepository.current
-    val viewModel: LanguageViewModel = viewModel { LanguageViewModel(languagePreferenceRepository) }
+    val viewModel: LanguageViewModel =
+        viewModel { LanguageViewModel(languagePreferenceRepository, technicalLog) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -30,5 +36,9 @@ fun LanguageRoute(modifier: Modifier = Modifier) {
         }
     }
 
-    LanguageScreen(uiState = uiState, onIntent = viewModel::handleIntent, modifier = modifier)
+    LanguageScreen(
+        uiState = uiState,
+        onIntent = viewModel::handleIntent,
+        modifier = modifier,
+    )
 }

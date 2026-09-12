@@ -1,32 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_appearance_title">外观</string>
+    <string name="settings_appearance_subtitle">整个应用的配色</string>
+
     <string name="settings_theme_heading">主题</string>
+    <string name="settings_theme_headline">这个选择作用于整个应用</string>
+    <string name="settings_theme_detail">每一屏、每个列表与标签的颜色都从主题取，所以在这里切换会立刻改变全应用配色。选择会存在本机。</string>
+    <string name="settings_theme_selected">当前选择</string>
+
     <string name="settings_theme_automatic">跟随系统</string>
+    <string name="settings_theme_automatic_headline">跟随操作系统</string>
+    <string name="settings_theme_automatic_detail">系统是浅色就用浅色，系统是深色就用深色；系统按自己的时间表切换时也跟着切。</string>
     <string name="settings_theme_light">浅色</string>
+    <string name="settings_theme_light_headline">始终保持浅色</string>
+    <string name="settings_theme_light_detail">即使系统是深色也保持浅色配色，适合在户外看。</string>
     <string name="settings_theme_dark">深色</string>
+    <string name="settings_theme_dark_headline">始终保持深色</string>
+    <string name="settings_theme_dark_detail">即使系统是浅色也保持深色配色，夜里看着更舒服。</string>
 
     <string name="settings_language_title">语言</string>
+    <string name="settings_language_subtitle">所有界面文字与提示的语言</string>
     <string name="settings_language_heading">界面语言</string>
-    <string name="settings_language_automatic">跟随系统</string>
+    <string name="settings_language_headline">换语言会重建一次界面</string>
+    <string name="settings_language_detail">所有可见文字都来自所选语言的资源，因此切换时界面会重建一次。已保存的数据不受影响。</string>
+    <string name="settings_language_selected">当前选择</string>
     <!-- 语言名按各自的语言书写，三种语言里都一样。 -->
+    <string name="settings_language_automatic">跟随系统</string>
     <string name="settings_language_english">English</string>
     <string name="settings_language_chinese">简体中文</string>
     <string name="settings_language_german">Deutsch</string>
 
     <string name="settings_security_title">安全</string>
+    <string name="settings_security_subtitle">这个客户端拒绝做什么</string>
     <string name="settings_security_redaction_heading">脱敏</string>
-    <string name="settings_security_redaction_body">敏感值只在导出的副本里被打码，归档原件永远不会被改写。</string>
+    <string name="settings_security_redaction_headline">只在导出副本上掩码</string>
+    <string name="settings_security_redaction_body">敏感值只在导出的副本里被掩码，归档的原始记录永不被改写。</string>
     <string name="settings_security_logging_heading">日志</string>
-    <string name="settings_security_logging_body">请求与响应的报文本体、Cookie、Authorization 头与各类令牌都不会写进日志。</string>
+    <string name="settings_security_logging_headline">报文本体与凭据不进日志</string>
+    <string name="settings_security_logging_body">请求与响应的报文体、Cookie、Authorization 头与令牌都不会写进日志。技术日志里只有标识、计数与失败原因名。</string>
     <string name="settings_security_pairing_heading">配对</string>
-    <string name="settings_security_pairing_body">任何控制命令被接受之前，设备必须先完成配对。局域网按不可信网络对待。</string>
+    <string name="settings_security_pairing_headline">没有配对就不接受控制命令</string>
+    <string name="settings_security_pairing_body">任何控制命令被接受之前，设备必须先完成配对。局域网被当作不可信网络。</string>
+    <string name="settings_security_reason_heading">暂时还配不了的项</string>
     <string name="settings_security_reason">可配置的脱敏默认值需要一个目前还不存在的设置端口</string>
 
     <string name="settings_storage_title">存储</string>
+    <string name="settings_storage_subtitle">本地数据放在哪，什么时候离开本机</string>
     <string name="settings_storage_database_heading">本地数据库</string>
-    <string name="settings_storage_database_body">事件日志与它的投影放在本应用的私有目录里，不往共享存储写任何东西。</string>
+    <string name="settings_storage_database_headline">只属于本应用</string>
+    <string name="settings_storage_database_body">事件日志与各投影位于本应用的私有存储里，不会写进共享存储。</string>
     <string name="settings_storage_export_heading">导出</string>
-    <string name="settings_storage_export_body">导出包只写进你在系统文件选择器里指定的位置，本应用不会另留一份。</string>
+    <string name="settings_storage_export_headline">只写到你选的位置</string>
+    <string name="settings_storage_export_body">导出包只写到你在系统文件选择器里挑的位置；本应用不再留第二份。</string>
+    <string name="settings_storage_maintenance_heading">维护</string>
+    <string name="settings_storage_reason_heading">暂时还做不了的项</string>
     <string name="settings_storage_reason">清空与迁移本地数据需要目前还不存在的存储端口</string>
 </resources>

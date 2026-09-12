@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  调试包叠加层。
+
+  插件侧当前只提供明文端点（http/ws），而 targetSdk 28 起系统默认禁止明文；端到端联调必须能连上它。
+  把这个开关放在 debug 叠加层而不是主清单里：发布包继续用系统默认（禁止明文），不会因为联调而放宽。
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application android:usesCleartextTraffic="true" />
+
+</manifest>

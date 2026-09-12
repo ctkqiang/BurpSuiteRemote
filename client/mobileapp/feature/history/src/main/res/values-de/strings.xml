@@ -1,16 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="history_title">Live-Verlauf</string>
-    <string name="history_empty_message">Noch keine Anfragen beobachtet. Verbinde Burp, um sie hier zu sehen.</string>
+    <string name="history_subtitle">Nur Metadaten — Rümpfe werden bei Bedarf geladen</string>
     <string name="history_absent_value">—</string>
+    <string name="history_action_refresh">Aktualisieren</string>
+
+    <string name="history_response_length_label">Größe</string>
     <string name="history_response_length_value">%1$d B</string>
+    <string name="history_duration_label">Dauer</string>
+    <string name="history_duration_value">%1$d ms</string>
+
+    <string name="history_loading_headline">Lokale Projektion wird gelesen</string>
+    <string name="history_loading_detail">Die Verlaufsprojektion wird von diesem Gerät gelesen.</string>
+    <string name="history_empty_headline">Es läuft nichts ein</string>
+    <string name="history_empty_detail">Der Live-Verlauf ist leer. Verbinden Sie Burp und leiten Sie Verkehr über den Proxy; sobald das Plug-in weiterleitet, erscheinen die Einträge hier. Leer heißt nicht, dass nichts passiert ist, sondern dass nichts dieses Gerät erreicht hat.</string>
+
+    <string name="history_error_headline">Die Verlaufsprojektion konnte nicht gelesen werden</string>
+    <string name="history_error_read_failed">die Verlaufsprojektion ließ sich auf diesem Gerät nicht lesen</string>
+    <string name="history_error_action">Erneut versuchen</string>
 
     <string name="history_detail_title">Anfragedetails</string>
-    <string name="history_detail_loading">Datensatz wird geladen…</string>
-    <string name="history_detail_not_found">Dieser Datensatz ist nicht mehr in der lokalen Projektion.</string>
+    <string name="history_detail_loading_headline">Eintrag wird geladen…</string>
+    <string name="history_detail_loading">Der Eintrag wird aus der lokalen Projektion gelesen.</string>
+    <string name="history_detail_not_found_headline">Dieser Eintrag ist verschwunden</string>
+    <string name="history_detail_not_found">Der Eintrag ist nicht mehr in der lokalen Projektion. Möglicherweise wurde er durch einen Snapshot ersetzt.</string>
     <string name="history_detail_value_yes">Ja</string>
     <string name="history_detail_value_no">Nein</string>
 
+    <string name="history_detail_summary_heading">Übersicht</string>
     <string name="history_detail_request_heading">Anfrage</string>
     <string name="history_detail_request_line_label">Anfragezeile</string>
     <string name="history_detail_host_label">Host</string>
@@ -24,27 +41,46 @@
     <string name="history_detail_mime_type_label">MIME-Typ</string>
     <string name="history_detail_response_length_label">Antwortlänge</string>
     <string name="history_detail_duration_label">Dauer</string>
-    <string name="history_detail_duration_value">%1$d ms</string>
 
-    <string name="history_detail_record_heading">Lokaler Datensatz</string>
-    <string name="history_detail_archive_state_label">Archivstatus</string>
+    <string name="history_detail_record_heading">Lokaler Eintrag</string>
     <string name="history_detail_archive_state_live">Live</string>
     <string name="history_detail_archive_state_archived">Archiviert</string>
-    <string name="history_detail_saved_at_label">Archiviert am</string>
+    <string name="history_detail_saved_at_label">Gespeichert am</string>
     <string name="history_detail_annotation_count_label">Anmerkungen</string>
     <string name="history_detail_last_annotated_at_label">Letzte Anmerkung</string>
     <string name="history_detail_title_label">Titel</string>
     <string name="history_detail_edited_label">Bearbeitet</string>
 
-    <string name="history_detail_timeline_heading">Zeitleiste</string>
+    <string name="history_detail_timeline_heading">Zeitachse</string>
     <string name="history_detail_sequence_number_label">Ereignissequenznummer</string>
     <string name="history_detail_occurred_at_label">Beobachtet am</string>
 
     <string name="history_detail_message_heading">Nachricht</string>
-    <string name="history_detail_message_unavailable">Anfrage- und Antwortbytes sind lokal nicht erfasst.</string>
-    <string name="history_detail_reason_message">der Client hat noch keinen Port für Nachrichtenkörper</string>
+    <string name="history_detail_message_headline">Keine Bytes auf diesem Gerät</string>
+    <string name="history_detail_message_unavailable">Die Bytes von Anfrage und Antwort wurden lokal nicht erfasst; diese Ansicht zeigt daher nur Metadaten. Es wird nichts ersatzweise angezeigt — ein Platzhalter sähe wie ein Beweis aus.</string>
+    <string name="history_detail_reason_headline">Warum das fehlt</string>
+    <string name="history_detail_reason_message">dem Client fehlt noch ein Port für Nachrichtenrümpfe</string>
 
+    <string name="history_detail_actions_heading">Aktionen</string>
     <string name="history_detail_action_share">Teilen oder exportieren</string>
     <string name="history_detail_action_send_to_repeater">An Repeater senden</string>
-    <string name="history_detail_reason_send_to_repeater">der Client hat noch keinen Repeater-Befehlskanal</string>
+    <string name="history_detail_reason_send_to_repeater">dem Client fehlt noch ein Repeater-Befehlskanal</string>
+
+    <string name="history_relative_just_now">gerade eben</string>
+    <plurals name="history_relative_seconds">
+        <item quantity="one">vor %1$d Sekunde</item>
+        <item quantity="other">vor %1$d Sekunden</item>
+    </plurals>
+    <plurals name="history_relative_minutes">
+        <item quantity="one">vor %1$d Minute</item>
+        <item quantity="other">vor %1$d Minuten</item>
+    </plurals>
+    <plurals name="history_relative_hours">
+        <item quantity="one">vor %1$d Stunde</item>
+        <item quantity="other">vor %1$d Stunden</item>
+    </plurals>
+    <plurals name="history_relative_days">
+        <item quantity="one">vor %1$d Tag</item>
+        <item quantity="other">vor %1$d Tagen</item>
+    </plurals>
 </resources>

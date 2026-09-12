@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screenshot_title">Screenshots</string>
+    <string name="screenshot_subtitle">Original image and beautified copy are kept apart</string>
 
     <string name="screenshot_pipeline_heading">Processing pipeline</string>
-    <string name="screenshot_pipeline_note">An imported picture moves through the stages below. The original is never overwritten.</string>
-    <string name="screenshot_stage_imported">1. Imported</string>
-    <string name="screenshot_stage_analyzing">2. Analysing the layout</string>
-    <string name="screenshot_stage_detected">3. Content region detected</string>
-    <string name="screenshot_stage_beautifying">4. Beautifying</string>
-    <string name="screenshot_stage_ready">5. Ready</string>
+    <string name="screenshot_pipeline_note_headline">How an imported picture moves through the stages</string>
+    <string name="screenshot_pipeline_note">Each stage adds to the previous one and the original is never overwritten, so a failed beautification still leaves the import intact.</string>
+    <string name="screenshot_stage_imported">Imported</string>
+    <string name="screenshot_stage_analyzing">Analysing the layout</string>
+    <string name="screenshot_stage_detected">Content region detected</string>
+    <string name="screenshot_stage_beautifying">Beautifying</string>
+    <string name="screenshot_stage_ready">Ready</string>
     <string name="screenshot_stage_failed">Failed — the original is still intact</string>
 
     <string name="screenshot_stored_heading">Stored screenshots</string>
-    <string name="screenshot_stored_empty">No screenshots are stored on this device.</string>
+    <string name="screenshot_stored_empty_headline">Nothing is stored on this device</string>
+    <string name="screenshot_stored_empty">No screenshot has been imported or generated here yet, and none is listed that the device does not hold.</string>
+    <string name="screenshot_reason_headline">What is missing</string>
     <string name="screenshot_reason_import">the client has no screenshot port yet, so nothing can be imported</string>
     <string name="screenshot_action_import">Import a screenshot</string>
 </resources>

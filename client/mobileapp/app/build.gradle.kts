@@ -36,6 +36,10 @@ dependencies {
     implementation(project(":ui"))
     implementation(project(":data"))
     implementation(project(":domain"))
+    // 装配层要亲手建 AndroidTechnicalLog 与事件摄入的进程级作用域，日志端口因此在这里可见。
+    implementation(project(":core:common"))
+    // 配对入口要在本地解二维码里的票据、校验协议版本，因此协议层也在这里可见。
+    implementation(project(":core:protocol"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:history"))
@@ -51,10 +55,12 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     // NavHost 建在装配层：只有这里同时看得见各 feature 与导航模型（rules.md §6.1）。
     implementation(libs.androidx.navigation.compose)
+    // 装配层持有传输引擎的实例与生命周期（进程退出时要把它关掉），因此需要它的类型在编译期可见。
+    implementation(libs.ktor.client.core)
     // 装配层要亲手建 Room 库（data 把 Room 藏在实现细节里，不对外暴露），因此这里显式声明它。
     implementation(libs.androidx.room.runtime)
     implementation(libs.compose.ui)
-    implementation(libs.compose.material3)
+    implementation(libs.compose.foundation)
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
 }

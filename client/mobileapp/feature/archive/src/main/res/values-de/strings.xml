@@ -1,19 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="archive_title">Archiv</string>
+    <string name="archive_subtitle">Gespeicherte Kopien bleiben offline lesbar</string>
     <string name="archive_absent_value">—</string>
+    <string name="archive_action_refresh">Aktualisieren</string>
+    <string name="archive_archived_pill">Archiviert</string>
 
-    <string name="archive_tab_saved_history">Gespeicherter Verlauf</string>
+    <string name="archive_tab_saved_history">Gespeichert</string>
     <string name="archive_tab_bookmarks">Lesezeichen</string>
     <string name="archive_tab_screenshots">Screenshots</string>
 
-    <string name="archive_saved_history_empty">Es wurde noch nichts gespeichert. Speichern ist ein Steuerbefehl und braucht eine aktive Verbindung.</string>
+    <string name="archive_loading_headline">Gespeicherter Verlauf wird gelesen</string>
+    <string name="archive_loading_detail">Der archivierte Teil der Verlaufsprojektion wird von diesem Gerät gelesen.</string>
+    <string name="archive_error_headline">Gespeicherter Verlauf konnte nicht gelesen werden</string>
+    <string name="archive_error_read_failed">der archivierte Teil der Verlaufsprojektion ließ sich nicht lesen</string>
+    <string name="archive_error_action">Erneut versuchen</string>
+
+    <string name="archive_saved_history_heading">Gespeicherte Kopien</string>
+    <string name="archive_saved_history_empty">Es wurde noch nichts gespeichert</string>
+    <string name="archive_saved_history_empty_detail">Speichern ist ein Steuerbefehl und braucht daher eine laufende Verbindung; bis dahin bleibt dieser Tab leer. Es wird nichts aufgelistet, was das Gerät nicht wirklich hat.</string>
+    <string name="archive_saved_at_label">Gespeichert · %1$s</string>
     <string name="archive_action_share">Teilen oder exportieren</string>
 
-    <string name="archive_bookmarks_empty">Auf diesem Gerät sind keine mit Lesezeichen versehenen Einträge gespeichert.</string>
-    <string name="archive_reason_bookmarks">der Client hat noch keinen Port für die Lesezeichen-Projektion</string>
+    <string name="archive_bookmarks_heading">Mit Lesezeichen versehene Anfragen</string>
+    <string name="archive_bookmarks_empty">Auf diesem Gerät ist kein Lesezeichen gespeichert</string>
+    <string name="archive_reason_bookmarks">dem Client fehlt noch ein Port für die Lesezeichen-Projektion</string>
 
-    <string name="archive_screenshots_empty">Auf diesem Gerät sind keine Screenshots gespeichert.</string>
-    <string name="archive_reason_screenshots">der Client hat noch keinen Screenshot-Port, und die Bildpipeline liegt noch in der Datenschicht</string>
+    <string name="archive_screenshots_heading">Screenshots</string>
+    <string name="archive_screenshots_empty">Auf diesem Gerät ist kein Screenshot gespeichert</string>
+    <string name="archive_reason_screenshots">dem Client fehlt noch ein Screenshot-Port, und die Bildpipeline liegt weiterhin in der Datenschicht</string>
     <string name="archive_screenshots_open_action">Screenshot-Arbeitsbereich öffnen</string>
+
+    <string name="archive_relative_just_now">gerade eben</string>
+    <plurals name="archive_relative_seconds">
+        <item quantity="one">vor %1$d Sekunde</item>
+        <item quantity="other">vor %1$d Sekunden</item>
+    </plurals>
+    <plurals name="archive_relative_minutes">
+        <item quantity="one">vor %1$d Minute</item>
+        <item quantity="other">vor %1$d Minuten</item>
+    </plurals>
+    <plurals name="archive_relative_hours">
+        <item quantity="one">vor %1$d Stunde</item>
+        <item quantity="other">vor %1$d Stunden</item>
+    </plurals>
+    <plurals name="archive_relative_days">
+        <item quantity="one">vor %1$d Tag</item>
+        <item quantity="other">vor %1$d Tagen</item>
+    </plurals>
 </resources>

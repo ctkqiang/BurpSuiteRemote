@@ -2,35 +2,43 @@
 <resources>
     <string name="sharing_title">分享或导出</string>
     <string name="sharing_absent_value">—</string>
-    <string name="sharing_loading">正在读取这条记录……</string>
-    <string name="sharing_not_found">本地投影里已经没有这条记录了。</string>
+    <string name="sharing_loading_headline">正在读取这条记录……</string>
+    <string name="sharing_loading">正在从本机投影里读这条记录。</string>
+    <string name="sharing_not_found_headline">这条记录已经不在了</string>
+    <string name="sharing_not_found">它已经不在本机投影里，因此没有可导出的内容。</string>
 
+    <string name="sharing_subject_heading">导出的对象</string>
     <string name="sharing_request_line_label">请求行</string>
     <string name="sharing_host_label">主机</string>
+    <string name="sharing_identifier_label">历史记录标识</string>
 
     <string name="sharing_scope_heading">导出范围</string>
-    <string name="sharing_scope_note">只导出这台设备上真有的东西。请求与响应的报文本体还没有被捕获，因此导出包里有元数据、清单和这份脱敏报告，别的没有。</string>
+    <string name="sharing_scope_headline">只有本机真有的那些</string>
+    <string name="sharing_scope_note">导出包里是清单、脱敏报告，以及本机存下来的字段。请求与响应的字节还没有被捕获，因此不在里面——包里会写明这一点，而不是用别的东西把它撑满。</string>
 
     <string name="sharing_scan_heading">敏感数据扫描</string>
-    <string name="sharing_scan_summary">共扫描 %1$d 行，检查凭证类头部、Bearer 令牌、JSON Web Token 与邮件地址。</string>
-    <string name="sharing_scan_empty">被扫描的字段里没有发现敏感内容。</string>
-    <string name="sharing_scan_finding">第 %1$d 行：%2$s</string>
+    <string name="sharing_scan_count_label">已扫描行数</string>
+    <string name="sharing_scan_empty_headline">没有发现敏感数据</string>
+    <string name="sharing_scan_empty">在要导出的字段里没有出现凭据头、Bearer 令牌、JSON Web Token 或邮箱地址。</string>
 
     <string name="sharing_kind_authorization_header">Authorization 头</string>
     <string name="sharing_kind_cookie_header">Cookie 头</string>
     <string name="sharing_kind_set_cookie_header">Set-Cookie 头</string>
-    <string name="sharing_kind_api_key_header">API 密钥头</string>
+    <string name="sharing_kind_api_key_header">API Key 头</string>
     <string name="sharing_kind_bearer_token">Bearer 令牌</string>
     <string name="sharing_kind_json_web_token">JSON Web Token</string>
-    <string name="sharing_kind_email_address">邮件地址</string>
+    <string name="sharing_kind_email_address">邮箱地址</string>
 
-    <string name="sharing_preview_heading">脱敏预览</string>
-    <string name="sharing_preview_note">脱敏只作用于这份导出副本。归档原件保持字节不变，永远不会被改写。</string>
+    <string name="sharing_preview_heading">脱敏后的预览</string>
+    <string name="sharing_preview_headline">离开本机的就是这些内容</string>
+    <string name="sharing_preview_note">脱敏只作用于这份导出副本。归档的原始记录保持逐字节不变，不会被改写。</string>
 
+    <string name="sharing_confirm_heading">确认</string>
     <string name="sharing_confirm_action">确认并导出</string>
+    <string name="sharing_state_exported">已导出</string>
     <string name="sharing_exported">导出包已经写到你选择的位置。</string>
-    <string name="sharing_export_failed">导出包没能写出去，换个位置再试一次。</string>
+    <string name="sharing_state_failed">导出失败</string>
+    <string name="sharing_export_failed">导出包写不进去，请换一个位置再试。</string>
 
-    <!-- 写进导出包 notice.txt 的说明；导出文件是给用户看的，因此文案同样走资源。 -->
-    <string name="sharing_export_notice">Burp Remote 导出包\n\n这份归档由 Burp Remote 移动端生成。\n里面包含 manifest.json、redaction-report.json 和本说明。\n\n范围：只包含设备上真有的字段。本客户端还没有捕获请求与响应的报文本体，\n因此它们不在导出内容里。\n\n脱敏：敏感值只在这次导出的副本里被打码，归档原件没有被修改。</string>
+    <string name="sharing_export_notice">Burp Remote 导出包\n\n本归档由 Burp Remote 移动客户端生成。\n包含 manifest.json、redaction-report.json 与本说明。\n\n范围：只包含本机存下来的字段。请求与响应的字节尚未被本客户端捕获，\n因此不属于本次导出。\n\n脱敏：敏感值只在这份导出副本里被掩码；归档的原始记录未被修改。</string>
 </resources>

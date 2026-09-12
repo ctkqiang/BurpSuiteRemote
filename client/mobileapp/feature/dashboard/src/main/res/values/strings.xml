@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="dashboard_title">Burp Remote</string>
-    <string name="dashboard_target_host_label">Recent target host</string>
+    <string name="dashboard_target_host_label">Target host</string>
     <string name="dashboard_absent_value">—</string>
+
+    <string name="dashboard_scan_headline">Not paired yet?</string>
+    <string name="dashboard_scan_detail">The pairing code carries the address, the port and a one-time code, so it is the only way to point this device at a Burp instance.</string>
+    <string name="dashboard_action_scan_pairing">Scan pairing code</string>
 
     <string name="dashboard_live_request_label">Live requests</string>
     <string name="dashboard_intercepted_label">Intercepted</string>
@@ -12,6 +15,42 @@
     <string name="dashboard_entry_intercept">Intercept</string>
     <string name="dashboard_entry_repeater">Repeater</string>
 
-    <string name="dashboard_recent_heading">Recent</string>
-    <string name="dashboard_recent_empty">No requests observed yet. Connect Burp to see them here.</string>
+    <string name="dashboard_actions_heading">Live workspace</string>
+    <string name="dashboard_entry_history_detail">Every request the plug-in has forwarded, newest first.</string>
+    <string name="dashboard_entry_intercept_detail">Requests the plug-in is holding back until you decide.</string>
+    <string name="dashboard_entry_repeater_detail">Re-send a stored request and compare the responses.</string>
+
+    <string name="dashboard_recent_heading">Recent requests</string>
+    <string name="dashboard_recent_observed_at_label">Observed</string>
+    <string name="dashboard_last_observed_label">Last observed · %1$s</string>
+
+    <string name="dashboard_recent_empty_live_headline">Nothing observed yet</string>
+    <string name="dashboard_recent_empty_live_detail">Burp is connected, but no request has reached this device yet. Traffic shows up here as soon as the plug-in forwards it.</string>
+    <string name="dashboard_recent_empty_offline_headline">Burp is not connected</string>
+    <string name="dashboard_recent_empty_offline_detail">Scan the pairing code shown in the Burp Remote tab to see live traffic here. Saved history and screenshots stay readable offline.</string>
+
+    <string name="dashboard_loading_headline">Reading local data</string>
+    <string name="dashboard_loading_detail">The event journal and its projections are being read on this device.</string>
+
+    <string name="dashboard_error_headline">Local data could not be read</string>
+    <string name="dashboard_error_read_failed">the event journal or one of its projections could not be read</string>
+    <string name="dashboard_error_action">Try again</string>
+
+    <string name="dashboard_relative_just_now">just now</string>
+    <plurals name="dashboard_relative_seconds">
+        <item quantity="one">%1$d second ago</item>
+        <item quantity="other">%1$d seconds ago</item>
+    </plurals>
+    <plurals name="dashboard_relative_minutes">
+        <item quantity="one">%1$d minute ago</item>
+        <item quantity="other">%1$d minutes ago</item>
+    </plurals>
+    <plurals name="dashboard_relative_hours">
+        <item quantity="one">%1$d hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
+    </plurals>
+    <plurals name="dashboard_relative_days">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
 </resources>

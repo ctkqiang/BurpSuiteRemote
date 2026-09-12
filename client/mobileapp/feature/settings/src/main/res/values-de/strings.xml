@@ -1,32 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_appearance_title">Darstellung</string>
+    <string name="settings_appearance_subtitle">Farbschema der gesamten Anwendung</string>
+
     <string name="settings_theme_heading">Design</string>
+    <string name="settings_theme_headline">Diese Wahl gilt überall</string>
+    <string name="settings_theme_detail">Jede Ansicht, jede Liste und jedes Label bezieht die Farben aus dem Design; ein Wechsel hier färbt die App sofort um. Die Wahl wird auf diesem Gerät gespeichert.</string>
+    <string name="settings_theme_selected">Ausgewählt</string>
+
     <string name="settings_theme_automatic">Systemeinstellung folgen</string>
+    <string name="settings_theme_automatic_headline">Dem Betriebssystem folgen</string>
+    <string name="settings_theme_automatic_detail">Hell, solange das System hell ist, dunkel, solange es dunkel ist — auch wenn das System selbst umschaltet.</string>
     <string name="settings_theme_light">Hell</string>
+    <string name="settings_theme_light_headline">Immer hell</string>
+    <string name="settings_theme_light_detail">Behält die hellen Farben auch bei dunklem System. Draußen nützlich.</string>
     <string name="settings_theme_dark">Dunkel</string>
+    <string name="settings_theme_dark_headline">Immer dunkel</string>
+    <string name="settings_theme_dark_detail">Behält die dunklen Farben auch bei hellem System. Nachts angenehmer für die Augen.</string>
 
     <string name="settings_language_title">Sprache</string>
+    <string name="settings_language_subtitle">Sprache aller Ansichten und Meldungen</string>
     <string name="settings_language_heading">Sprache der Oberfläche</string>
-    <string name="settings_language_automatic">Systemeinstellung folgen</string>
+    <string name="settings_language_headline">Ein Wechsel baut die Oberfläche neu auf</string>
+    <string name="settings_language_detail">Jeder sichtbare Text stammt aus den Ressourcen der gewählten Sprache, daher wird die Oberfläche beim Wechsel einmal neu aufgebaut. Gespeicherte Daten bleiben unberührt.</string>
+    <string name="settings_language_selected">Ausgewählt</string>
     <!-- 语言名按各自的语言书写，三种语言里都一样。 -->
+    <string name="settings_language_automatic">Systemeinstellung folgen</string>
     <string name="settings_language_english">English</string>
     <string name="settings_language_chinese">简体中文</string>
     <string name="settings_language_german">Deutsch</string>
 
     <string name="settings_security_title">Sicherheit</string>
+    <string name="settings_security_subtitle">Was dieser Client nicht tut</string>
     <string name="settings_security_redaction_heading">Redaktion</string>
+    <string name="settings_security_redaction_headline">Nur beim Export maskiert</string>
     <string name="settings_security_redaction_body">Sensible Werte werden nur in exportierten Kopien maskiert. Das archivierte Original wird nie überschrieben.</string>
     <string name="settings_security_logging_heading">Protokollierung</string>
-    <string name="settings_security_logging_body">Anfrage- und Antwortbytes, Cookies, Authorization-Header und Token landen nie im Protokoll.</string>
+    <string name="settings_security_logging_headline">Rümpfe und Credentials bleiben draußen</string>
+    <string name="settings_security_logging_body">Anfrage- und Antwortrümpfe, Cookies, Authorization-Header und Token landen nie im Protokoll. Technische Protokolle enthalten nur Bezeichner, Zählwerte und Fehlernamen.</string>
     <string name="settings_security_pairing_heading">Kopplung</string>
+    <string name="settings_security_pairing_headline">Keine Steuerung ohne gekoppeltes Gerät</string>
     <string name="settings_security_pairing_body">Bevor ein Steuerbefehl akzeptiert wird, muss das Gerät gekoppelt sein. Das lokale Netz gilt als nicht vertrauenswürdig.</string>
+    <string name="settings_security_reason_heading">Was noch nicht einstellbar ist</string>
     <string name="settings_security_reason">konfigurierbare Redaktionsvorgaben brauchen einen Port, den es noch nicht gibt</string>
 
     <string name="settings_storage_title">Speicher</string>
+    <string name="settings_storage_subtitle">Wo lokale Daten liegen und was das Gerät verlässt</string>
     <string name="settings_storage_database_heading">Lokale Datenbank</string>
+    <string name="settings_storage_database_headline">Privat für diese Anwendung</string>
     <string name="settings_storage_database_body">Ereignisjournal und Projektionen liegen im privaten Speicher dieser App. In gemeinsamen Speicher wird nichts geschrieben.</string>
     <string name="settings_storage_export_heading">Exporte</string>
+    <string name="settings_storage_export_headline">Nur an den gewählten Ort</string>
     <string name="settings_storage_export_body">Exportpakete werden nur an den im Systemdialog gewählten Ort geschrieben; diese App behält keine zweite Kopie.</string>
+    <string name="settings_storage_maintenance_heading">Wartung</string>
+    <string name="settings_storage_reason_heading">Was noch nicht möglich ist</string>
     <string name="settings_storage_reason">Löschen und Migrieren lokaler Daten brauchen Speicher-Ports, die es noch nicht gibt</string>
 </resources>

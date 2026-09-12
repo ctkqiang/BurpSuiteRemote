@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screenshot_title">Screenshots</string>
+    <string name="screenshot_subtitle">Original und aufbereitete Kopie bleiben getrennt</string>
 
-    <string name="screenshot_pipeline_heading">Verarbeitungskette</string>
-    <string name="screenshot_pipeline_note">Ein importiertes Bild durchläuft die folgenden Stufen. Das Original wird nie überschrieben.</string>
-    <string name="screenshot_stage_imported">1. Importiert</string>
-    <string name="screenshot_stage_analyzing">2. Layout wird analysiert</string>
-    <string name="screenshot_stage_detected">3. Inhaltsbereich erkannt</string>
-    <string name="screenshot_stage_beautifying">4. Wird aufbereitet</string>
-    <string name="screenshot_stage_ready">5. Fertig</string>
-    <string name="screenshot_stage_failed">Fehlgeschlagen — das Original ist unversehrt</string>
+    <string name="screenshot_pipeline_heading">Verarbeitungspipeline</string>
+    <string name="screenshot_pipeline_note_headline">So wandert ein importiertes Bild durch die Stufen</string>
+    <string name="screenshot_pipeline_note">Jede Stufe baut auf der vorigen auf, und das Original wird nie überschrieben: Selbst eine fehlgeschlagene Aufbereitung lässt den Import intakt.</string>
+    <string name="screenshot_stage_imported">Importiert</string>
+    <string name="screenshot_stage_analyzing">Layout wird analysiert</string>
+    <string name="screenshot_stage_detected">Inhaltsbereich erkannt</string>
+    <string name="screenshot_stage_beautifying">Wird aufbereitet</string>
+    <string name="screenshot_stage_ready">Bereit</string>
+    <string name="screenshot_stage_failed">Fehlgeschlagen — das Original ist weiterhin intakt</string>
 
     <string name="screenshot_stored_heading">Gespeicherte Screenshots</string>
-    <string name="screenshot_stored_empty">Auf diesem Gerät sind keine Screenshots gespeichert.</string>
-    <string name="screenshot_reason_import">der Client hat noch keinen Screenshot-Port, es kann nichts importiert werden</string>
+    <string name="screenshot_stored_empty_headline">Auf diesem Gerät ist nichts gespeichert</string>
+    <string name="screenshot_stored_empty">Hier wurde noch kein Screenshot importiert oder erzeugt, und es wird nichts aufgelistet, was das Gerät nicht hat.</string>
+    <string name="screenshot_reason_headline">Was fehlt</string>
+    <string name="screenshot_reason_import">dem Client fehlt noch ein Screenshot-Port, daher lässt sich nichts importieren</string>
     <string name="screenshot_action_import">Screenshot importieren</string>
 </resources>

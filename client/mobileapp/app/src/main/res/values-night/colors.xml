@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 深色主题的窗口底色，取值与 ui/theme 里的深色 background 一致：近黑中性色，不是纯黑。 -->
+<resources>
+    <color name="window_background">#FF0E1114</color>
+</resources>

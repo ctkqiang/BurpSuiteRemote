@@ -13,6 +13,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.HistoryRecord
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.HistoryRepository
@@ -31,6 +35,7 @@ class SharingViewModel(
     private val exportDestinationWriter: ExportDestinationWriter,
     /** 写进导出包的说明文字；由装配层从资源里取，ViewModel 不碰资源。 */
     private val exportNoticeText: String,
+    private val technicalLog: TechnicalLog = SilentTechnicalLog,
     private val timeProvider: TimeProvider = TimeProvider { Instant.now() },
 ) : ViewModel() {
     private val effectChannel = Channel<SharingUserInterfaceEffect>(Channel.BUFFERED)
@@ -59,8 +64,10 @@ class SharingViewModel(
 
     fun handleIntent(intent: SharingUserInterfaceIntent) {
         when (intent) {
-            is SharingUserInterfaceIntent.ConfirmExport ->
+            is SharingUserInterfaceIntent.ConfirmExport -> {
+                record(category = TechnicalLogCategory.UserInterface, message = "用户确认导出，打开系统文件选择器")
                 effectChannel.trySend(SharingUserInterfaceEffect.RequestExportDestination(suggestedFileName()))
+            }
 
             is SharingUserInterfaceIntent.WriteExport -> writeExport(intent.destinationUri)
         }
@@ -83,7 +90,20 @@ class SharingViewModel(
                         bundleBytes = bundleBytes,
                     )
                 }
-            exportOutcome.update { if (outcome.isSuccess) ExportOutcome.Succeeded else ExportOutcome.Failed }
+            val exportOutcomeValue = if (outcome.isSuccess) ExportOutcome.Succeeded else ExportOutcome.Failed
+            val logCategory =
+                if (outcome.isSuccess) TechnicalLogCategory.UserInterface else TechnicalLogCategory.Failure
+            record(
+                category = logCategory,
+                message = if (outcome.isSuccess) "导出包已写出" else "导出包写出失败",
+                attributes =
+                    mapOf(
+                        "bundleByteCount" to bundleBytes.size.toString(),
+                        // 失败原因只记异常类型：导出内容里可能有凭据（rules.md §12）。
+                        "failure" to outcome.exceptionOrNull()?.javaClass?.simpleName.orEmpty(),
+                    ),
+            )
+            exportOutcome.update { exportOutcomeValue }
         }
     }
 
@@ -156,6 +176,16 @@ class SharingViewModel(
     }
 
     private fun suggestedFileName(): String = EXPORT_FILE_NAME_PREFIX + historyIdentifier + EXPORT_FILE_NAME_SUFFIX
+
+    private fun record(
+        category: TechnicalLogCategory,
+        message: String,
+        attributes: Map<String, String> = emptyMap(),
+    ) {
+        technicalLog.record(
+            TechnicalLogEvent(category = category, message = message, attributes = attributes),
+        )
+    }
 
     private enum class ExportOutcome {
         NotAttempted,

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="dashboard_title">Burp Remote</string>
-    <string name="dashboard_target_host_label">最近目标主机</string>
+    <string name="dashboard_target_host_label">目标主机</string>
     <string name="dashboard_absent_value">—</string>
+
+    <string name="dashboard_scan_headline">还没有配对？</string>
+    <string name="dashboard_scan_detail">配对码里带着地址、端口与一次性配对码，这是把本机指向某个 Burp 实例的唯一途径。</string>
+    <string name="dashboard_action_scan_pairing">扫码配对</string>
 
     <string name="dashboard_live_request_label">实时请求</string>
     <string name="dashboard_intercepted_label">已拦截</string>
@@ -12,6 +15,38 @@
     <string name="dashboard_entry_intercept">拦截</string>
     <string name="dashboard_entry_repeater">重放</string>
 
-    <string name="dashboard_recent_heading">最近</string>
-    <string name="dashboard_recent_empty">还没有观测到任何请求。连接 Burp 之后这里会实时出现。</string>
+    <string name="dashboard_actions_heading">实时工作区</string>
+    <string name="dashboard_entry_history_detail">插件转发过来的每一个请求，最新的排在最前面。</string>
+    <string name="dashboard_entry_intercept_detail">被插件拦下、等你决定的请求。</string>
+    <string name="dashboard_entry_repeater_detail">重新发出已保存的请求，并对比两次响应。</string>
+
+    <string name="dashboard_recent_heading">最近请求</string>
+    <string name="dashboard_recent_observed_at_label">观测时刻</string>
+    <string name="dashboard_last_observed_label">最后观测 · %1$s</string>
+
+    <string name="dashboard_recent_empty_live_headline">还没有观测到请求</string>
+    <string name="dashboard_recent_empty_live_detail">Burp 已连接，但还没有任何请求到达本机。插件一旦转发过来，这里会立刻出现。</string>
+    <string name="dashboard_recent_empty_offline_headline">Burp 未连接</string>
+    <string name="dashboard_recent_empty_offline_detail">扫一扫 Burp Remote 标签页里的配对码，实时流量就会出现在这里。已保存的历史与截图离线仍然可读。</string>
+
+    <string name="dashboard_loading_headline">正在读取本机数据</string>
+    <string name="dashboard_loading_detail">正在读取本机的事件日志与各投影。</string>
+
+    <string name="dashboard_error_headline">本机数据读取失败</string>
+    <string name="dashboard_error_read_failed">事件日志或其中一个投影读不出来</string>
+    <string name="dashboard_error_action">重试</string>
+
+    <string name="dashboard_relative_just_now">刚刚</string>
+    <plurals name="dashboard_relative_seconds">
+        <item quantity="other">%1$d 秒前</item>
+    </plurals>
+    <plurals name="dashboard_relative_minutes">
+        <item quantity="other">%1$d 分钟前</item>
+    </plurals>
+    <plurals name="dashboard_relative_hours">
+        <item quantity="other">%1$d 小时前</item>
+    </plurals>
+    <plurals name="dashboard_relative_days">
+        <item quantity="other">%1$d 天前</item>
+    </plurals>
 </resources>

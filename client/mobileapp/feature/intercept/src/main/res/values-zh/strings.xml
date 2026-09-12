@@ -1,33 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="intercept_title">拦截队列</string>
-    <string name="intercept_empty">拦截队列里现在没有等待处理的请求。</string>
+    <string name="intercept_subtitle">只显示插件已转发的元数据</string>
     <string name="intercept_absent_value">—</string>
+    <string name="intercept_action_refresh">刷新</string>
 
-    <string name="intercept_state_pending">待处理</string>
-    <string name="intercept_state_modified">已修改</string>
+    <string name="intercept_state_pending">等待决定</string>
+    <string name="intercept_state_modified">已改写</string>
     <string name="intercept_state_forwarded">已放行</string>
     <string name="intercept_state_dropped">已丢弃</string>
 
-    <string name="intercept_detail_title">拦截项</string>
-    <string name="intercept_detail_loading">正在读取这条拦截项……</string>
-    <string name="intercept_detail_not_found">本地投影里已经没有这条拦截项了。</string>
+    <string name="intercept_loading_headline">正在读取拦截队列</string>
+    <string name="intercept_loading_detail">正在从本机读取拦截投影。</string>
+    <string name="intercept_empty_headline">队列里没有东西</string>
+    <string name="intercept_empty_detail">当前没有请求被拦下。只有当插件正在拦截、且某条请求还没被放行或丢弃时，它才会出现在这里。</string>
 
+    <string name="intercept_error_headline">拦截队列读取失败</string>
+    <string name="intercept_error_read_failed">本机读不出拦截投影</string>
+    <string name="intercept_error_action">重试</string>
+
+    <string name="intercept_detail_title">拦截项</string>
+    <string name="intercept_detail_loading_headline">正在读取这条拦截项……</string>
+    <string name="intercept_detail_loading">正在从本机投影里读这条拦截项。</string>
+    <string name="intercept_detail_not_found_headline">这条已经不在了</string>
+    <string name="intercept_detail_not_found">它已经不在本机投影里。</string>
+
+    <string name="intercept_detail_summary_heading">概览</string>
     <string name="intercept_detail_request_heading">请求</string>
     <string name="intercept_detail_request_line_label">请求行</string>
     <string name="intercept_detail_host_label">主机</string>
-    <string name="intercept_detail_state_label">队列状态</string>
     <string name="intercept_detail_sequence_number_label">事件序号</string>
     <string name="intercept_detail_created_at_label">产生时刻</string>
     <string name="intercept_detail_updated_at_label">最后变更时刻</string>
 
     <string name="intercept_detail_editor_heading">修改</string>
+    <string name="intercept_detail_editor_headline">只是本机草稿</string>
+    <string name="intercept_detail_editor_local_only">这些改动只留在本机：插件侧还没有拦截端点，因此不会提交，Burp 里那条请求也不会被改写。</string>
     <string name="intercept_detail_request_headers_label">请求头</string>
-    <string name="intercept_detail_editor_local_only">这些编辑只留在本机：插件还没有拦截端点，因此不会提交任何改动。</string>
 
     <string name="intercept_detail_actions_heading">动作</string>
     <string name="intercept_detail_action_submit">提交修改</string>
     <string name="intercept_detail_action_forward">放行</string>
     <string name="intercept_detail_action_drop">丢弃</string>
-    <string name="intercept_detail_reason_command">插件对拦截端点回 not_implemented，客户端也还没有对应的命令端口</string>
+    <string name="intercept_detail_reason_headline">为什么是禁用的</string>
+    <string name="intercept_detail_reason_command">插件对拦截相关的端点回的是 not_implemented，而客户端也还没有对应的命令端口</string>
+
+    <string name="intercept_relative_just_now">刚刚</string>
+    <plurals name="intercept_relative_seconds">
+        <item quantity="other">%1$d 秒前</item>
+    </plurals>
+    <plurals name="intercept_relative_minutes">
+        <item quantity="other">%1$d 分钟前</item>
+    </plurals>
+    <plurals name="intercept_relative_hours">
+        <item quantity="other">%1$d 小时前</item>
+    </plurals>
+    <plurals name="intercept_relative_days">
+        <item quantity="other">%1$d 天前</item>
+    </plurals>
 </resources>

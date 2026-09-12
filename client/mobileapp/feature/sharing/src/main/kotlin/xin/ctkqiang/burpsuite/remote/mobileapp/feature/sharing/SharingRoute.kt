@@ -10,10 +10,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.HistoryRepository
 
 /**
- * 装配层：把仓库与写盘实现交给 ViewModel，把状态与意图处理交给无状态的界面。
+ * 装配层：把仓库、写盘实现与日志端口交给 ViewModel，把状态与意图处理交给无状态的界面。
  *
  * 导出位置由系统文件选择器决定，因此「打开选择器」这件事只能在这一层做（它是 Compose 的东西），
  * ViewModel 只发效果、只接结果（rules.md §8.1）。
@@ -23,6 +25,7 @@ fun SharingRoute(
     historyIdentifier: String,
     historyRepository: HistoryRepository,
     modifier: Modifier = Modifier,
+    technicalLog: TechnicalLog = SilentTechnicalLog,
 ) {
     val context = LocalContext.current
     val exportNoticeText = stringResource(R.string.sharing_export_notice)
@@ -35,6 +38,7 @@ fun SharingRoute(
                 exportDestinationWriter =
                     ContentResolverExportDestinationWriter(context.applicationContext),
                 exportNoticeText = exportNoticeText,
+                technicalLog = technicalLog,
             )
         }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -55,7 +59,11 @@ fun SharingRoute(
         }
     }
 
-    SharingScreen(uiState = uiState, onIntent = viewModel::handleIntent, modifier = modifier)
+    SharingScreen(
+        uiState = uiState,
+        onIntent = viewModel::handleIntent,
+        modifier = modifier,
+    )
 }
 
 // 导出包是 ZIP；.burpremote 只是它面向用户的扩展名。

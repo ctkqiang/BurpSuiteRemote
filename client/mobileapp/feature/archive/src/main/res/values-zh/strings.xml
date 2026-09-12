@@ -1,19 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="archive_title">归档</string>
+    <string name="archive_subtitle">已保存的副本离线也能读</string>
     <string name="archive_absent_value">—</string>
+    <string name="archive_action_refresh">刷新</string>
+    <string name="archive_archived_pill">已归档</string>
 
-    <string name="archive_tab_saved_history">已保存历史</string>
+    <string name="archive_tab_saved_history">已保存</string>
     <string name="archive_tab_bookmarks">书签</string>
     <string name="archive_tab_screenshots">截图</string>
 
-    <string name="archive_saved_history_empty">还没有保存过任何记录。保存是一条控制命令，需要先连上 Burp。</string>
+    <string name="archive_loading_headline">正在读取已保存历史</string>
+    <string name="archive_loading_detail">正在从本机读取历史投影里已归档的那部分。</string>
+    <string name="archive_error_headline">已保存历史读取失败</string>
+    <string name="archive_error_read_failed">本机读不出历史投影里已归档的那部分</string>
+    <string name="archive_error_action">重试</string>
+
+    <string name="archive_saved_history_heading">已保存的副本</string>
+    <string name="archive_saved_history_empty">还没有任何已保存的记录</string>
+    <string name="archive_saved_history_empty_detail">保存要发控制命令，因此需要一条实时连接；在那之前这个页签是空的。本机没有的东西，这里不会列出来。</string>
+    <string name="archive_saved_at_label">保存于 · %1$s</string>
     <string name="archive_action_share">分享或导出</string>
 
-    <string name="archive_bookmarks_empty">这台设备上还没有加过书签的历史记录。</string>
-    <string name="archive_reason_bookmarks">客户端还没有书签投影端口</string>
+    <string name="archive_bookmarks_heading">加了书签的请求</string>
+    <string name="archive_bookmarks_empty">本机没有存过书签</string>
+    <string name="archive_reason_bookmarks">客户端还没有书签投影的读端口</string>
 
-    <string name="archive_screenshots_empty">这台设备上还没有截图。</string>
-    <string name="archive_reason_screenshots">客户端还没有截图端口，图像管线也还在 data 层</string>
+    <string name="archive_screenshots_heading">截图</string>
+    <string name="archive_screenshots_empty">本机没有存过截图</string>
+    <string name="archive_reason_screenshots">客户端还没有截图端口，图像处理流程至今仍在数据层里</string>
     <string name="archive_screenshots_open_action">打开截图工作区</string>
+
+    <string name="archive_relative_just_now">刚刚</string>
+    <plurals name="archive_relative_seconds">
+        <item quantity="other">%1$d 秒前</item>
+    </plurals>
+    <plurals name="archive_relative_minutes">
+        <item quantity="other">%1$d 分钟前</item>
+    </plurals>
+    <plurals name="archive_relative_hours">
+        <item quantity="other">%1$d 小时前</item>
+    </plurals>
+    <plurals name="archive_relative_days">
+        <item quantity="other">%1$d 天前</item>
+    </plurals>
 </resources>

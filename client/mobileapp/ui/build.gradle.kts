@@ -28,16 +28,27 @@ kotlin {
     jvmToolchain(17)
 }
 
+// rules.md §2 指定 JUnit 5：主题令牌与系统栏图标映射是纯值逻辑，必须有断言盯着。
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 dependencies {
     // 主题要认 ThemeMode，那是领域层的类型；界面层依赖领域层是允许的方向。
     implementation(project(":domain"))
+    // 技术日志要记「导航切换」，界面层据此上报每一次路由变化；它出现在导航依赖表的公开签名里，
+    // 因此用 api 而不是 implementation——藏起来会让各 feature 拿到依赖表却读不到日志端口。
+    api(project(":core:common"))
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
-    implementation(libs.compose.material3)
+    implementation(libs.compose.foundation)
     // 底栏条目的 icon 是必填参数，核心图标集够用；扩展集太大，不进包。
     implementation(libs.compose.material.icons.core)
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
+
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

@@ -1,14 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="repeater_title">Repeater</string>
+    <string name="repeater_subtitle">Needs a live session and an execution port</string>
+    <string name="repeater_mode_live">LIVE</string>
+    <string name="repeater_mode_offline">OFFLINE</string>
 
-    <string name="repeater_request_list_heading">Requests</string>
-    <string name="repeater_request_list_empty">No repeater requests are stored on this device.</string>
-    <string name="repeater_action_create">New request</string>
-    <string name="repeater_reason_request_list">the client has no repeater-request port yet</string>
+    <string name="repeater_connection_heading">Connection</string>
+    <string name="repeater_connection_state_label">Session state</string>
+    <string name="repeater_connection_state_disconnected">Disconnected</string>
+    <string name="repeater_connection_state_discovering">Discovering</string>
+    <string name="repeater_connection_state_connecting">Connecting</string>
+    <string name="repeater_connection_state_authenticating">Authenticating</string>
+    <string name="repeater_connection_state_synchronising">Synchronising</string>
+    <string name="repeater_connection_state_connected">Connected</string>
+    <string name="repeater_connection_state_reconnecting">Reconnecting</string>
+    <string name="repeater_connection_state_resynchronisation_required">Resynchronisation required</string>
+    <string name="repeater_connection_state_authentication_failed">Authentication failed</string>
+    <string name="repeater_connection_state_protocol_error">Protocol error</string>
+    <string name="repeater_connection_state_timed_out">Timed out</string>
+    <string name="repeater_connection_state_server_unavailable">Server unavailable</string>
+
+    <string name="repeater_loading_headline">Reading the session state</string>
+    <string name="repeater_loading_detail">The session state is being read from the local projection.</string>
+    <string name="repeater_error_headline">The session state could not be read</string>
+    <string name="repeater_error_read_failed">the session state could not be read from this device</string>
+    <string name="repeater_error_action">Try again</string>
+
+    <string name="repeater_request_list_heading">Stored requests</string>
+    <string name="repeater_request_list_empty_headline">No repeater request exists</string>
+    <string name="repeater_request_list_empty_detail">Repeater requests are not stored on this device yet, and nothing is invented to fill the gap.</string>
 
     <string name="repeater_execution_heading">Execution</string>
-    <string name="repeater_execution_empty">Nothing has been executed yet.</string>
+    <string name="repeater_execution_empty_headline">Nothing has been executed</string>
+    <string name="repeater_execution_empty_detail">Execution results would come from the plug-in. Until that path exists, this screen shows the state of the session and nothing else.</string>
+
+    <string name="repeater_reason_headline">What is missing</string>
+    <string name="repeater_reason_request_list">the client has no repeater-projection port yet</string>
+    <string name="repeater_reason_execute">the client has no repeater-command port yet</string>
+    <string name="repeater_action_create">New repeater request</string>
     <string name="repeater_action_execute">Execute</string>
-    <string name="repeater_reason_execute">the plug-in answers not_implemented for the repeater endpoints, and the client has no command port for them</string>
 </resources>

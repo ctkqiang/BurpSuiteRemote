@@ -1,32 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_appearance_title">Appearance</string>
+    <string name="settings_appearance_subtitle">Colour scheme of the whole application</string>
+
     <string name="settings_theme_heading">Theme</string>
+    <string name="settings_theme_headline">This choice applies everywhere</string>
+    <string name="settings_theme_detail">Every screen, list and pill takes its colours from the theme, so switching here re-colours the app at once. The choice is stored on this device.</string>
+    <string name="settings_theme_selected">Selected</string>
+
     <string name="settings_theme_automatic">Follow system</string>
+    <string name="settings_theme_automatic_headline">Follow the operating system</string>
+    <string name="settings_theme_automatic_detail">Light while the system is in light mode and dark while it is in dark mode, including when the system switches on its own schedule.</string>
     <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_light_headline">Always light</string>
+    <string name="settings_theme_light_detail">Keeps the light colours even when the system is dark. Useful outdoors.</string>
     <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_dark_headline">Always dark</string>
+    <string name="settings_theme_dark_detail">Keeps the dark colours even when the system is light. Softer on the eyes at night.</string>
 
     <string name="settings_language_title">Language</string>
+    <string name="settings_language_subtitle">Language of every screen and message</string>
     <string name="settings_language_heading">Interface language</string>
-    <string name="settings_language_automatic">Follow system</string>
+    <string name="settings_language_headline">Changing this restarts the interface</string>
+    <string name="settings_language_detail">Every visible string comes from the resources of the chosen language, so the interface is rebuilt once when you switch. Saved data is not touched.</string>
+    <string name="settings_language_selected">Selected</string>
     <!-- 语言名按各自的语言书写，三种语言里都一样。 -->
+    <string name="settings_language_automatic">Follow system</string>
     <string name="settings_language_english">English</string>
     <string name="settings_language_chinese">简体中文</string>
     <string name="settings_language_german">Deutsch</string>
 
     <string name="settings_security_title">Security</string>
+    <string name="settings_security_subtitle">What this client refuses to do</string>
     <string name="settings_security_redaction_heading">Redaction</string>
+    <string name="settings_security_redaction_headline">Masked on export only</string>
     <string name="settings_security_redaction_body">Sensitive values are masked in exported copies only. The archived original is never rewritten.</string>
     <string name="settings_security_logging_heading">Logging</string>
-    <string name="settings_security_logging_body">Request and response bodies, cookies, Authorization headers and tokens are never written to the log.</string>
+    <string name="settings_security_logging_headline">Bodies and credentials stay out of the log</string>
+    <string name="settings_security_logging_body">Request and response bodies, cookies, Authorization headers and tokens are never written to the log. Technical logs carry identifiers, counts and failure names only.</string>
     <string name="settings_security_pairing_heading">Pairing</string>
+    <string name="settings_security_pairing_headline">No control without a paired device</string>
     <string name="settings_security_pairing_body">A device must be paired before any control command is accepted. The local network is treated as untrusted.</string>
+    <string name="settings_security_reason_heading">What cannot be configured yet</string>
     <string name="settings_security_reason">configurable redaction defaults need a settings port that does not exist yet</string>
 
     <string name="settings_storage_title">Storage</string>
+    <string name="settings_storage_subtitle">Where local data lives and what leaves it</string>
     <string name="settings_storage_database_heading">Local database</string>
+    <string name="settings_storage_database_headline">Private to this application</string>
     <string name="settings_storage_database_body">The event journal and its projections live in the private storage of this application. Nothing is written to shared storage.</string>
     <string name="settings_storage_export_heading">Exports</string>
+    <string name="settings_storage_export_headline">Only where you point the file picker</string>
     <string name="settings_storage_export_body">Export bundles are written only to the location you pick in the system file picker; this app keeps no second copy.</string>
+    <string name="settings_storage_maintenance_heading">Maintenance</string>
+    <string name="settings_storage_reason_heading">What cannot be done yet</string>
     <string name="settings_storage_reason">clearing and migrating local data need storage ports that do not exist yet</string>
 </resources>

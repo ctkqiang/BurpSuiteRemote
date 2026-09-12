@@ -2,84 +2,94 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.feature.screenshot
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ScreenshotProcessingState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.EmptyStateText
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.NotImplementedReasonText
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.ScreenHeading
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.SectionHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButton
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButtonStyle
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSectionHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 
 /**
  * 截图工作区（plan §28–§30）。
  *
  * 这一屏没有 ViewModel：客户端还没有截图端口，没有任何可观察的状态，硬造一个状态持有者只是摆设。
- * 它显示的是真实存在的领域知识——处理阶段清单——以及诚实的空状态。
+ * 它显示的是真实存在的领域知识——处理阶段清单——以及诚实的空状态：本机没有的东西不摆出来。
  */
 @Composable
 fun ScreenshotScreen(modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
-    ) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = HORIZONTAL_PADDING, vertical = VERTICAL_PADDING),
-            verticalArrangement = Arrangement.spacedBy(SECTION_SPACING),
-        ) {
-            ScreenHeading(titleResource = R.string.screenshot_title)
-            PipelineSection()
-            StoredScreenshotsSection()
+    Box(modifier = modifier.fillMaxSize()) {
+        // 顶栏与底栏由装配层的壳统一提供，各屏不再画第二层标题。
+        run {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            horizontal = BurpRemoteSpacing.Large,
+                            vertical = BurpRemoteSpacing.Large,
+                        ),
+                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium),
+            ) {
+                PipelineSection()
+                StoredScreenshotsSection()
+            }
         }
     }
 }
 
 @Composable
 private fun PipelineSection() {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-        SectionHeading(titleResource = R.string.screenshot_pipeline_heading)
-        Text(
-            text = stringResource(R.string.screenshot_pipeline_note),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+        BurpRemoteSectionHeading(text = stringResource(R.string.screenshot_pipeline_heading))
+        BurpRemoteEmptyState(
+            headline = stringResource(R.string.screenshot_pipeline_note_headline),
+            detail = stringResource(R.string.screenshot_pipeline_note),
         )
-        // 阶段名直接来自领域模型，界面不自己维护一份平行的字符串表。
-        ScreenshotProcessingState.entries.forEach { processingState ->
-            Text(
-                text = stringResource(processingState.labelResource),
-                style = MaterialTheme.typography.bodyMedium,
-            )
+        BurpRemoteCard {
+            // 阶段名直接来自领域模型，界面不自己维护一份平行的字符串表。
+            ScreenshotProcessingState.entries.forEachIndexed { index, processingState ->
+                BurpRemoteTechnicalValue(
+                    text = (index + 1).toString(),
+                    label = stringResource(processingState.labelResource),
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun StoredScreenshotsSection() {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-        SectionHeading(titleResource = R.string.screenshot_stored_heading)
-        EmptyStateText(messageResource = R.string.screenshot_stored_empty)
-        NotImplementedReasonText(reasonResource = R.string.screenshot_reason_import)
-        Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.screenshot_action_import))
-        }
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+        BurpRemoteSectionHeading(text = stringResource(R.string.screenshot_stored_heading))
+        BurpRemoteEmptyState(
+            headline = stringResource(R.string.screenshot_stored_empty_headline),
+            detail = stringResource(R.string.screenshot_stored_empty),
+        )
+        BurpRemoteEmptyState(
+            headline = stringResource(R.string.screenshot_reason_headline),
+            detail = stringResource(R.string.screenshot_reason_import),
+        )
+        BurpRemoteButton(
+            text = stringResource(R.string.screenshot_action_import),
+            onClick = {},
+            style = BurpRemoteButtonStyle.Secondary,
+            isEnabled = false,
+        )
     }
 }
 
@@ -107,8 +117,3 @@ private fun ScreenshotScreenLightPreview() {
 private fun ScreenshotScreenDarkPreview() {
     BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) { ScreenshotScreen() }
 }
-
-private val HORIZONTAL_PADDING = 24.dp
-private val VERTICAL_PADDING = 24.dp
-private val SECTION_SPACING = 24.dp
-private val ROW_SPACING = 8.dp

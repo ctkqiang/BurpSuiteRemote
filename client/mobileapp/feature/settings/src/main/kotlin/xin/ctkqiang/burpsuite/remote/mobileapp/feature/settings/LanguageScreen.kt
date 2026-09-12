@@ -1,57 +1,68 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.ScreenHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSectionHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 
-/** 语言设置（plan §46）。无状态：状态由外面传进来，用户意图往外抛。 */
+/**
+ * 语言设置（plan §46）。
+ *
+ * 无状态：状态由外面传进来，用户意图往外抛。换语言要重建界面才生效，那件事由装配层接效果去做
+ * （rules.md §8.1：一次性动作走效果，不进状态）。
+ */
 @Composable
 fun LanguageScreen(
     uiState: LanguageUserInterfaceState,
     onIntent: (LanguageUserInterfaceIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
-    ) {
-        Column(modifier = Modifier.fillMaxSize().padding(HORIZONTAL_PADDING)) {
-            ScreenHeading(titleResource = R.string.settings_language_title)
-            Spacer(modifier = Modifier.height(SECTION_SPACING))
-            Text(
-                text = stringResource(R.string.settings_language_heading),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Spacer(modifier = Modifier.height(ROW_SPACING))
-            // selectableGroup 让读屏把整组选项当成单选来念，而不是四个各自独立的控件。
-            Column(modifier = Modifier.selectableGroup()) {
+    val haptics = rememberBurpRemoteHaptics()
+
+    Box(modifier = modifier.fillMaxSize()) {
+        // 顶栏与底栏由装配层的壳统一提供，各屏不再画第二层标题。
+        run {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            horizontal = BurpRemoteSpacing.Large,
+                            vertical = BurpRemoteSpacing.Large,
+                        ),
+                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium),
+            ) {
+                BurpRemoteSectionHeading(text = stringResource(R.string.settings_language_heading))
+                BurpRemoteEmptyState(
+                    headline = stringResource(R.string.settings_language_headline),
+                    detail = stringResource(R.string.settings_language_detail),
+                )
                 LanguagePreference.entries.forEach { language ->
-                    LanguageOptionRow(
-                        labelResource = language.labelResource,
+                    LanguageOption(
+                        language = language,
                         isSelected = language == uiState.language,
-                        onSelect = { onIntent(LanguageUserInterfaceIntent.SelectLanguage(language)) },
+                        onSelect = {
+                            haptics.select()
+                            onIntent(LanguageUserInterfaceIntent.SelectLanguage(language))
+                        },
                     )
                 }
             }
@@ -60,22 +71,22 @@ fun LanguageScreen(
 }
 
 @Composable
-private fun LanguageOptionRow(
-    @StringRes labelResource: Int,
+private fun LanguageOption(
+    language: LanguagePreference,
     isSelected: Boolean,
     onSelect: () -> Unit,
 ) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .selectable(selected = isSelected, role = Role.RadioButton, onClick = onSelect)
-                .padding(vertical = ROW_SPACING),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        RadioButton(selected = isSelected, onClick = null)
-        Spacer(modifier = Modifier.width(ROW_SPACING))
-        Text(text = stringResource(labelResource), style = MaterialTheme.typography.bodyLarge)
+    BurpRemoteCard(isInteractive = true, onClick = onSelect) {
+        BurpRemoteStatusPill(
+            text = stringResource(language.labelResource),
+            tone = if (isSelected) BurpRemoteStatusTone.Live else BurpRemoteStatusTone.Neutral,
+        )
+        if (isSelected) {
+            BurpRemoteStatusPill(
+                text = stringResource(R.string.settings_language_selected),
+                tone = BurpRemoteStatusTone.Live,
+            )
+        }
     }
 }
 
@@ -109,7 +120,3 @@ private fun LanguageScreenDarkPreview() {
         )
     }
 }
-
-private val HORIZONTAL_PADDING = 24.dp
-private val SECTION_SPACING = 24.dp
-private val ROW_SPACING = 8.dp

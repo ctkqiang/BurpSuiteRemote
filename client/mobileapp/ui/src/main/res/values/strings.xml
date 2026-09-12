@@ -3,6 +3,8 @@
     <string name="components_not_implemented_reason">Not implemented yet: %1$s</string>
     <string name="components_unavailable_reason">Unavailable: %1$s</string>
     <string name="components_absent_value">—</string>
+    <string name="components_navigate_back">Back</string>
+    <string name="components_scanner_toggle_torch">Toggle flashlight</string>
 
     <!-- 实时与离线是全局口径（plan §59），因此写作固定词形，三种语言都不翻译。 -->
     <string name="components_mode_live">LIVE</string>
@@ -34,4 +36,15 @@
     <string name="connection_state_protocol_error">Protocol error</string>
     <string name="connection_state_timed_out">Timed out</string>
     <string name="connection_state_server_unavailable">Server unavailable</string>
+
+    <!-- 配对结论逐条分开写：每一种都对应不同的下一步，合并成一句等于让用户自己猜。 -->
+    <string name="pairing_conclusion_succeeded">Paired. Connecting to Burp…</string>
+    <string name="pairing_conclusion_malformed_ticket">This code is not a Burp Remote pairing ticket.</string>
+    <string name="pairing_conclusion_ticket_expired">This pairing ticket has expired. Scan a fresh one.</string>
+    <string name="pairing_conclusion_protocol_version_unsupported">Protocol version mismatch. Upgrade Burp Remote or the extension.</string>
+    <string name="pairing_conclusion_device_not_paired">Burp does not accept this device. Start pairing from the extension.</string>
+    <string name="pairing_conclusion_pairing_code_mismatch">The pairing code does not match. Check it and retry.</string>
+    <string name="pairing_conclusion_pairing_session_expired">The pairing session on Burp has expired. Scan a fresh ticket.</string>
+    <string name="pairing_conclusion_unreachable">Burp is unreachable. Check the address, the port and your network.</string>
+    <string name="pairing_conclusion_failed">Pairing failed. See the technical log for the exact cause.</string>
 </resources>

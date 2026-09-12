@@ -1,16 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="history_title">Live history</string>
-    <string name="history_empty_message">No requests observed yet. Connect Burp to see them here.</string>
+    <string name="history_subtitle">Metadata only — bodies are fetched on demand</string>
     <string name="history_absent_value">—</string>
+    <string name="history_action_refresh">Refresh</string>
+
+    <string name="history_response_length_label">Size</string>
     <string name="history_response_length_value">%1$d B</string>
+    <string name="history_duration_label">Duration</string>
+    <string name="history_duration_value">%1$d ms</string>
+
+    <string name="history_loading_headline">Reading the local projection</string>
+    <string name="history_loading_detail">The history projection is being read from this device.</string>
+    <string name="history_empty_headline">Nothing is streaming in</string>
+    <string name="history_empty_detail">Live history is empty. Connect Burp and send traffic through the proxy; records show up here as soon as the plug-in forwards them. Nothing to show does not mean nothing happened — it means nothing reached this device.</string>
+
+    <string name="history_error_headline">The history projection could not be read</string>
+    <string name="history_error_read_failed">the history projection could not be read from this device</string>
+    <string name="history_error_action">Try again</string>
 
     <string name="history_detail_title">Request detail</string>
-    <string name="history_detail_loading">Loading this record…</string>
-    <string name="history_detail_not_found">This record is not in the local projection any more.</string>
+    <string name="history_detail_loading_headline">Loading this record…</string>
+    <string name="history_detail_loading">The record is being read from the local projection.</string>
+    <string name="history_detail_not_found_headline">This record is gone</string>
+    <string name="history_detail_not_found">The record is not in the local projection any more. It may have been replaced by a snapshot.</string>
     <string name="history_detail_value_yes">Yes</string>
     <string name="history_detail_value_no">No</string>
 
+    <string name="history_detail_summary_heading">Summary</string>
     <string name="history_detail_request_heading">Request</string>
     <string name="history_detail_request_line_label">Request line</string>
     <string name="history_detail_host_label">Host</string>
@@ -24,10 +41,8 @@
     <string name="history_detail_mime_type_label">MIME type</string>
     <string name="history_detail_response_length_label">Response length</string>
     <string name="history_detail_duration_label">Duration</string>
-    <string name="history_detail_duration_value">%1$d ms</string>
 
     <string name="history_detail_record_heading">Local record</string>
-    <string name="history_detail_archive_state_label">Archive state</string>
     <string name="history_detail_archive_state_live">Live</string>
     <string name="history_detail_archive_state_archived">Archived</string>
     <string name="history_detail_saved_at_label">Saved at</string>
@@ -41,10 +56,31 @@
     <string name="history_detail_occurred_at_label">Observed at</string>
 
     <string name="history_detail_message_heading">Message</string>
-    <string name="history_detail_message_unavailable">The request and response bytes are not captured locally.</string>
+    <string name="history_detail_message_headline">No bytes on this device</string>
+    <string name="history_detail_message_unavailable">The request and response bytes are not captured locally, so this screen shows metadata only. Nothing is shown in their place: a placeholder would look like evidence.</string>
+    <string name="history_detail_reason_headline">Why this is missing</string>
     <string name="history_detail_reason_message">the client has no message-body port yet</string>
 
+    <string name="history_detail_actions_heading">Actions</string>
     <string name="history_detail_action_share">Share or export</string>
     <string name="history_detail_action_send_to_repeater">Send to Repeater</string>
     <string name="history_detail_reason_send_to_repeater">the client has no repeater-command port yet</string>
+
+    <string name="history_relative_just_now">just now</string>
+    <plurals name="history_relative_seconds">
+        <item quantity="one">%1$d second ago</item>
+        <item quantity="other">%1$d seconds ago</item>
+    </plurals>
+    <plurals name="history_relative_minutes">
+        <item quantity="one">%1$d minute ago</item>
+        <item quantity="other">%1$d minutes ago</item>
+    </plurals>
+    <plurals name="history_relative_hours">
+        <item quantity="one">%1$d hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
+    </plurals>
+    <plurals name="history_relative_days">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
 </resources>

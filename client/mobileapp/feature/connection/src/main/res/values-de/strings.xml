@@ -1,37 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="connection_title">Burp-Verbindung</string>
+    <string name="connection_absent_value">—</string>
+    <string name="connection_mode_live">LIVE</string>
+    <string name="connection_mode_offline">OFFLINE</string>
+
     <string name="connection_status_heading">Verbindungsstatus</string>
     <string name="connection_server_address_label">Serveradresse</string>
     <string name="connection_server_address_absent">Nicht konfiguriert</string>
     <string name="connection_server_port_label">Port</string>
 
-    <string name="connection_scan_pairing_title">Pairing-Code scannen</string>
-    <string name="connection_scan_pairing_action">Scanner öffnen</string>
-    <string name="connection_scanner_close_action">Scanner schließen</string>
-    <string name="connection_scanner_permission_pending">Kameraberechtigung wird angefragt…</string>
-    <string name="connection_scanner_permission_denied">Der Kamerazugriff ist verweigert, daher kann der Pairing-QR-Code nicht gelesen werden. Erteile die Berechtigung erneut oder nutze die manuelle Eingabe unten. Falls Android die Abfrage nicht mehr zeigt, aktiviere die Kameraberechtigung in den Systemeinstellungen.</string>
-    <string name="connection_scanner_permission_request_action">Kamerazugriff erneut anfragen</string>
+    <string name="connection_state_disconnected">Nicht verbunden</string>
+    <string name="connection_state_discovering">Plug-in wird gesucht</string>
+    <string name="connection_state_connecting">Verbindung wird aufgebaut</string>
+    <string name="connection_state_authenticating">Gerät wird authentifiziert</string>
+    <string name="connection_state_synchronising">Ereignisse werden nachgeladen</string>
+    <string name="connection_state_connected">Verbunden</string>
+    <string name="connection_state_reconnecting">Neuverbindung läuft</string>
+    <string name="connection_state_resynchronisation_required">Neuer Snapshot erforderlich</string>
+    <string name="connection_state_authentication_failed">Authentifizierung abgelehnt</string>
+    <string name="connection_state_protocol_error">Protokollfehler</string>
+    <string name="connection_state_timed_out">Zeitüberschreitung</string>
+    <string name="connection_state_server_unavailable">Plug-in nicht erreichbar</string>
 
-    <string name="connection_ticket_heading">Pairing-Ticket</string>
+    <string name="connection_scan_heading">Kopplungscode scannen</string>
+    <string name="connection_scan_headline">QR-Code in den Sucher halten</string>
+    <string name="connection_scan_detail">Erzeugen Sie den Code im Burp-Remote-Tab des Plug-ins und scannen Sie ihn. Der Code enthält Adresse, Port und einen einmaligen Kopplungscode und ist damit der einzige Weg, dieses Gerät zu konfigurieren.</string>
+    <string name="connection_scan_action">Scanner öffnen</string>
+
+    <string name="connection_scanner_status_searching">QR-Code wird gesucht…</string>
+    <string name="connection_scanner_status_pending">Kameraberechtigung wird erwartet…</string>
+    <string name="connection_scanner_status_permission_denied">Kamerazugriff ist verweigert</string>
+    <string name="connection_scanner_status_undecodable">Dieser Code ist kein Kopplungsticket</string>
+    <string name="connection_scanner_status_expired">Dieses Ticket ist abgelaufen</string>
+    <string name="connection_scanner_status_protocol">Protokollversion passt nicht</string>
+    <string name="connection_scanner_close_action">Scanner schließen</string>
+
+    <string name="connection_scanner_mode_camera">Kamera</string>
+    <string name="connection_scanner_mode_manual">Kopplungstext</string>
+    <string name="connection_scanner_manual_headline">Scannen nicht möglich?</string>
+    <string name="connection_scanner_manual_detail">Fügen Sie den Kopplungstext ein, den das Plug-in neben dem QR-Code anzeigt. Er durchläuft dieselbe lokale Prüfung und dieselbe Kopplungsanfrage wie ein gescannter Code.</string>
+
+    <string name="connection_scanner_permission_denied_headline">Kamerazugriff ist verweigert</string>
+    <string name="connection_scanner_permission_denied_detail">Ohne Kamera lässt sich der QR-Code nicht lesen und dieses Gerät nicht konfigurieren. Erteilen Sie die Berechtigung zum Scannen. Zeigt Android die Abfrage nicht mehr, aktivieren Sie die Kameraberechtigung für diese App in den Systemeinstellungen.</string>
+    <string name="connection_scanner_permission_request_action">Kamerazugriff erlauben</string>
+    <string name="connection_scanner_permission_pending_headline">Kameraberechtigung wird erwartet</string>
+    <string name="connection_scanner_permission_pending_detail">Android fragt gerade nach der Kameraberechtigung. Sobald sie erteilt ist, öffnet sich hier der Sucher.</string>
+
+    <string name="connection_ticket_heading">Kopplungsticket</string>
     <string name="connection_ticket_host_label">Host</string>
     <string name="connection_ticket_port_label">Port</string>
-    <string name="connection_ticket_protocol_version_label">Protokollversion</string>
+    <string name="connection_ticket_protocol_version_label">Protokollversion des Tickets</string>
     <string name="connection_ticket_expires_at_label">Gültig bis</string>
-    <string name="connection_ticket_expired">Dieses Ticket ist bereits abgelaufen. Erzeuge in Burp ein neues.</string>
-    <string name="connection_ticket_undecodable">Dieser QR-Code ist kein Pairing-Ticket. Scanne den Code im Burp-Remote-Tab.</string>
+    <string name="connection_ticket_absent_headline">Noch kein Ticket gescannt</string>
+    <string name="connection_ticket_absent_detail">Auf diesem Gerät wurde noch nichts gescannt; es gibt daher noch keine Adresse, keinen Port und keinen einmaligen Code.</string>
 
-    <string name="connection_manual_pairing_title">Pairing-Code manuell eingeben</string>
-    <string name="connection_manual_pairing_hint">Der Pairing-Code gehört zum Ticket, daher zuerst einmal scannen; was hier steht, ersetzt den Code aus dem Ticket.</string>
-    <string name="connection_manual_pairing_code_label">Pairing-Code</string>
+    <string name="connection_ticket_rejection_undecodable_headline">Dieser QR-Code ist kein Kopplungsticket</string>
+    <string name="connection_ticket_rejection_undecodable_detail">Der Code wurde gelesen, sein Inhalt entspricht aber nicht dem Ticket-Vertrag. Scannen Sie den Code aus dem Burp-Remote-Tab des Plug-ins.</string>
+    <string name="connection_ticket_rejection_expired_headline">Dieses Ticket ist bereits abgelaufen</string>
+    <string name="connection_ticket_rejection_expired_detail">Es war bis %1$s gültig. Erzeugen Sie im Plug-in einen neuen Code und scannen Sie ihn.</string>
+    <string name="connection_ticket_rejection_protocol_headline">Protokollversion nicht unterstützt</string>
+    <string name="connection_ticket_rejection_protocol_detail">Das Ticket nennt Protokollversion %1$d, dieser Client spricht Version %2$d. Aktualisieren Sie die ältere Seite und erzeugen Sie einen neuen Code.</string>
+
+    <string name="connection_manual_pairing_heading">Kopplungstext von Hand eingeben</string>
+    <string name="connection_manual_pairing_headline">Rückfalloption, wenn der Code nicht scanbar ist</string>
+    <string name="connection_manual_pairing_hint">Fügen Sie den Kopplungstext ein, den das Plug-in neben dem QR-Code anzeigt. Er läuft durch dieselbe Kette wie ein gescannter Code; beide Wege enden in derselben Kopplungsanfrage.</string>
+    <string name="connection_manual_pairing_text_label">Kopplungstext</string>
     <string name="connection_manual_pairing_action">Koppeln</string>
 
+    <string name="connection_pairing_result_heading">Kopplungsergebnis</string>
+    <string name="connection_pairing_succeeded_headline">Das Plug-in hat dieses Gerät akzeptiert</string>
+    <string name="connection_pairing_succeeded_detail">Das Credential liegt auf diesem Gerät. Die Verbindung kann nun im Hintergrund weiterlaufen.</string>
+    <string name="connection_pairing_rejection_code">der Kopplungscode stimmte nicht mit dem vom Plug-in ausgegebenen überein</string>
+    <string name="connection_pairing_rejection_session_expired">die Kopplungssitzung ist bereits abgelaufen; erzeugen Sie einen neuen Code</string>
+    <string name="connection_pairing_rejection_session_unavailable">das Plug-in kennt diese Kopplungssitzung nicht mehr; scannen Sie einen frischen Code</string>
+    <string name="connection_pairing_rejection_protocol">beide Seiten sind sich bei der Protokollversion uneinig</string>
+    <string name="connection_pairing_rejection_authentication">diese Geräteidentität wurde abgelehnt</string>
+    <string name="connection_pairing_rejection_unreachable">das Plug-in war nicht erreichbar; prüfen Sie Adresse, Port und ob Burp läuft</string>
+    <string name="connection_pairing_rejection_not_supported">das Plug-in hat diesen Endpunkt noch nicht implementiert</string>
+    <string name="connection_pairing_rejection_unknown">das Plug-in antwortete mit einem Fehler, den dieser Client nicht kennt</string>
+    <string name="connection_pairing_in_flight">Kopplung läuft…</string>
+
+    <string name="connection_unavailable_headline">Diese Aktion ist noch nicht verfügbar</string>
+    <string name="connection_reason_no_transport">die entfernte Übertragungsschicht ist in diesem Build noch nicht verdrahtet</string>
+    <string name="connection_reason_no_ticket">scannen Sie zuerst ein Kopplungsticket oder fügen Sie den Kopplungstext oben ein</string>
+    <string name="connection_reason_ticket_unusable">das gescannte Ticket ist so nicht verwendbar; der Grund steht oben im Ticket-Abschnitt</string>
+
+    <string name="connection_paired_heading">Gekoppeltes Gerät</string>
+    <string name="connection_paired_state_paired">GEKOPPELT</string>
+    <string name="connection_paired_state_unpaired">NICHT GEKOPPELT</string>
+    <string name="connection_paired_headline">Die Kopplung liegt auf diesem Gerät</string>
+    <string name="connection_paired_detail_paired">Adresse und Port unten stammen aus dem gescannten Ticket. Erneut koppeln ersetzt das Credential; Kopplung löschen vergisst dieses Gerät auf beiden Seiten.</string>
+    <string name="connection_paired_detail_unpaired">Es ist noch kein Credential gespeichert. Scannen Sie ein Ticket zum Koppeln; Adresse und Port werden daraus übernommen.</string>
+    <string name="connection_paired_host_label">Gekoppelter Host</string>
+    <string name="connection_paired_port_label">Gekoppelter Port</string>
+    <string name="connection_paired_re_pair_action">Erneut koppeln</string>
+    <string name="connection_paired_clear_action">Kopplung löschen</string>
+
+    <string name="connection_endpoint_heading">Serveradresse und Port</string>
+    <string name="connection_endpoint_headline">Wo das Plug-in lauscht</string>
+    <string name="connection_endpoint_detail">Der Standardport ist %1$d. Die Kopplung schreibt diese beiden Werte aus dem Ticket; ändern Sie sie hier, um auf einen anderen Host zu zeigen, und speichern Sie.</string>
+    <string name="connection_endpoint_host_label">Host</string>
+    <string name="connection_endpoint_port_label">Port</string>
+    <string name="connection_endpoint_save_action">Speichern</string>
+
     <string name="connection_retry_heading">Verbindung</string>
+    <string name="connection_retry_headline">Sitzung zu Burp öffnen</string>
+    <string name="connection_retry_detail">Eine Verbindung hält eine Sitzung offen und schreibt Ereignisse fortlaufend ins lokale Journal. Nach einem Fehler können Sie es hier erneut versuchen.</string>
     <string name="connection_retry_action">Verbindung erneut versuchen</string>
-
-    <string name="connection_pairing_succeeded">Das Plug-in hat dieses Gerät akzeptiert.</string>
-    <string name="connection_pairing_rejected">Das Plug-in hat den Pairing-Versuch abgelehnt. Scanne einen neuen Code.</string>
-
-    <string name="connection_reason_no_transport">der Remote-Transport ist noch nicht angeschlossen</string>
-    <string name="connection_reason_no_ticket">zuerst den Pairing-Code scannen</string>
 </resources>

@@ -1,19 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="archive_title">Archive</string>
+    <string name="archive_subtitle">Saved copies stay readable offline</string>
     <string name="archive_absent_value">—</string>
+    <string name="archive_action_refresh">Refresh</string>
+    <string name="archive_archived_pill">Archived</string>
 
-    <string name="archive_tab_saved_history">Saved history</string>
+    <string name="archive_tab_saved_history">Saved</string>
     <string name="archive_tab_bookmarks">Bookmarks</string>
     <string name="archive_tab_screenshots">Screenshots</string>
 
-    <string name="archive_saved_history_empty">Nothing has been saved yet. Saving is a control command, so it needs a live connection.</string>
+    <string name="archive_loading_headline">Reading saved history</string>
+    <string name="archive_loading_detail">The archived part of the history projection is being read from this device.</string>
+    <string name="archive_error_headline">Saved history could not be read</string>
+    <string name="archive_error_read_failed">the archived part of the history projection could not be read</string>
+    <string name="archive_error_action">Try again</string>
+
+    <string name="archive_saved_history_heading">Saved copies</string>
+    <string name="archive_saved_history_empty">Nothing has been saved yet</string>
+    <string name="archive_saved_history_empty_detail">Saving is a control command, so it needs a live connection; until then this tab stays empty. Nothing is listed that the device does not actually hold.</string>
+    <string name="archive_saved_at_label">Saved · %1$s</string>
     <string name="archive_action_share">Share or export</string>
 
-    <string name="archive_bookmarks_empty">No bookmarked history is stored on this device.</string>
+    <string name="archive_bookmarks_heading">Bookmarked requests</string>
+    <string name="archive_bookmarks_empty">No bookmark is stored on this device</string>
     <string name="archive_reason_bookmarks">the client has no bookmark-projection port yet</string>
 
-    <string name="archive_screenshots_empty">No screenshots are stored on this device.</string>
-    <string name="archive_reason_screenshots">the client has no screenshot-port yet, and the image pipeline still lives in the data layer</string>
+    <string name="archive_screenshots_heading">Screenshots</string>
+    <string name="archive_screenshots_empty">No screenshot is stored on this device</string>
+    <string name="archive_reason_screenshots">the client has no screenshot port yet, and the image pipeline still lives in the data layer</string>
     <string name="archive_screenshots_open_action">Open screenshot workspace</string>
+
+    <string name="archive_relative_just_now">just now</string>
+    <plurals name="archive_relative_seconds">
+        <item quantity="one">%1$d second ago</item>
+        <item quantity="other">%1$d seconds ago</item>
+    </plurals>
+    <plurals name="archive_relative_minutes">
+        <item quantity="one">%1$d minute ago</item>
+        <item quantity="other">%1$d minutes ago</item>
+    </plurals>
+    <plurals name="archive_relative_hours">
+        <item quantity="one">%1$d hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
+    </plurals>
+    <plurals name="archive_relative_days">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
 </resources>

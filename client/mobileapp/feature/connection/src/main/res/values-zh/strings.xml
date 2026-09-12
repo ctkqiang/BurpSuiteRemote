@@ -1,37 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="connection_title">Burp 连接</string>
+    <string name="connection_absent_value">—</string>
+    <string name="connection_mode_live">LIVE</string>
+    <string name="connection_mode_offline">OFFLINE</string>
+
     <string name="connection_status_heading">连接状态</string>
     <string name="connection_server_address_label">服务器地址</string>
     <string name="connection_server_address_absent">尚未配置</string>
     <string name="connection_server_port_label">端口</string>
 
-    <string name="connection_scan_pairing_title">扫码配对</string>
-    <string name="connection_scan_pairing_action">打开扫码</string>
-    <string name="connection_scanner_close_action">关闭扫码</string>
-    <string name="connection_scanner_permission_pending">正在等待相机权限……</string>
-    <string name="connection_scanner_permission_denied">相机权限被拒绝了，读不到配对二维码。可以再授权一次，或者用下面的手动入口。如果系统不再弹出授权框，请到系统设置里为本应用打开相机权限。</string>
-    <string name="connection_scanner_permission_request_action">重新申请相机权限</string>
+    <string name="connection_state_disconnected">未连接</string>
+    <string name="connection_state_discovering">正在发现插件</string>
+    <string name="connection_state_connecting">正在建立连接</string>
+    <string name="connection_state_authenticating">正在认证设备</string>
+    <string name="connection_state_synchronising">正在补齐事件</string>
+    <string name="connection_state_connected">已连接</string>
+    <string name="connection_state_reconnecting">正在重连</string>
+    <string name="connection_state_resynchronisation_required">需要重新取快照</string>
+    <string name="connection_state_authentication_failed">认证被拒绝</string>
+    <string name="connection_state_protocol_error">协议不一致</string>
+    <string name="connection_state_timed_out">握手超时</string>
+    <string name="connection_state_server_unavailable">插件不可达</string>
+
+    <string name="connection_scan_heading">扫码配对</string>
+    <string name="connection_scan_headline">把二维码对准取景框</string>
+    <string name="connection_scan_detail">在插件的 Burp Remote 标签页里生成二维码，再扫它。地址、端口与一次性配对码都在码里，这是配置本机的唯一途径。</string>
+    <string name="connection_scan_action">打开扫码面板</string>
+
+    <string name="connection_scanner_status_searching">正在寻找二维码……</string>
+    <string name="connection_scanner_status_pending">正在等待相机权限……</string>
+    <string name="connection_scanner_status_permission_denied">相机权限被拒绝</string>
+    <string name="connection_scanner_status_undecodable">这张码不是配对票据</string>
+    <string name="connection_scanner_status_expired">这张票据已经过期</string>
+    <string name="connection_scanner_status_protocol">协议版本不一致</string>
+    <string name="connection_scanner_close_action">关闭扫码面板</string>
+
+    <string name="connection_scanner_mode_camera">相机</string>
+    <string name="connection_scanner_mode_manual">配对文本</string>
+    <string name="connection_scanner_manual_headline">扫不出来？</string>
+    <string name="connection_scanner_manual_detail">把插件里二维码旁边那段配对文本粘进来。它会经过与扫码完全相同的本地校验，最后发出的是同一个配对请求。</string>
+
+    <string name="connection_scanner_permission_denied_headline">相机权限被拒绝</string>
+    <string name="connection_scanner_permission_denied_detail">没有相机就读不出二维码，本机也就没法配置。请授予相机权限后再扫一次；如果系统已经不再弹窗，请到系统设置里为本应用打开相机权限。</string>
+    <string name="connection_scanner_permission_request_action">申请相机权限</string>
+    <string name="connection_scanner_permission_pending_headline">正在等待相机权限</string>
+    <string name="connection_scanner_permission_pending_detail">系统正在询问相机权限；授权之后取景框就会出现在这里。</string>
 
     <string name="connection_ticket_heading">配对票据</string>
     <string name="connection_ticket_host_label">主机</string>
     <string name="connection_ticket_port_label">端口</string>
-    <string name="connection_ticket_protocol_version_label">协议版本</string>
-    <string name="connection_ticket_expires_at_label">有效至</string>
-    <string name="connection_ticket_expired">这张票据已经过期了，请在 Burp 里重新生成一张。</string>
-    <string name="connection_ticket_undecodable">这个二维码不是配对票据。请扫 Burp Remote 标签页里显示的那一张。</string>
+    <string name="connection_ticket_protocol_version_label">票据声明的协议版本</string>
+    <string name="connection_ticket_expires_at_label">失效时刻</string>
+    <string name="connection_ticket_absent_headline">还没有扫到票据</string>
+    <string name="connection_ticket_absent_detail">本机还没有扫过任何码，因此没有可用的地址、端口与一次性配对码。</string>
 
-    <string name="connection_manual_pairing_title">手动输入配对码</string>
-    <string name="connection_manual_pairing_hint">配对码是票据的一部分，所以要先扫码一次；这里填的码会覆盖票据里的那一个。</string>
-    <string name="connection_manual_pairing_code_label">配对码</string>
+    <string name="connection_ticket_rejection_undecodable_headline">这张二维码不是配对票据</string>
+    <string name="connection_ticket_rejection_undecodable_detail">码读出来了，但内容不符合配对票据契约。请扫插件 Burp Remote 标签页里显示的那张码。</string>
+    <string name="connection_ticket_rejection_expired_headline">这张票据已经过期</string>
+    <string name="connection_ticket_rejection_expired_detail">它的失效时刻是 %1$s。请在插件里重新生成一张码再扫。</string>
+    <string name="connection_ticket_rejection_protocol_headline">协议版本不受支持</string>
+    <string name="connection_ticket_rejection_protocol_detail">票据声明的是协议版本 %1$d，本客户端说的是版本 %2$d。请把较旧的一端升级后重新生成一张码。</string>
+
+    <string name="connection_manual_pairing_heading">手输配对文本</string>
+    <string name="connection_manual_pairing_headline">码扫不出来时的兜底</string>
+    <string name="connection_manual_pairing_hint">把插件里二维码旁边那段配对文本粘进来。它和扫到的码走的是同一条链路，两条路最后发出的是同一个配对请求。</string>
+    <string name="connection_manual_pairing_text_label">配对文本</string>
     <string name="connection_manual_pairing_action">配对</string>
 
-    <string name="connection_retry_heading">连接</string>
+    <string name="connection_pairing_result_heading">配对结果</string>
+    <string name="connection_pairing_succeeded_headline">插件已接受本机</string>
+    <string name="connection_pairing_succeeded_detail">凭据已存在本机。接下来连接可以在后台继续。</string>
+    <string name="connection_pairing_rejection_code">配对码与插件签发的那一串不一致</string>
+    <string name="connection_pairing_rejection_session_expired">配对会话已经过期，请重新生成一张码</string>
+    <string name="connection_pairing_rejection_session_unavailable">插件已经不认识这个配对会话，请重新扫一张新码</string>
+    <string name="connection_pairing_rejection_protocol">两端对协议版本的说法不一致</string>
+    <string name="connection_pairing_rejection_authentication">本机身份被拒绝</string>
+    <string name="connection_pairing_rejection_unreachable">连不上插件；请检查地址、端口，以及 Burp 是否在运行</string>
+    <string name="connection_pairing_rejection_not_supported">插件侧该端点尚未实现</string>
+    <string name="connection_pairing_rejection_unknown">插件回了一个本客户端不认识的失败原因</string>
+    <string name="connection_pairing_in_flight">正在配对……</string>
+
+    <string name="connection_unavailable_headline">这个动作暂时不可用</string>
+    <string name="connection_reason_no_transport">这个构建里还没有接上远程传输层</string>
+    <string name="connection_reason_no_ticket">请先扫一张配对票据，或把配对文本粘进上面的输入框</string>
+    <string name="connection_reason_ticket_unusable">扫到的票据当前用不了，具体原因写在上面的票据一节里</string>
+
+    <string name="connection_paired_heading">已配对设备</string>
+    <string name="connection_paired_state_paired">已配对</string>
+    <string name="connection_paired_state_unpaired">未配对</string>
+    <string name="connection_paired_headline">配对凭据存在本机</string>
+    <string name="connection_paired_detail_paired">下面的地址与端口来自扫到的那张票据。要换一份凭据就重新配对；要让两端都忘掉本机就清除配对。</string>
+    <string name="connection_paired_detail_unpaired">本机还没有凭据。扫一张票据即可配对，地址与端口会从票据里写进来。</string>
+    <string name="connection_paired_host_label">已配对主机</string>
+    <string name="connection_paired_port_label">已配对端口</string>
+    <string name="connection_paired_re_pair_action">重新配对</string>
+    <string name="connection_paired_clear_action">清除配对</string>
+
+    <string name="connection_endpoint_heading">服务器地址与端口</string>
+    <string name="connection_endpoint_headline">插件监听在哪里</string>
+    <string name="connection_endpoint_detail">默认端口是 %1$d。配对时会用票据里的值写这两项；要连另一台机器就在这里改完保存。</string>
+    <string name="connection_endpoint_host_label">主机</string>
+    <string name="connection_endpoint_port_label">端口</string>
+    <string name="connection_endpoint_save_action">保存</string>
+
+    <string name="connection_retry_heading">建立连接</string>
+    <string name="connection_retry_headline">打开与 Burp 的会话</string>
+    <string name="connection_retry_detail">连接会保持一条长会话，把事件持续写入本机的事件日志。失败之后可以在这里重试。</string>
     <string name="connection_retry_action">重试连接</string>
-
-    <string name="connection_pairing_succeeded">插件已经接受了这台设备。</string>
-    <string name="connection_pairing_rejected">插件拒绝了这次配对。重新扫一张票据再试。</string>
-
-    <string name="connection_reason_no_transport">远程传输层尚未接通</string>
-    <string name="connection_reason_no_ticket">请先扫码取得配对票据</string>
 </resources>

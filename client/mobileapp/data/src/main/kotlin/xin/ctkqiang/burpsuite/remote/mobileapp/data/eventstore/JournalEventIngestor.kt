@@ -1,5 +1,9 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.data.eventstore
 
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.projection.ProjectionStore
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.transaction.AtomicUnitOfWork
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.event.JournalEvent
@@ -25,6 +29,7 @@ class JournalEventIngestor(
     private val recordedEventMapper: JournalEventRecordedEventMapper,
     private val atomicUnitOfWork: AtomicUnitOfWork,
     private val timeProvider: TimeProvider,
+    private val technicalLog: TechnicalLog = SilentTechnicalLog,
 ) {
     /**
      * 收下一条事件。
@@ -32,7 +37,20 @@ class JournalEventIngestor(
      * [synchronisationCoordinator] 只记内存里的进度，装配时必须以日志的最新序号为初值：
      * 否则重启后会把「已经收到过」误判成断洞。
      */
-    suspend fun ingest(event: JournalEvent): EventIngestionOutcome =
+    suspend fun ingest(event: JournalEvent): EventIngestionOutcome {
+        val outcome = accept(event)
+        // 只记序号与结论：事件载荷属于用户数据，不进日志（rules.md §12）。
+        technicalLog.record(
+            TechnicalLogEvent(
+                category = TechnicalLogCategory.EventIngestion,
+                message = outcome.description,
+                attributes = mapOf("sequenceNumber" to event.sequenceNumber.toString()),
+            ),
+        )
+        return outcome
+    }
+
+    private suspend fun accept(event: JournalEvent): EventIngestionOutcome =
         when (val decision = synchronisationCoordinator.accept(event)) {
             EventSynchronisationDecision.Duplicate -> EventIngestionOutcome.AlreadyDelivered
             is EventSynchronisationDecision.GapDetected ->
@@ -65,3 +83,13 @@ class JournalEventIngestor(
         }
     }
 }
+
+// 结论要说成人话：光看「已丢弃」，分不出是重复投递还是断洞。
+private val EventIngestionOutcome.description: String
+    get() =
+        when (this) {
+            EventIngestionOutcome.Applied -> "事件已落盘并折入投影"
+            EventIngestionOutcome.AlreadyDelivered -> "重复投递，已丢弃"
+            is EventIngestionOutcome.ResynchronisationRequired -> "序号断洞，需从基准续传"
+            is EventIngestionOutcome.SequenceNumberReused -> "序号被另一条事件复用，拒收"
+        }

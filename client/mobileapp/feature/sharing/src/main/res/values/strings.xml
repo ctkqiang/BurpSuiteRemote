@@ -2,19 +2,24 @@
 <resources>
     <string name="sharing_title">Share or export</string>
     <string name="sharing_absent_value">—</string>
-    <string name="sharing_loading">Loading this record…</string>
-    <string name="sharing_not_found">This record is not in the local projection any more.</string>
+    <string name="sharing_loading_headline">Loading this record…</string>
+    <string name="sharing_loading">The record is being read from the local projection.</string>
+    <string name="sharing_not_found_headline">This record is gone</string>
+    <string name="sharing_not_found">The record is not in the local projection any more, so there is nothing to export.</string>
 
+    <string name="sharing_subject_heading">What is exported</string>
     <string name="sharing_request_line_label">Request line</string>
     <string name="sharing_host_label">Host</string>
+    <string name="sharing_identifier_label">History identifier</string>
 
-    <string name="sharing_scope_heading">What is exported</string>
-    <string name="sharing_scope_note">Only what this device holds is exported. The request and response bytes are not captured yet, so the export carries metadata, the manifest and this redaction report — nothing else.</string>
+    <string name="sharing_scope_heading">Scope of the export</string>
+    <string name="sharing_scope_headline">Only what this device holds</string>
+    <string name="sharing_scope_note">The export carries the manifest, the redaction report and the fields stored on this device. Request and response bytes are not captured yet, so they are not part of it — the bundle says so rather than padding itself out.</string>
 
     <string name="sharing_scan_heading">Sensitive data scan</string>
-    <string name="sharing_scan_summary">Scanned %1$d lines for credential headers, bearer tokens, JSON Web Tokens and e-mail addresses.</string>
-    <string name="sharing_scan_empty">Nothing sensitive showed up in the scanned fields.</string>
-    <string name="sharing_scan_finding">Line %1$d: %2$s</string>
+    <string name="sharing_scan_count_label">Lines scanned</string>
+    <string name="sharing_scan_empty_headline">Nothing sensitive found</string>
+    <string name="sharing_scan_empty">No credential header, bearer token, JSON Web Token or e-mail address showed up in the exported fields.</string>
 
     <string name="sharing_kind_authorization_header">Authorization header</string>
     <string name="sharing_kind_cookie_header">Cookie header</string>
@@ -25,10 +30,14 @@
     <string name="sharing_kind_email_address">E-mail address</string>
 
     <string name="sharing_preview_heading">Redacted preview</string>
+    <string name="sharing_preview_headline">This is what leaves the device</string>
     <string name="sharing_preview_note">Redaction applies to this exported copy only. The archived original stays byte-exact and is never rewritten.</string>
 
+    <string name="sharing_confirm_heading">Confirm</string>
     <string name="sharing_confirm_action">Confirm and export</string>
+    <string name="sharing_state_exported">Exported</string>
     <string name="sharing_exported">The export bundle was written to the location you chose.</string>
+    <string name="sharing_state_failed">Export failed</string>
     <string name="sharing_export_failed">The export could not be written. Try again with another location.</string>
 
     <!-- 写进导出包 notice.txt 的说明；导出文件是给用户看的，因此文案同样走资源。 -->

@@ -22,6 +22,18 @@ class RemoteInboundMessageDecoderTest {
     }
 
     @Test
+    fun `a plugin event frame without a message type is still decoded as an event`() {
+        val decoded = RemoteInboundMessageDecoder.decode(PLUGIN_EVENT_FRAME)
+
+        val eventReceived = assertInstanceOf(RemoteInboundMessage.EventReceived::class.java, decoded)
+        assertEquals(EventIdentifier("event_1"), eventReceived.envelope.eventIdentifier)
+        assertEquals(7L, eventReceived.envelope.sequenceNumber)
+        assertEquals(EventType("history.item.observed"), eventReceived.envelope.eventType)
+        assertEquals(AggregateType.History, eventReceived.envelope.aggregateType)
+        assertEquals(AggregateIdentifier("history_1"), eventReceived.envelope.aggregateIdentifier)
+    }
+
+    @Test
     fun `a signal frame is decoded into its code`() {
         val decoded = RemoteInboundMessageDecoder.decode(SIGNAL_FRAME)
 
@@ -64,6 +76,12 @@ class RemoteInboundMessageDecoderTest {
                 """"sequenceNumber":5,"occurredAt":1757660000000,"eventType":"history.item.observed",""" +
                 """"aggregateType":"history","aggregateIdentifier":"history_1",""" +
                 """"payload":{"host":"api.example.com"}}"""
+
+        // 插件侧 RemoteEventEnvelope 的真实线上形状：没有 messageType，只有事件专有字段。
+        const val PLUGIN_EVENT_FRAME =
+            """{"protocolVersion":1,"eventIdentifier":"event_1","sequenceNumber":7,""" +
+                """"occurredAt":1757660000000,"eventType":"history.item.observed","aggregateType":"history",""" +
+                """"aggregateIdentifier":"history_1","payload":{"host":"api.example.com"}}"""
 
         const val SIGNAL_FRAME =
             """{"protocolVersion":1,"messageType":"signal","code":"authentication_succeeded"}"""

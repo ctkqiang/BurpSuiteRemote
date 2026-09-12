@@ -1,7 +1,12 @@
+
+
 package xin.ctkqiang.burpsuite.remote.mobileapp.feature.archive
 
 /** 用户在归档屏上的意图。界面只表达「想看哪个 / 对哪条做什么」，跳转走一次性效果（rules.md §8.1）。 */
 sealed interface ArchiveUserInterfaceIntent {
+    /** 用户下拉刷新。 */
+    data object Refresh : ArchiveUserInterfaceIntent
+
     /** 切换页签。 */
     data class SelectTab(val tab: ArchiveTab) : ArchiveUserInterfaceIntent
 

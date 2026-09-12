@@ -14,6 +14,10 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.JsonElement
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.InterceptIdentifier
@@ -43,6 +47,7 @@ class RemoteRestClient(
     private val deviceIdentifierProvider: RemoteDeviceIdentifierProvider,
     private val timeouts: RemoteTimeouts,
     private val operationIdentifierGenerator: OperationIdentifierGenerator = OperationIdentifierGenerator.random(),
+    private val technicalLog: TechnicalLog = SilentTechnicalLog,
 ) : RemoteSnapshotSource {
     /** 配对：把票据里的一次性配对码换成设备身份，对应 POST /v1/pair。 */
     suspend fun pair(pairingAttempt: PairingAttempt): RemoteResult<DeviceIdentifier> {
@@ -214,6 +219,14 @@ class RemoteRestClient(
         operationIdentifier: OperationIdentifier?,
         requestBody: String? = null,
     ): RemoteResult<RemoteResponseEnvelope> {
+        // 只记方法与路径：请求头里有身份、请求体里有用户数据，两者都不进日志（rules.md §12）。
+        technicalLog.record(
+            TechnicalLogEvent(
+                category = TechnicalLogCategory.Transport,
+                message = "发出请求",
+                attributes = mapOf("method" to httpMethod.value, "path" to path),
+            ),
+        )
         val bodyText =
             when (
                 val bodyResult =
@@ -256,6 +269,13 @@ class RemoteRestClient(
                         }
                     }
                 val bodyText = response.bodyAsText()
+                technicalLog.record(
+                    TechnicalLogEvent(
+                        category = TechnicalLogCategory.Transport,
+                        message = "收到应答",
+                        attributes = mapOf("status" to response.status.value.toString()),
+                    ),
+                )
                 if (response.status.isSuccess()) {
                     RemoteResult.Succeeded(bodyText)
                 } else {
@@ -263,18 +283,34 @@ class RemoteRestClient(
                 }
             }
         } catch (requestTimeout: TimeoutCancellationException) {
-            RemoteResult.Failed(RemoteFailure.TimedOut)
+            transportFailureOf(cause = requestTimeout, failure = RemoteFailure.TimedOut)
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (unreachableServer: ConnectException) {
-            RemoteResult.Failed(RemoteFailure.ServerUnavailable)
+            transportFailureOf(cause = unreachableServer, failure = RemoteFailure.ServerUnavailable)
         } catch (unresolvableHost: UnknownHostException) {
-            RemoteResult.Failed(RemoteFailure.ServerUnavailable)
+            transportFailureOf(cause = unresolvableHost, failure = RemoteFailure.ServerUnavailable)
         } catch (transportFailure: IOException) {
-            RemoteResult.Failed(RemoteFailure.TransportFailure)
+            transportFailureOf(cause = transportFailure, failure = RemoteFailure.TransportFailure)
         } catch (unexpectedFailure: Exception) {
-            RemoteResult.Failed(RemoteFailure.TransportFailure)
+            transportFailureOf(cause = unexpectedFailure, failure = RemoteFailure.TransportFailure)
         }
+
+    // 传输级失败必须留下异常类型与摘要：这是排查「连不上」唯一的一手材料，报文与身份仍然不进日志。
+    private fun transportFailureOf(
+        cause: Exception,
+        failure: RemoteFailure,
+    ): RemoteResult.Failed {
+        technicalLog.record(
+            TechnicalLogEvent(
+                category = TechnicalLogCategory.Failure,
+                message = "传输级失败",
+                attributes = mapOf("failure" to failure.toString()),
+                failure = cause,
+            ),
+        )
+        return RemoteResult.Failed(failure)
+    }
 
     private fun interceptPath(
         interceptIdentifier: InterceptIdentifier,

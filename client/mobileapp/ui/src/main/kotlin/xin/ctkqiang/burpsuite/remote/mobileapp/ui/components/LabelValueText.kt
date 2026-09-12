@@ -3,20 +3,22 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.ui.components
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.R
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
 /**
  * 「标签 + 取值」两行。
  *
- * 各屏的元数据字段都用它，免得每屏各写一套排版；标签走资源，取值由调用方给（rules.md §9）。
+ * 取值走等宽字：这一栏放的是主机、标识符、序号这类要逐字符比对的东西（rules.md §10 之外见 plan §45）。
  */
 @Composable
 fun LabelValueText(
@@ -24,13 +26,20 @@ fun LabelValueText(
     value: String,
     modifier: Modifier = Modifier,
 ) {
+    val tokens = LocalBurpRemoteDesignTokens.current
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
+        BurpRemoteText(
             text = stringResource(labelResource),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = tokens.typography.label,
+            colour = tokens.colourScheme.contentSecondary,
+            maxLines = 1,
         )
-        Text(text = value, style = MaterialTheme.typography.bodyLarge)
+        BurpRemoteText(
+            text = value,
+            style = tokens.typography.technical,
+            colour = tokens.colourScheme.contentPrimary,
+            modifier = Modifier.padding(top = BurpRemoteSpacing.ExtraSmall),
+        )
     }
 }
 

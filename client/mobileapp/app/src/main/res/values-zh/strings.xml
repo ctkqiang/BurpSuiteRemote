@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Burp Remote</string>
+
+    <!-- 主面板顶栏的扫码动作：图标没有文字，因此这句同时是它的无障碍说明。 -->
+    <string name="navigation_action_scan_pairing">扫描配对二维码</string>
+
+    <!-- 分享与导出屏的标题；这一屏只有参数路由，标题归外壳那块唯一的顶栏。 -->
+    <string name="navigation_title_sharing">分享与导出</string>
+
+    <!-- 截图工作区是归档的子屏，与底栏的「Archive」区分开，否则两个目的地共用一个标题。 -->
+    <string name="navigation_title_screenshots">截图</string>
+
+    <!-- 弹窗容器在配对请求飞行期间说的话：那一段时间里界面必须有东西动，否则用户以为卡住了。 -->
+    <string name="pairing_scanner_status_in_flight">正在配对……</string>
 </resources>

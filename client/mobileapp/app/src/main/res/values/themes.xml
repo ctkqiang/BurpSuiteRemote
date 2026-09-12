@@ -2,7 +2,12 @@
 <!--
   只用平台主题，不引 AppCompat 或 Material 组件库：界面全部是 Compose，不需要那套 XML 主题体系。
   深浅两套在 values-night 里分开放，避免深色模式下先闪一帧浅色窗口背景。
+
+  窗口底色显式写成纯白/近黑：平台默认那两级灰会让 edge-to-edge 的手势条区域看起来比页面脏一档。
+  系统栏自身的底色由 MainActivity 设成完全透明，这里不再重复声明。
 -->
 <resources>
-    <style name="Theme.BurpsuiteRemote" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.BurpsuiteRemote" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+    </style>
 </resources>

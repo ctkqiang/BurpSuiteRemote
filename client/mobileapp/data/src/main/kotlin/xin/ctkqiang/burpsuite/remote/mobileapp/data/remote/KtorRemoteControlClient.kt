@@ -15,6 +15,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.eventstore.JournalEventIngestor
@@ -49,6 +53,7 @@ class KtorRemoteControlClient(
     resynchronisation: RemoteResynchronisation,
     private val reconnectionPolicy: ReconnectionPolicy = ReconnectionPolicy(),
     private val timeouts: RemoteTimeouts = RemoteTimeouts(),
+    private val technicalLog: TechnicalLog = SilentTechnicalLog,
     webSocketHttpClient: HttpClient = RemoteHttpClientFactory.create(),
 ) : RemoteControlClient {
     private val connectionStateFlow = MutableStateFlow(ConnectionState.Disconnected)
@@ -57,9 +62,10 @@ class KtorRemoteControlClient(
 
     private val lifecycleLock = Any()
 
-    private var hasActiveConnection = false
-
     private var activeConnectionScope: CoroutineScope? = null
+
+    // 每开一次会话就加一；旧会话收尾时靠它判断自己是否已被新会话取代，取代了就不能再动共享状态。
+    private var connectionGeneration = 0L
 
     private val eventStreamSession =
         RemoteEventStreamSession(
@@ -70,6 +76,7 @@ class KtorRemoteControlClient(
             timeouts = timeouts,
             onEventReceived = ::publishEvent,
             onConnectionStateChanged = ::publishConnectionState,
+            technicalLog = technicalLog,
         )
 
     override val connectionState: Flow<ConnectionState>
@@ -83,25 +90,39 @@ class KtorRemoteControlClient(
         }.buffer(Channel.BUFFERED)
 
     override suspend fun connect(configuration: RemoteConnectionConfiguration) {
-        if (!beginConnection()) return
+        // 父上下文在临界区之外取：synchronized 里不允许有挂起点。
         val parentContext = currentCoroutineContext()
-        val connectionScope = CoroutineScope(parentContext + SupervisorJob(parentContext[Job]))
-        synchronized(lifecycleLock) { activeConnectionScope = connectionScope }
+        val generation: Long
+        val connectionScope: CoroutineScope
+        synchronized(lifecycleLock) {
+            // 再来一次 connect 就是换一次会话：旧会话必须让位。若像以前那样直接返回，扫码换到的新身份与
+            // 新地址就永远等不到自己的连接，界面则一直停在 OFFLINE。
+            connectionGeneration += 1
+            generation = connectionGeneration
+            activeConnectionScope?.cancel()
+            connectionScope = CoroutineScope(parentContext + SupervisorJob(parentContext[Job]))
+            activeConnectionScope = connectionScope
+        }
         try {
             connectionScope.launch { runReconnectionLoop(configuration) }.join()
         } finally {
             synchronized(lifecycleLock) {
-                activeConnectionScope = null
-                hasActiveConnection = false
+                // 已被新会话取代时什么都不动：否则旧会话收尾会把新会话的句柄抹掉。
+                if (generation == connectionGeneration) activeConnectionScope = null
             }
             connectionScope.cancel()
-            publishConnectionState(ConnectionState.Disconnected)
         }
     }
 
     override suspend fun disconnect() {
-        val connectionScope = synchronized(lifecycleLock) { activeConnectionScope }
-        connectionScope?.cancel()
+        synchronized(lifecycleLock) {
+            connectionGeneration += 1
+            activeConnectionScope?.cancel()
+            activeConnectionScope = null
+        }
+        // 用户主动断开是唯一会回到「未连接且不再尝试」的路径；故障必须停在故障态，
+        // 否则认证失败、协议不一致都会被抹平成 OFFLINE，用户看不到任何可排查的原因。
+        publishConnectionState(ConnectionState.Disconnected)
     }
 
     override suspend fun pair(pairingAttempt: PairingAttempt): RemoteResult<DeviceIdentifier> =
@@ -179,6 +200,14 @@ class KtorRemoteControlClient(
     }
 
     private fun publishConnectionState(state: ConnectionState) {
+        // 连接状态是界面唯一读的东西，记下每一次跃迁，排查「为什么一直是 OFFLINE」时才有据可依。
+        technicalLog.record(
+            TechnicalLogEvent(
+                category = TechnicalLogCategory.EventStream,
+                message = "连接状态变化",
+                attributes = mapOf("connectionState" to state.name),
+            ),
+        )
         connectionStateFlow.value = state
     }
 
@@ -186,13 +215,5 @@ class KtorRemoteControlClient(
         for (listener in eventListeners) {
             listener(event)
         }
-    }
-
-    private fun beginConnection(): Boolean {
-        synchronized(lifecycleLock) {
-            if (hasActiveConnection) return false
-            hasActiveConnection = true
-        }
-        return true
     }
 }

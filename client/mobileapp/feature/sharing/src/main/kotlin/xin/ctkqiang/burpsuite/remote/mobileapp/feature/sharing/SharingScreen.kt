@@ -2,32 +2,28 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.feature.sharing
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.HistoryArchiveState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.HistoryRecord
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.EmptyStateText
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.LabelValueText
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.ScreenHeading
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.SectionHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButton
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButtonStyle
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSectionHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 import java.time.Instant
 
@@ -35,7 +31,7 @@ import java.time.Instant
  * 分享与导出（plan §75）。
  *
  * 顺序是固定的：看清导出范围 → 看敏感数据扫描结论 → 看脱敏后的副本 → 用户确认 → 才写出去。
- * 脱敏只作用于导出副本，原始归档在这里既读不到也改不到。
+ * 脱敏只作用于导出副本，原始归档在这里既读不到也改不到；脱敏后的预览是等宽文本，长按可整段复制。
  */
 @Composable
 fun SharingScreen(
@@ -43,32 +39,43 @@ fun SharingScreen(
     onIntent: (SharingUserInterfaceIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
-    ) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = HORIZONTAL_PADDING, vertical = VERTICAL_PADDING),
-            verticalArrangement = Arrangement.spacedBy(SECTION_SPACING),
-        ) {
-            ScreenHeading(titleResource = R.string.sharing_title)
-            val record = uiState.record
-            when {
-                record != null ->
-                    ExportGate(
-                        record = record,
-                        redaction = uiState.redaction,
-                        hasExported = uiState.hasExported,
-                        hasExportFailed = uiState.hasExportFailed,
-                        onIntent = onIntent,
-                    )
+    val haptics = rememberBurpRemoteHaptics()
 
-                uiState.hasLoaded -> EmptyStateText(messageResource = R.string.sharing_not_found)
-                else -> EmptyStateText(messageResource = R.string.sharing_loading)
+    Box(modifier = modifier.fillMaxSize()) {
+        // 顶栏与底栏由装配层的壳统一提供，各屏不再画第二层标题。
+        run {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = SCREEN_PADDING, vertical = SCREEN_PADDING),
+                verticalArrangement = Arrangement.spacedBy(SECTION_SPACING),
+            ) {
+                val record = uiState.record
+                when {
+                    record != null ->
+                        ExportGate(
+                            record = record,
+                            uiState = uiState,
+                            onExport = {
+                                haptics.tap()
+                                onIntent(SharingUserInterfaceIntent.ConfirmExport)
+                            },
+                        )
+
+                    uiState.hasLoaded ->
+                        BurpRemoteEmptyState(
+                            headline = stringResource(R.string.sharing_not_found_headline),
+                            detail = stringResource(R.string.sharing_not_found),
+                        )
+
+                    else ->
+                        BurpRemoteEmptyState(
+                            headline = stringResource(R.string.sharing_loading_headline),
+                            detail = stringResource(R.string.sharing_loading),
+                        )
+                }
             }
         }
     }
@@ -77,87 +84,98 @@ fun SharingScreen(
 @Composable
 private fun ExportGate(
     record: HistoryRecord,
-    redaction: RedactionSummary?,
-    hasExported: Boolean,
-    hasExportFailed: Boolean,
-    onIntent: (SharingUserInterfaceIntent) -> Unit,
+    uiState: SharingUserInterfaceState,
+    onExport: () -> Unit,
 ) {
     val absentValue = stringResource(R.string.sharing_absent_value)
-    LabelValueText(
-        labelResource = R.string.sharing_request_line_label,
-        value = "${record.method ?: absentValue} ${record.path ?: absentValue}",
-    )
-    LabelValueText(labelResource = R.string.sharing_host_label, value = record.host ?: absentValue)
-    ScopeSection()
-    if (redaction != null) {
-        ScanSection(redaction = redaction)
-        PreviewSection(redaction = redaction)
-    }
-    Button(onClick = { onIntent(SharingUserInterfaceIntent.ConfirmExport) }, modifier = Modifier.fillMaxWidth()) {
-        Text(text = stringResource(R.string.sharing_confirm_action))
-    }
-    if (hasExported) {
-        EmptyStateText(messageResource = R.string.sharing_exported)
-    }
-    if (hasExportFailed) {
-        EmptyStateText(messageResource = R.string.sharing_export_failed)
-    }
-}
 
-@Composable
-private fun ScopeSection() {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-        SectionHeading(titleResource = R.string.sharing_scope_heading)
-        EmptyStateText(messageResource = R.string.sharing_scope_note)
-    }
-}
-
-@Composable
-private fun ScanSection(redaction: RedactionSummary) {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-        SectionHeading(titleResource = R.string.sharing_scan_heading)
-        Text(
-            text = stringResource(R.string.sharing_scan_summary, redaction.scannedLines.size),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+    Section(titleResource = R.string.sharing_subject_heading) {
+        BurpRemoteTechnicalValue(
+            text = "${record.method ?: absentValue} ${record.path ?: absentValue}",
+            label = stringResource(R.string.sharing_request_line_label),
         )
-        if (redaction.findings.isEmpty()) {
-            EmptyStateText(messageResource = R.string.sharing_scan_empty)
-            return@Column
+        BurpRemoteTechnicalValue(
+            text = record.host ?: absentValue,
+            label = stringResource(R.string.sharing_host_label),
+        )
+        BurpRemoteTechnicalValue(
+            text = record.historyIdentifier.value,
+            label = stringResource(R.string.sharing_identifier_label),
+        )
+    }
+
+    Section(titleResource = R.string.sharing_scope_heading) {
+        BurpRemoteEmptyState(
+            headline = stringResource(R.string.sharing_scope_headline),
+            detail = stringResource(R.string.sharing_scope_note),
+        )
+    }
+
+    val redaction = uiState.redaction
+    if (redaction != null) {
+        Section(titleResource = R.string.sharing_scan_heading) {
+            BurpRemoteTechnicalValue(
+                text = redaction.scannedLines.size.toString(),
+                label = stringResource(R.string.sharing_scan_count_label),
+            )
+            if (redaction.findings.isEmpty()) {
+                BurpRemoteEmptyState(
+                    headline = stringResource(R.string.sharing_scan_empty_headline),
+                    detail = stringResource(R.string.sharing_scan_empty),
+                )
+            } else {
+                redaction.findings.forEach { finding ->
+                    BurpRemoteTechnicalValue(
+                        text = finding.lineNumber.toString(),
+                        label = stringResource(finding.kind.labelResource),
+                    )
+                }
+            }
         }
-        redaction.findings.forEach { finding ->
-            Text(
-                text =
-                    stringResource(
-                        R.string.sharing_scan_finding,
-                        finding.lineNumber,
-                        stringResource(finding.kind.labelResource),
-                    ),
-                style = MaterialTheme.typography.bodyMedium,
+
+        Section(titleResource = R.string.sharing_preview_heading) {
+            BurpRemoteEmptyState(
+                headline = stringResource(R.string.sharing_preview_headline),
+                detail = stringResource(R.string.sharing_preview_note),
+            )
+            BurpRemoteCard {
+                redaction.redactedLines.forEach { redactedLine ->
+                    BurpRemoteTechnicalValue(text = redactedLine)
+                }
+            }
+        }
+    }
+
+    Section(titleResource = R.string.sharing_confirm_heading) {
+        BurpRemoteButton(
+            text = stringResource(R.string.sharing_confirm_action),
+            onClick = onExport,
+            style = BurpRemoteButtonStyle.Primary,
+        )
+        if (uiState.hasExported) {
+            BurpRemoteEmptyState(
+                headline = stringResource(R.string.sharing_state_exported),
+                detail = stringResource(R.string.sharing_exported),
+            )
+        }
+        if (uiState.hasExportFailed) {
+            BurpRemoteEmptyState(
+                headline = stringResource(R.string.sharing_state_failed),
+                detail = stringResource(R.string.sharing_export_failed),
             )
         }
     }
 }
 
+/** 一节标题加一块内容；各节的排版一致。 */
 @Composable
-private fun PreviewSection(redaction: RedactionSummary) {
+private fun Section(
+    @StringRes titleResource: Int,
+    content: @Composable () -> Unit,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-        SectionHeading(titleResource = R.string.sharing_preview_heading)
-        EmptyStateText(messageResource = R.string.sharing_preview_note)
-        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(CARD_PADDING),
-                verticalArrangement = Arrangement.spacedBy(ROW_SPACING),
-            ) {
-                redaction.redactedLines.forEach { redactedLine ->
-                    Text(
-                        text = redactedLine,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontFamily = FontFamily.Monospace,
-                    )
-                }
-            }
-        }
+        BurpRemoteSectionHeading(text = stringResource(titleResource))
+        content()
     }
 }
 
@@ -173,6 +191,10 @@ private val SensitiveDataKind.labelResource: Int
             SensitiveDataKind.JsonWebToken -> R.string.sharing_kind_json_web_token
             SensitiveDataKind.EmailAddress -> R.string.sharing_kind_email_address
         }
+
+private val SCREEN_PADDING = 16.dp
+private val SECTION_SPACING = 20.dp
+private val ROW_SPACING = 8.dp
 
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。
 @Preview(name = "浅色", showBackground = true)
@@ -250,9 +272,3 @@ private fun previewState(hasExported: Boolean = false): SharingUserInterfaceStat
         hasExported = hasExported,
     )
 }
-
-private val HORIZONTAL_PADDING = 24.dp
-private val VERTICAL_PADDING = 24.dp
-private val SECTION_SPACING = 24.dp
-private val ROW_SPACING = 8.dp
-private val CARD_PADDING = 12.dp

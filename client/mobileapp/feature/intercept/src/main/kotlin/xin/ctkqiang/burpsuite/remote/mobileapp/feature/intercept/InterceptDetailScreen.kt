@@ -1,32 +1,34 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.feature.intercept
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.InterceptIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.InterceptRecord
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.InterceptState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.EmptyStateText
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.LabelValueText
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.NotImplementedReasonText
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.ScreenHeading
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.components.SectionHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButton
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButtonStyle
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSectionHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTextField
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -36,7 +38,10 @@ import java.time.format.FormatStyle
 /**
  * 拦截项详情与编辑（plan §43 的 Live/Intercept）。
  *
- * 编辑框可改，但提交要发控制命令，客户端还没有那条通路，因此三个动作按钮都是禁用并写明原因。
+ * 编辑框可改，但提交要发控制命令，客户端还没有那条通路，因此三个动作按钮都是禁用并写明原因：
+ * 点了没反应的按钮比一个禁用的按钮更糟。
+ *
+ * 标题与返回归装配层的壳；这一屏只负责内容，因此当前状态放在内容第一行，一眼能看到这条还停在队列里。
  */
 @Composable
 fun InterceptDetailScreen(
@@ -44,24 +49,34 @@ fun InterceptDetailScreen(
     onIntent: (InterceptDetailUserInterfaceIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = HORIZONTAL_PADDING, vertical = VERTICAL_PADDING),
-            verticalArrangement = Arrangement.spacedBy(SECTION_SPACING),
+                    .padding(
+                        horizontal = BurpRemoteSpacing.Large,
+                        vertical = BurpRemoteSpacing.Large,
+                    ),
+            verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium),
         ) {
-            ScreenHeading(titleResource = R.string.intercept_detail_title)
             val record = uiState.record
             when {
-                record != null -> InterceptDetailContent(record = record, uiState = uiState, onIntent = onIntent)
-                uiState.hasLoaded -> EmptyStateText(messageResource = R.string.intercept_detail_not_found)
-                else -> EmptyStateText(messageResource = R.string.intercept_detail_loading)
+                record != null ->
+                    InterceptDetailContent(record = record, uiState = uiState, onIntent = onIntent)
+
+                uiState.hasLoaded ->
+                    BurpRemoteEmptyState(
+                        headline = stringResource(R.string.intercept_detail_not_found_headline),
+                        detail = stringResource(R.string.intercept_detail_not_found),
+                    )
+
+                else ->
+                    BurpRemoteEmptyState(
+                        headline = stringResource(R.string.intercept_detail_loading_headline),
+                        detail = stringResource(R.string.intercept_detail_loading),
+                    )
             }
         }
     }
@@ -75,81 +90,105 @@ private fun InterceptDetailContent(
 ) {
     val absentValue = stringResource(R.string.intercept_absent_value)
 
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-        SectionHeading(titleResource = R.string.intercept_detail_request_heading)
-        LabelValueText(
-            labelResource = R.string.intercept_detail_request_line_label,
-            value = "${record.method ?: absentValue} ${record.path ?: absentValue}",
+    Section(titleResource = R.string.intercept_detail_summary_heading) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            BurpRemoteStatusPill(
+                text = stringResource(record.state.labelResource),
+                tone = interceptStateTone(state = record.state),
+            )
+        }
+        BurpRemoteTechnicalValue(
+            text = "${record.method ?: absentValue} ${record.path ?: absentValue}",
+            label = stringResource(R.string.intercept_detail_request_line_label),
         )
-        LabelValueText(labelResource = R.string.intercept_detail_host_label, value = record.host ?: absentValue)
-        LabelValueText(
-            labelResource = R.string.intercept_detail_state_label,
-            value = stringResource(record.state.labelResource),
+        BurpRemoteTechnicalValue(
+            text = record.host ?: absentValue,
+            label = stringResource(R.string.intercept_detail_host_label),
         )
-        LabelValueText(
-            labelResource = R.string.intercept_detail_sequence_number_label,
-            value = record.sequenceNumber?.toString() ?: absentValue,
+        BurpRemoteTechnicalValue(
+            text = record.sequenceNumber?.toString() ?: absentValue,
+            label = stringResource(R.string.intercept_detail_sequence_number_label),
         )
-        LabelValueText(
-            labelResource = R.string.intercept_detail_created_at_label,
-            value = INTERCEPT_TIME_FORMATTER.format(record.createdAt),
+        BurpRemoteTechnicalValue(
+            text = INTERCEPT_TIME_FORMATTER.format(record.createdAt),
+            label = stringResource(R.string.intercept_detail_created_at_label),
         )
-        LabelValueText(
-            labelResource = R.string.intercept_detail_updated_at_label,
-            value = INTERCEPT_TIME_FORMATTER.format(record.updatedAt),
+        BurpRemoteTechnicalValue(
+            text = INTERCEPT_TIME_FORMATTER.format(record.updatedAt),
+            label = stringResource(R.string.intercept_detail_updated_at_label),
         )
     }
 
-    InterceptEditor(uiState = uiState, onIntent = onIntent)
-    InterceptActions(uiState = uiState)
-}
-
-@Composable
-private fun InterceptEditor(
-    uiState: InterceptDetailUserInterfaceState,
-    onIntent: (InterceptDetailUserInterfaceIntent) -> Unit,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-        SectionHeading(titleResource = R.string.intercept_detail_editor_heading)
-        Text(
-            text = stringResource(R.string.intercept_detail_editor_local_only),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+    Section(titleResource = R.string.intercept_detail_editor_heading) {
+        BurpRemoteEmptyState(
+            headline = stringResource(R.string.intercept_detail_editor_headline),
+            detail = stringResource(R.string.intercept_detail_editor_local_only),
         )
-        OutlinedTextField(
+        BurpRemoteTextField(
             value = uiState.requestLineInput,
             onValueChange = { requestLineInput ->
                 onIntent(InterceptDetailUserInterfaceIntent.UpdateRequestLineInput(requestLineInput))
             },
-            label = { Text(text = stringResource(R.string.intercept_detail_request_line_label)) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(R.string.intercept_detail_request_line_label),
+            isMonospace = true,
         )
-        OutlinedTextField(
+        BurpRemoteTextField(
             value = uiState.requestHeadersInput,
             onValueChange = { requestHeadersInput ->
                 onIntent(InterceptDetailUserInterfaceIntent.UpdateRequestHeadersInput(requestHeadersInput))
             },
-            label = { Text(text = stringResource(R.string.intercept_detail_request_headers_label)) },
-            modifier = Modifier.fillMaxWidth().height(HEADERS_FIELD_HEIGHT),
+            label = stringResource(R.string.intercept_detail_request_headers_label),
+            isMonospace = true,
+        )
+    }
+
+    Section(titleResource = R.string.intercept_detail_actions_heading) {
+        BurpRemoteButton(
+            text = stringResource(R.string.intercept_detail_action_submit),
+            onClick = {},
+            style = BurpRemoteButtonStyle.Primary,
+            isEnabled = uiState.canSendCommand,
+        )
+        BurpRemoteButton(
+            text = stringResource(R.string.intercept_detail_action_forward),
+            onClick = {},
+            style = BurpRemoteButtonStyle.Secondary,
+            isEnabled = uiState.canSendCommand,
+        )
+        BurpRemoteButton(
+            text = stringResource(R.string.intercept_detail_action_drop),
+            onClick = {},
+            style = BurpRemoteButtonStyle.Danger,
+            isEnabled = uiState.canSendCommand,
+        )
+        BurpRemoteEmptyState(
+            headline = stringResource(R.string.intercept_detail_reason_headline),
+            detail = stringResource(R.string.intercept_detail_reason_command),
         )
     }
 }
 
+/** 状态配色与列表一致：等决定的最需要被看见，已放行是正常流，已丢弃就安静下来。 */
+private fun interceptStateTone(state: InterceptState): BurpRemoteStatusTone =
+    when (state) {
+        InterceptState.Pending, InterceptState.Modified -> BurpRemoteStatusTone.Warning
+        InterceptState.Forwarded -> BurpRemoteStatusTone.Live
+        InterceptState.Dropped -> BurpRemoteStatusTone.Neutral
+    }
+
+/** 一节标题加一块内容；各节的排版一致。 */
 @Composable
-private fun InterceptActions(uiState: InterceptDetailUserInterfaceState) {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-        SectionHeading(titleResource = R.string.intercept_detail_actions_heading)
-        Button(onClick = {}, enabled = uiState.canSendCommand, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.intercept_detail_action_submit))
-        }
-        Button(onClick = {}, enabled = uiState.canSendCommand, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.intercept_detail_action_forward))
-        }
-        Button(onClick = {}, enabled = uiState.canSendCommand, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.intercept_detail_action_drop))
-        }
-        NotImplementedReasonText(reasonResource = R.string.intercept_detail_reason_command)
+private fun Section(
+    @StringRes titleResource: Int,
+    content: @Composable () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+        BurpRemoteSectionHeading(text = stringResource(titleResource))
+        BurpRemoteCard { content() }
     }
 }
 
@@ -178,10 +217,7 @@ private fun InterceptDetailScreenDarkPreview() {
 @Composable
 private fun InterceptDetailScreenMissingLightPreview() {
     BurpsuiteRemoteTheme(themeMode = ThemeMode.Light) {
-        InterceptDetailScreen(
-            uiState = InterceptDetailUserInterfaceState(hasLoaded = true),
-            onIntent = {},
-        )
+        InterceptDetailScreen(uiState = InterceptDetailUserInterfaceState(hasLoaded = true), onIntent = {})
     }
 }
 
@@ -189,10 +225,7 @@ private fun InterceptDetailScreenMissingLightPreview() {
 @Composable
 private fun InterceptDetailScreenMissingDarkPreview() {
     BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
-        InterceptDetailScreen(
-            uiState = InterceptDetailUserInterfaceState(hasLoaded = true),
-            onIntent = {},
-        )
+        InterceptDetailScreen(uiState = InterceptDetailUserInterfaceState(hasLoaded = true), onIntent = {})
     }
 }
 
@@ -214,9 +247,3 @@ private fun previewState(): InterceptDetailUserInterfaceState =
         requestLineInput = "POST /api/user HTTP/1.1",
         requestHeadersInput = "Host: api.example.com\nContent-Type: application/json",
     )
-
-private val HORIZONTAL_PADDING = 24.dp
-private val VERTICAL_PADDING = 24.dp
-private val SECTION_SPACING = 24.dp
-private val ROW_SPACING = 8.dp
-private val HEADERS_FIELD_HEIGHT = 160.dp

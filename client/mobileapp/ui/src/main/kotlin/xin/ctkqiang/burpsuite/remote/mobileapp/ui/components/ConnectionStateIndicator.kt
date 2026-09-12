@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ConnectionState
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.R
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
 /**
  * 连接状态指示：一个状态灯加本地化后的状态名（plan §44）。
@@ -30,30 +31,37 @@ fun ConnectionStateIndicator(
     connectionState: ConnectionState,
     modifier: Modifier = Modifier,
 ) {
+    val tokens = LocalBurpRemoteDesignTokens.current
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier =
                 Modifier
                     .size(INDICATOR_SIZE)
                     .clip(CircleShape)
-                    .background(indicatorColour(connectionState)),
+                    .background(indicatorColour(connectionState, tokens.colourScheme)),
         )
         Spacer(modifier = Modifier.width(INDICATOR_SPACING))
-        Text(text = stringResource(connectionState.labelResource), style = MaterialTheme.typography.bodyLarge)
+        BurpRemoteText(
+            text = stringResource(connectionState.labelResource),
+            style = tokens.typography.body,
+            colour = tokens.colourScheme.contentPrimary,
+        )
     }
 }
 
 // 颜色全部取自主题：全项目只有主题那一处写过色值。
-@Composable
-private fun indicatorColour(connectionState: ConnectionState): Color =
+private fun indicatorColour(
+    connectionState: ConnectionState,
+    colourScheme: BurpRemoteColourScheme,
+): Color =
     when {
-        connectionState.isConnected -> MaterialTheme.colorScheme.primary
-        connectionState == ConnectionState.Disconnected -> MaterialTheme.colorScheme.outline
-        connectionState in FAILURE_STATES -> MaterialTheme.colorScheme.error
-        else -> MaterialTheme.colorScheme.tertiary
+        connectionState.isConnected -> colourScheme.success
+        connectionState == ConnectionState.Disconnected -> colourScheme.contentSecondary
+        connectionState in FAILURE_STATES -> colourScheme.danger
+        else -> colourScheme.warning
     }
 
-/** 协议版本不符、超时这类状态都算故障，配色统一走错误色。 */
+/** 协议版本不符、超时这类状态都算故障，配色统一走危险色。 */
 private val FAILURE_STATES: Set<ConnectionState> =
     setOf(
         ConnectionState.AuthenticationFailed,

@@ -22,9 +22,11 @@ object RemoteInboundMessageDecoder {
             }
         val messageObject = messageElement as? JsonObject ?: return RemoteInboundMessage.Malformed
 
-        return when (messageTypeOf(messageObject)) {
+        return when (val messageType = messageTypeOf(messageObject)) {
             EVENT_MESSAGE_TYPE -> decodeEvent(messageObject)
             SIGNAL_MESSAGE_TYPE -> decodeSignal(messageObject)
+            // 插件的事件信封不带 messageType（它只带事件专有字段），缺了它就整条事件流被判成协议不一致。
+            null -> decodeEvent(messageObject)
             else -> RemoteInboundMessage.Malformed
         }
     }

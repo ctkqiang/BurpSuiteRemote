@@ -18,6 +18,7 @@ dependencyResolutionManagement {
 rootProject.name = "burpsuite-remote-mobileapp"
 
 include(":app")
+include(":core:common")
 include(":core:model")
 include(":core:protocol")
 include(":domain")

@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screenshot_title">截图</string>
+    <string name="screenshot_subtitle">原始图与美化图分开保存</string>
 
     <string name="screenshot_pipeline_heading">处理流程</string>
-    <string name="screenshot_pipeline_note">导入的图片按下面的阶段走一遍。原始图永远不会被覆盖。</string>
-    <string name="screenshot_stage_imported">1. 已导入</string>
-    <string name="screenshot_stage_analyzing">2. 正在分析版面</string>
-    <string name="screenshot_stage_detected">3. 已识别内容区域</string>
-    <string name="screenshot_stage_beautifying">4. 正在美化</string>
-    <string name="screenshot_stage_ready">5. 就绪</string>
-    <string name="screenshot_stage_failed">处理失败——原始图仍然完好</string>
+    <string name="screenshot_pipeline_note_headline">一张导入的图会按下面的阶段往前走</string>
+    <string name="screenshot_pipeline_note">每个阶段都在上一个阶段的结果上继续，原始图永不被覆盖：即使美化失败，导入的那张原图仍然完好。</string>
+    <string name="screenshot_stage_imported">已导入</string>
+    <string name="screenshot_stage_analyzing">正在分析画面结构</string>
+    <string name="screenshot_stage_detected">已识别内容区域</string>
+    <string name="screenshot_stage_beautifying">正在美化</string>
+    <string name="screenshot_stage_ready">已就绪</string>
+    <string name="screenshot_stage_failed">失败——原始图仍然完好</string>
 
-    <string name="screenshot_stored_heading">已存截图</string>
-    <string name="screenshot_stored_empty">这台设备上还没有截图。</string>
-    <string name="screenshot_reason_import">客户端还没有截图端口，无法导入</string>
-    <string name="screenshot_action_import">导入截图</string>
+    <string name="screenshot_stored_heading">已保存的截图</string>
+    <string name="screenshot_stored_empty_headline">本机没有存过截图</string>
+    <string name="screenshot_stored_empty">本机还没有导入或生成过截图；本机没有的东西，这里不会列出来。</string>
+    <string name="screenshot_reason_headline">缺什么</string>
+    <string name="screenshot_reason_import">客户端还没有截图端口，因此无法导入</string>
+    <string name="screenshot_action_import">导入一张截图</string>
 </resources>

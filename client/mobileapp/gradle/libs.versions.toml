@@ -67,9 +67,12 @@ compose-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-compose-material3 = { module = "androidx.compose.material3:material3" }
-# 底栏的 NavigationBarItem 必须给 icon；核心图标集随 BOM 定版，不单独挑版本。
+# 界面层不用 Material 3（rules.md §10 的品牌色与自建设计系统），版式、控件、动效都建在 foundation 与 ui 上。
+compose-foundation = { module = "androidx.compose.foundation:foundation" }
+# 底栏条目的 icon 必须是 ImageVector，核心图标集随 BOM 定版，不单独挑版本。
 compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
+# 尚未迁移到自建设计系统的 feature 模块仍在用 Material 3；等它们全部重写完，这条与各 feature 的引用一起删。
+compose-material3 = { module = "androidx.compose.material3:material3" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }

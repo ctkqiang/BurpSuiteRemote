@@ -1,33 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="intercept_title">Intercept-Warteschlange</string>
-    <string name="intercept_empty">In der Intercept-Warteschlange wartet nichts.</string>
+    <string name="intercept_title">Abfang-Warteschlange</string>
+    <string name="intercept_subtitle">Nur Metadaten, die das Plug-in weitergeleitet hat</string>
     <string name="intercept_absent_value">—</string>
+    <string name="intercept_action_refresh">Aktualisieren</string>
 
-    <string name="intercept_state_pending">Ausstehend</string>
-    <string name="intercept_state_modified">Bearbeitet</string>
+    <string name="intercept_state_pending">Wartet</string>
+    <string name="intercept_state_modified">Geändert</string>
     <string name="intercept_state_forwarded">Weitergeleitet</string>
     <string name="intercept_state_dropped">Verworfen</string>
 
-    <string name="intercept_detail_title">Intercept-Eintrag</string>
-    <string name="intercept_detail_loading">Eintrag wird geladen…</string>
-    <string name="intercept_detail_not_found">Dieser Eintrag ist nicht mehr in der lokalen Projektion.</string>
+    <string name="intercept_loading_headline">Abfang-Warteschlange wird gelesen</string>
+    <string name="intercept_loading_detail">Die Abfangprojektion wird von diesem Gerät gelesen.</string>
+    <string name="intercept_empty_headline">Nichts wartet</string>
+    <string name="intercept_empty_detail">Derzeit wird keine Anfrage zurückgehalten. Einträge erscheinen hier nur, solange das Plug-in abfängt und eine Anfrage noch nicht weitergeleitet oder verworfen wurde.</string>
 
+    <string name="intercept_error_headline">Die Abfang-Warteschlange konnte nicht gelesen werden</string>
+    <string name="intercept_error_read_failed">die Abfangprojektion ließ sich auf diesem Gerät nicht lesen</string>
+    <string name="intercept_error_action">Erneut versuchen</string>
+
+    <string name="intercept_detail_title">Abgefangener Eintrag</string>
+    <string name="intercept_detail_loading_headline">Eintrag wird geladen…</string>
+    <string name="intercept_detail_loading">Der Eintrag wird aus der lokalen Projektion gelesen.</string>
+    <string name="intercept_detail_not_found_headline">Dieser Eintrag ist verschwunden</string>
+    <string name="intercept_detail_not_found">Der abgefangene Eintrag ist nicht mehr in der lokalen Projektion.</string>
+
+    <string name="intercept_detail_summary_heading">Übersicht</string>
     <string name="intercept_detail_request_heading">Anfrage</string>
     <string name="intercept_detail_request_line_label">Anfragezeile</string>
     <string name="intercept_detail_host_label">Host</string>
-    <string name="intercept_detail_state_label">Warteschlangenstatus</string>
     <string name="intercept_detail_sequence_number_label">Ereignissequenznummer</string>
     <string name="intercept_detail_created_at_label">Erstellt am</string>
     <string name="intercept_detail_updated_at_label">Zuletzt geändert am</string>
 
-    <string name="intercept_detail_editor_heading">Bearbeiten</string>
+    <string name="intercept_detail_editor_heading">Ändern</string>
+    <string name="intercept_detail_editor_headline">Nur ein Entwurf auf diesem Gerät</string>
+    <string name="intercept_detail_editor_local_only">Diese Änderungen bleiben auf diesem Gerät: das Plug-in hat noch keinen Abfang-Endpunkt, es wird also nichts übermittelt und die in Burp gehaltene Anfrage bleibt unverändert.</string>
     <string name="intercept_detail_request_headers_label">Anfrage-Header</string>
-    <string name="intercept_detail_editor_local_only">Diese Änderungen bleiben auf diesem Gerät: das Plug-in hat noch keinen Intercept-Endpunkt, es wird nichts übermittelt.</string>
 
     <string name="intercept_detail_actions_heading">Aktionen</string>
     <string name="intercept_detail_action_submit">Änderung anwenden</string>
     <string name="intercept_detail_action_forward">Weiterleiten</string>
     <string name="intercept_detail_action_drop">Verwerfen</string>
-    <string name="intercept_detail_reason_command">das Plug-in antwortet auf den Intercept-Endpunkten mit not_implemented, und der Client hat keinen Befehlskanal dafür</string>
+    <string name="intercept_detail_reason_headline">Warum das deaktiviert ist</string>
+    <string name="intercept_detail_reason_command">das Plug-in antwortet auf die Abfang-Endpunkte mit not_implemented, und dem Client fehlt dafür der Befehlskanal</string>
+
+    <string name="intercept_relative_just_now">gerade eben</string>
+    <plurals name="intercept_relative_seconds">
+        <item quantity="one">vor %1$d Sekunde</item>
+        <item quantity="other">vor %1$d Sekunden</item>
+    </plurals>
+    <plurals name="intercept_relative_minutes">
+        <item quantity="one">vor %1$d Minute</item>
+        <item quantity="other">vor %1$d Minuten</item>
+    </plurals>
+    <plurals name="intercept_relative_hours">
+        <item quantity="one">vor %1$d Stunde</item>
+        <item quantity="other">vor %1$d Stunden</item>
+    </plurals>
+    <plurals name="intercept_relative_days">
+        <item quantity="one">vor %1$d Tag</item>
+        <item quantity="other">vor %1$d Tagen</item>
+    </plurals>
 </resources>

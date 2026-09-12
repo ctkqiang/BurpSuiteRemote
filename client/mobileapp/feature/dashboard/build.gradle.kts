@@ -31,11 +31,14 @@ kotlin {
 dependencies {
     // 主面板只读领域端口，不认识 Room 与传输层（rules.md §6.1）。
     implementation(project(":domain"))
+    // 设计系统住在 :ui；各屏只用它，不再直接用 Material 3（rules.md §10：颜色只从主题取）。
     implementation(project(":ui"))
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
-    implementation(libs.compose.material3)
+    // 各屏的排版（Column/Row/LazyColumn/下拉刷新等等）全部来自 foundation，而版本目录里还没有它的别名，
+    // 因此这里写字面量坐标，版本仍由 BOM 定。补上别名后应换成 libs.compose.foundation。
+    implementation("androidx.compose.foundation:foundation")
     // @Preview 注解来自 tooling-preview，渲染器只在 debug 变体里进包（rules.md §8.3 要求每屏两套预览）。
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)

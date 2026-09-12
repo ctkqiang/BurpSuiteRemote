@@ -1,5 +1,9 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.data.remote
 
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.projection.ProjectionRebuilder
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.projection.ProjectionStore
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteConnectionConfiguration
@@ -19,12 +23,34 @@ class RemoteResynchronisation(
     private val resynchronisationRecorder: ResynchronisationRecorder,
     private val projectionRebuilder: ProjectionRebuilder,
     private val projectionStores: List<ProjectionStore>,
+    private val technicalLog: TechnicalLog = SilentTechnicalLog,
 ) {
     /** 取快照、推续传基准、重建本地投影；快照取不到时什么都不改，如实返回失败。 */
     suspend fun resynchronise(configuration: RemoteConnectionConfiguration): RemoteResult<RemoteRuntimeState> =
         when (val snapshotResult = snapshotSource.requestSnapshot(configuration)) {
-            is RemoteResult.Failed -> snapshotResult
+            is RemoteResult.Failed -> {
+                technicalLog.record(
+                    TechnicalLogEvent(
+                        category = TechnicalLogCategory.Failure,
+                        message = "取快照失败，本次重新同步作废",
+                        attributes = mapOf("failure" to snapshotResult.failure.toString()),
+                    ),
+                )
+                snapshotResult
+            }
+
             is RemoteResult.Succeeded -> {
+                technicalLog.record(
+                    TechnicalLogEvent(
+                        category = TechnicalLogCategory.EventStream,
+                        message = "取到快照，续传基准推进到插件最新序号",
+                        attributes =
+                            mapOf(
+                                "latestEventSequenceNumber" to
+                                    snapshotResult.value.latestEventSequenceNumber.toString(),
+                            ),
+                    ),
+                )
                 resynchronisationRecorder.recordSnapshot(snapshotResult.value.latestEventSequenceNumber)
                 projectionStores.forEach { projectionStore -> projectionRebuilder.rebuild(projectionStore) }
                 snapshotResult
