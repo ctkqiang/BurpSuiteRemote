@@ -22,7 +22,6 @@ import java.awt.Component
 import java.awt.Font
 import java.awt.GridBagLayout
 import java.awt.GridLayout
-import java.awt.Insets
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.KeyEvent
@@ -39,7 +38,6 @@ import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JTextField
 import javax.swing.Timer
 
 /**
@@ -109,7 +107,7 @@ class RemoteStatusPanel(
             .withZone(ZoneId.systemDefault())
 
     private val pairingCodeValue =
-        createSelectableValue().apply {
+        SelectableValueField().apply {
             // 配对码是机器码，必须逐字符核对，因此改用等宽字体并放大字号。这里刻意不沿用
             // 界面字体：成比例字体下 0 与 O、1 与 l 的形状差异太小，抄写时极易出错。
             font = Font(Font.MONOSPACED, Font.BOLD, PAIRING_CODE_FONT_SIZE)
@@ -160,7 +158,7 @@ class RemoteStatusPanel(
      * 扫码之外还有一条手工通道：操作者在手机上手动输入地址。IP 地址恰好是最容易被抄错的
      * 一类值——一个数字看错，界面上没有任何提示，只有「连不上」这一个结果。
      */
-    private val advertisedAddressValue = createSelectableValue(ADVERTISED_ADDRESS_COLUMNS)
+    private val advertisedAddressValue = SelectableValueField(ADVERTISED_ADDRESS_COLUMNS)
 
     private val remotePortValueLabel = JLabel()
 
@@ -254,17 +252,10 @@ class RemoteStatusPanel(
 
     /**
      * 构建配对区：左侧二维码，右侧配对码、有效期与操作。
-     *
-     * 整块区域用带标题的边框围起来，而不是只靠一行加粗标题。并排的两块内容若没有边界，
-     * 操作者得先逐字读完才知道「哪几行属于同一件事」；边框把这层信息交给视觉去传达。
-     *
-     * 边框的线条与标题颜色一律留给当前的 Look and Feel 决定，此处不写死：Burp 允许在浅色
-     * 与深色主题之间切换，写死的颜色必然在其中一种主题下失效。
      */
     private fun buildPairingSection(): JPanel {
-        val section = JPanel(BorderLayout(SECTION_SPACING, 0))
-        section.border = BorderFactory.createTitledBorder(localisedText.text(TextKey.PAIRING_SECTION_HEADING))
-        section.add(qrCodeHolder, BorderLayout.WEST)
+        val pairingContent = JPanel(BorderLayout(SECTION_SPACING, 0))
+        pairingContent.add(qrCodeHolder, BorderLayout.WEST)
 
         val pairingDetails = JPanel()
         pairingDetails.layout = BoxLayout(pairingDetails, BoxLayout.Y_AXIS)
@@ -285,8 +276,8 @@ class RemoteStatusPanel(
         val detailsContainer = JPanel(BorderLayout())
         detailsContainer.add(pairingDetails, BorderLayout.NORTH)
 
-        section.add(detailsContainer, BorderLayout.CENTER)
-        return section
+        pairingContent.add(detailsContainer, BorderLayout.CENTER)
+        return SectionCard(localisedText.text(TextKey.PAIRING_SECTION_HEADING), pairingContent)
     }
 
     /**
@@ -303,6 +294,9 @@ class RemoteStatusPanel(
         // 记忆，同一个位置在换语言之后突然变成另一个字母，比没有助记键更糟。
         val refreshButton = JButton(localisedText.text(TextKey.REFRESH_PAIRING_CODE_LABEL))
         refreshButton.mnemonic = KeyEvent.VK_R
+        // 两个按钮里只有刷新是主要动作，因此只有它加粗：用粗细区分主次，而不是给其中一个
+        // 填上颜色——填色必须写死色值，而写死的色值必然在其中一种主题下变得刺眼。
+        refreshButton.font = refreshButton.font.deriveFont(Font.BOLD)
         refreshButton.addActionListener {
             // 顺带刷新设备列表：这个按钮是当前唯一的人工刷新入口，而设备列表在没有传输层之前
             // 也只能由本面板改变。等到设备可以经网络配对时，列表必须改为由登记处主动通知刷新，
@@ -324,9 +318,6 @@ class RemoteStatusPanel(
      * 构建运行参数区。
      */
     private fun buildRuntimeSection(): JPanel {
-        val section = JPanel(BorderLayout())
-        section.border = BorderFactory.createTitledBorder(localisedText.text(TextKey.RUNTIME_SECTION_HEADING))
-
         // 参数排成「标签—取值」两列。用网格而不是逐项指定坐标：Burp 允许用户放大界面字体，
         // 写死的坐标在字体变化之后必然错位，而网格由 Swing 在每次布局时重新计算。
         val details = JPanel(GridLayout(0, DETAIL_COLUMNS, DETAIL_HORIZONTAL_GAP, DETAIL_VERTICAL_GAP))
@@ -343,8 +334,7 @@ class RemoteStatusPanel(
         // 两者之间隔着一整屏空白，眼睛无法把它们连起来。
         val detailsRow = JPanel(BorderLayout())
         detailsRow.add(details, BorderLayout.WEST)
-        section.add(detailsRow, BorderLayout.NORTH)
-        return section
+        return SectionCard(localisedText.text(TextKey.RUNTIME_SECTION_HEADING), detailsRow)
     }
 
     /**
@@ -354,11 +344,7 @@ class RemoteStatusPanel(
      * 因为排错时「移除一台不该被信任的设备」比「端口是多少」紧迫得多。
      */
     private fun buildPairedDeviceSection(): JPanel {
-        val section = JPanel(BorderLayout())
-        section.border =
-            BorderFactory.createTitledBorder(localisedText.text(TextKey.PAIRED_DEVICE_SECTION_HEADING))
-        section.add(pairedDeviceRows, BorderLayout.NORTH)
-        return section
+        return SectionCard(localisedText.text(TextKey.PAIRED_DEVICE_SECTION_HEADING), pairedDeviceRows)
     }
 
     /**
@@ -397,7 +383,7 @@ class RemoteStatusPanel(
      * 「请把这一台加回来」的凭据，必须能被完整复制出去。
      */
     private fun buildPairedDeviceRow(pairedDevice: PairedDevice): JPanel {
-        val deviceIdentifierValue = createSelectableValue()
+        val deviceIdentifierValue = SelectableValueField()
         deviceIdentifierValue.text = pairedDevice.deviceIdentifier.value
 
         val pairedAtLabel =
@@ -545,30 +531,6 @@ class RemoteStatusPanel(
     }
 
     /**
-     * 造出一个「可选中但不可编辑」的取值控件。
-     *
-     * 用它代替 `JLabel` 的理由很具体：文本字段可以用鼠标选中并按 Ctrl+C，而标签不行。
-     * 配对码与配对地址都是要原样抄到另一台设备上的机器值，只让操作者依赖「复制」按钮或
-     * 肉眼抄写，等于把他的出错概率当成可接受成本。
-     *
-     * 关掉不透明与边框，是为了让它在视觉上仍然是一个静止的取值，而不是一个「等着你输入」的
-     * 输入框——它一旦长得像输入框，操作者就会去点它，然后奇怪为什么打不了字。
-     *
-     * @param columns 首选宽度，以字符列数计；0 表示按当前内容自适应。
-     */
-    private fun createSelectableValue(columns: Int = CONTENT_WIDTH_COLUMNS): JTextField {
-        val valueField = JTextField(columns)
-        valueField.isEditable = false
-        valueField.isOpaque = false
-        valueField.border = null
-        valueField.margin = Insets(0, 0, 0, 0)
-        // 显式左对齐。Swing 组件的默认横向对齐是「居中」，而一个宽度不能随容器伸展的控件
-        // 在纵向布局里就会被居中摆放——取值会比它上方的说明文字向右偏出一段，看上去像排版错误。
-        valueField.alignmentX = Component.LEFT_ALIGNMENT
-        return valueField
-    }
-
-    /**
      * 造出一个次级文字控件（字段说明、操作指引、瞬时反馈）。
      *
      * 把这件事收在一个工厂方法里，而不是在每个调用点各自调一次派生字体：漏掉任何一处，
@@ -634,15 +596,6 @@ class RemoteStatusPanel(
         private const val SECONDARY_FONT_SIZE_DELTA = -2f
 
         private const val PAIRING_CODE_FONT_SIZE = 22
-
-        /**
-         * 取值的首选宽度改为「按内容自适应」。
-         *
-         * `JTextField` 的列数为 0 时，宽度由当前内容算得。配对码长度由安全层决定，
-         * 在这里写死一个列数等于把那个长度复制了一遍——安全层一旦调整长度，界面就会把
-         * 末尾几位裁掉，而裁掉的部分在屏幕上「看起来没问题」。
-         */
-        private const val CONTENT_WIDTH_COLUMNS = 0
 
         /**
          * 配对地址的固定宽度，以字符列数计。
