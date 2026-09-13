@@ -7,16 +7,29 @@ import android.util.Log
 /**
  * 落到 logcat 的技术日志。
  *
- * 用 verbose 级别：这些是排查用的细节，不是产品行为；级别调高会把 logcat 刷满，
- * 真出故障时反而找不到那一行。敏感键的取值在落地前抹成 `***`。
+ * 落地级别跟着 [TechnicalLogEvent.severity] 走，而不是一律 verbose：级别是这条日志唯一
+ * 能被 logcat 侧直接过滤的维度，压成同一档等于把刚建好的那根轴在这里掐断。
+ * 排查完的 Debug 细节不该继续占用 logcat 的默认视图，而 Warning 与 Error 必须默认可见。
+ *
+ * 敏感键的取值在落地前抹成 `***`（rules.md §12）。
+ *
+ * @param tag logcat 的标签；与各屏统一，方便 `adb logcat -s` 一起过滤出本应用的日志。
  */
 class AndroidTechnicalLog(
     private val tag: String = DEFAULT_LOG_TAG,
 ) : TechnicalLog {
+    /** 按级别选一个 logcat 落地级别，再按统一格式渲染正文。 */
     override fun record(event: TechnicalLogEvent) {
-        Log.v(tag, render(event))
+        val rendered = render(event)
+        when (event.severity) {
+            TechnicalLogSeverity.Debug -> Log.d(tag, rendered)
+            TechnicalLogSeverity.Information -> Log.i(tag, rendered)
+            TechnicalLogSeverity.Warning -> Log.w(tag, rendered)
+            TechnicalLogSeverity.Error -> Log.e(tag, rendered)
+        }
     }
 
+    /** 把一条日志渲染成 `[分类] 消息 键=值 … 原因: 摘要`；分类与级别分工不同，正文只出分类。 */
     private fun render(event: TechnicalLogEvent): String {
         val builder = StringBuilder()
         builder.append('[').append(event.category.displayName).append("] ").append(event.message)
@@ -54,7 +67,6 @@ class AndroidTechnicalLog(
             }
 
     private companion object {
-        // 与各屏统一的 tag，方便 adb logcat -s 一起过滤出本应用的日志。
         const val DEFAULT_LOG_TAG = "BurpRemote"
 
         const val REDACTED_VALUE = "***"

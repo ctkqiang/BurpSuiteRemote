@@ -30,6 +30,10 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    // 用 api：内存日志把「最近若干条」以 StateFlow 的形式交给界面，StateFlow 出现在公开签名上，
+    // 用 implementation 藏起来会让读它的 feature 拿到一个类型都解析不出来的属性。
+    api(libs.kotlinx.coroutines.core)
+
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotlinx.coroutines.test)
     testRuntimeOnly(libs.junit.platform.launcher)
