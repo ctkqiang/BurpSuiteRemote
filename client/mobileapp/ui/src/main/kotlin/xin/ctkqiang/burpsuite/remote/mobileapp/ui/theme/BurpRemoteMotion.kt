@@ -1,7 +1,11 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.unit.Dp
 
 /**
  * 动效的时长与缓动。
@@ -15,9 +19,13 @@ object BurpRemoteMotion {
     /** 220ms：常规出现、消失与状态切换。 */
     const val DURATION_REGULAR = 220
 
-    /** 320ms：强调，例如浮底栏这类需要被看清的进场。 */
+    /** 320ms：强调，例如弹层进场。 */
     const val DURATION_EMPHASISED = 320
 
     /** 标准缓动：快出慢入，位移看起来才像是被手带过去的。 */
     val EasingStandard: Easing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
+
+    /** 底栏指示器位移：定长缓动推过去像被定时器推的，无回弹的 spring 才像被手带过去的。 */
+    val SpringIndicator: AnimationSpec<Dp> =
+        spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMediumLow)
 }

@@ -20,6 +20,12 @@ import androidx.compose.ui.graphics.Color
  * @property danger 危险语义色。
  * @property information 信息语义色。
  * @property scrim 遮罩色。
+ * @property onScrim 压在遮罩上的字色；扫码取景是「黑遮罩 + 相机」，只能用浅色，不能跟着主题翻。
+ * @property codeKey 代码高亮：键名。
+ * @property codeString 代码高亮：字符串字面量。
+ * @property codeNumber 代码高亮：数值字面量。
+ * @property codeLiteral 代码高亮：`true` / `false` / `null` 这类关键字字面量。
+ * @property codeComment 代码高亮：注释，也是整块代码里最该退到后面的那一层。
  */
 data class BurpRemoteColourScheme(
     val background: Color,
@@ -35,4 +41,10 @@ data class BurpRemoteColourScheme(
     val danger: Color,
     val information: Color,
     val scrim: Color,
+    val onScrim: Color,
+    val codeKey: Color,
+    val codeString: Color,
+    val codeNumber: Color,
+    val codeLiteral: Color,
+    val codeComment: Color,
 )

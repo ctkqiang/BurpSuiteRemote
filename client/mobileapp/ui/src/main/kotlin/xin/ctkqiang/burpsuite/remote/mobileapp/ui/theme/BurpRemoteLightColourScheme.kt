@@ -6,21 +6,28 @@ import androidx.compose.ui.graphics.Color
  * 浅色配色。
  *
  * 底色是纯白：这是阅读密集界面的前提，任何带灰的「白」都会让等宽技术值看起来发脏。
- * 表面比底色略冷，靠明度差分层，不靠描边。
+ * 卡片与页面只差一档极浅的灰（`#FAFAFA`），分层主要靠 1dp 描边，不叠阴影——一屏里叠三层阴影之后，
+ * 哪一层更靠前就全靠猜了。底栏与弹层用与页面相同的纯白，靠描边与投影从内容里浮起来。
  */
 val BurpRemoteLightColourScheme =
     BurpRemoteColourScheme(
         background = Color(0xFFFFFFFF),
-        surface = Color(0xFFF5F6F8),
-        surfaceElevated = Color(0xFFFCFCFD),
-        outline = Color(0xFFE1E5EA),
-        contentPrimary = Color(0xFF14171C),
-        contentSecondary = Color(0xFF5A6169),
+        surface = Color(0xFFFAFAFA),
+        surfaceElevated = Color(0xFFFFFFFF),
+        outline = Color(0xFFE7E8EA),
+        contentPrimary = Color(0xFF0B0D0F),
+        contentSecondary = Color(0xFF5B6169),
         accent = BurpRemoteColour,
         onAccent = Color(0xFFFFFFFF),
-        success = Color(0xFF1B7F4B),
-        warning = Color(0xFFB26A00),
-        danger = Color(0xFFC0392B),
-        information = Color(0xFF1D6FB8),
-        scrim = Color(0x5214171C),
+        success = Color(0xFF16A34A),
+        warning = Color(0xFFD97706),
+        danger = Color(0xFFDC2626),
+        information = Color(0xFF2563EB),
+        scrim = Color(0xB3000000),
+        onScrim = Color(0xFFFFFFFF),
+        codeKey = Color(0xFF7C3AED),
+        codeString = Color(0xFF15803D),
+        codeNumber = Color(0xFFB45309),
+        codeLiteral = Color(0xFF0E7490),
+        codeComment = Color(0xFF6B7280),
     )

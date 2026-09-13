@@ -1,16 +1,12 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component
 
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.burpRemoteLongPressClipboard
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
@@ -25,21 +21,12 @@ fun BurpRemoteTechnicalValue(
     label: String? = null,
 ) {
     val tokens = LocalBurpRemoteDesignTokens.current
-    val clipboardManager = LocalClipboardManager.current
-    val haptics = rememberBurpRemoteHaptics()
 
     Column(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .pointerInput(text) {
-                    detectTapGestures(
-                        onLongPress = {
-                            clipboardManager.setText(AnnotatedString(text))
-                            haptics.success()
-                        },
-                    )
-                }
+                .burpRemoteLongPressClipboard(text)
                 .padding(vertical = BurpRemoteSpacing.ExtraSmall),
     ) {
         if (label != null) {

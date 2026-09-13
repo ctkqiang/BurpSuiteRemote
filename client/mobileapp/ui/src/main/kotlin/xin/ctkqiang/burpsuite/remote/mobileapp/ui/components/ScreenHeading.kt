@@ -20,7 +20,7 @@ fun ScreenHeading(
     val tokens = LocalBurpRemoteDesignTokens.current
     BurpRemoteText(
         text = stringResource(titleResource),
-        style = tokens.typography.display,
+        style = tokens.typography.title,
         colour = tokens.colourScheme.contentPrimary,
         modifier = modifier,
     )

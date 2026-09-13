@@ -5,6 +5,7 @@
     <string name="components_absent_value">—</string>
     <string name="components_navigate_back">Back</string>
     <string name="components_scanner_toggle_torch">Toggle flashlight</string>
+    <string name="components_retry">Retry</string>
 
     <!-- 实时与离线是全局口径（plan §59），因此写作固定词形，三种语言都不翻译。 -->
     <string name="components_mode_live">LIVE</string>
@@ -12,8 +13,12 @@
 
     <string name="navigation_section_dashboard">Dashboard</string>
     <string name="navigation_section_live">Live</string>
-    <string name="navigation_section_archive">Archive</string>
     <string name="navigation_section_settings">Settings</string>
+
+    <!-- 分区索引按组排列：每组一个标题，组内几行共用一个描边容器。 -->
+    <string name="navigation_group_connection">Connection</string>
+    <string name="navigation_group_interface">Interface</string>
+    <string name="navigation_group_data">Data and security</string>
 
     <string name="navigation_entry_live_history">History</string>
     <string name="navigation_entry_live_intercept">Intercept</string>
@@ -23,6 +28,16 @@
     <string name="navigation_entry_settings_language">Language</string>
     <string name="navigation_entry_settings_security">Security</string>
     <string name="navigation_entry_settings_storage">Storage</string>
+
+    <!-- 每一行补一句它通向什么：索引页的价值在于点之前就知道会去哪，而不是点进去再退回来。 -->
+    <string name="navigation_entry_live_history_detail">Every request the plug-in has forwarded, newest first.</string>
+    <string name="navigation_entry_live_intercept_detail">Requests the plug-in is holding back until you decide.</string>
+    <string name="navigation_entry_live_repeater_detail">Re-send a stored request and compare the responses.</string>
+    <string name="navigation_entry_settings_burp_connection_detail">Address, port, pairing ticket and live connection state.</string>
+    <string name="navigation_entry_settings_appearance_detail">Light or dark, and whether to follow the system.</string>
+    <string name="navigation_entry_settings_language_detail">Rebuilds the interface once so every string matches.</string>
+    <string name="navigation_entry_settings_security_detail">What is stored on this device and how it is protected.</string>
+    <string name="navigation_entry_settings_storage_detail">Local database size and how to clear captured data.</string>
 
     <string name="connection_state_disconnected">Disconnected</string>
     <string name="connection_state_discovering">Discovering</string>
@@ -39,12 +54,46 @@
 
     <!-- 配对结论逐条分开写：每一种都对应不同的下一步，合并成一句等于让用户自己猜。 -->
     <string name="pairing_conclusion_succeeded">Paired. Connecting to Burp…</string>
-    <string name="pairing_conclusion_malformed_ticket">This code is not a Burp Remote pairing ticket.</string>
+    <string name="pairing_conclusion_malformed_ticket">This code is not a Burpsuite Remote pairing ticket.</string>
     <string name="pairing_conclusion_ticket_expired">This pairing ticket has expired. Scan a fresh one.</string>
-    <string name="pairing_conclusion_protocol_version_unsupported">Protocol version mismatch. Upgrade Burp Remote or the extension.</string>
+    <string name="pairing_conclusion_protocol_version_unsupported">Protocol version mismatch. Upgrade Burpsuite Remote or the extension.</string>
     <string name="pairing_conclusion_device_not_paired">Burp does not accept this device. Start pairing from the extension.</string>
     <string name="pairing_conclusion_pairing_code_mismatch">The pairing code does not match. Check it and retry.</string>
     <string name="pairing_conclusion_pairing_session_expired">The pairing session on Burp has expired. Scan a fresh ticket.</string>
     <string name="pairing_conclusion_unreachable">Burp is unreachable. Check the address, the port and your network.</string>
     <string name="pairing_conclusion_failed">Pairing failed. See the technical log for the exact cause.</string>
+
+    <!-- 日志面板的级别标签。级别同时用颜色与文字表达，不以颜色作为唯一线索。 -->
+    <string name="components_severity_debug">Debug</string>
+    <string name="components_severity_information">Info</string>
+    <string name="components_severity_warning">Warning</string>
+    <string name="components_severity_error">Error</string>
+
+    <!-- 日志分类标签。 -->
+    <string name="components_category_pairing">Pairing</string>
+    <string name="components_category_transport">Transport</string>
+    <string name="components_category_event_stream">Event stream</string>
+    <string name="components_category_event_ingestion">Ingestion</string>
+    <string name="components_category_navigation">Navigation</string>
+    <string name="components_category_user_interface">Interface</string>
+    <string name="components_category_failure">Failure</string>
+
+    <!-- 相对时间：全应用共用一套，各屏不再各写一份。 -->
+    <string name="components_relative_just_now">Just now</string>
+    <plurals name="components_relative_seconds">
+        <item quantity="one">%d second ago</item>
+        <item quantity="other">%d seconds ago</item>
+    </plurals>
+    <plurals name="components_relative_minutes">
+        <item quantity="one">%d minute ago</item>
+        <item quantity="other">%d minutes ago</item>
+    </plurals>
+    <plurals name="components_relative_hours">
+        <item quantity="one">%d hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+    <plurals name="components_relative_days">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
 </resources>

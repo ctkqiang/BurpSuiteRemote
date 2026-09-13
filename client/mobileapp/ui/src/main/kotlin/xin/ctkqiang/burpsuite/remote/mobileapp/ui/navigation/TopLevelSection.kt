@@ -3,7 +3,6 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -42,25 +41,20 @@ enum class TopLevelSection(
             listOf(
                 SectionMenuEntry(
                     labelResource = R.string.navigation_entry_live_history,
+                    descriptionResource = R.string.navigation_entry_live_history_detail,
                     route = BurpRemoteRoute.LIVE_HISTORY,
                 ),
                 SectionMenuEntry(
                     labelResource = R.string.navigation_entry_live_intercept,
+                    descriptionResource = R.string.navigation_entry_live_intercept_detail,
                     route = BurpRemoteRoute.LIVE_INTERCEPT,
                 ),
                 SectionMenuEntry(
                     labelResource = R.string.navigation_entry_live_repeater,
+                    descriptionResource = R.string.navigation_entry_live_repeater_detail,
                     route = BurpRemoteRoute.LIVE_REPEATER,
                 ),
             ),
-    ),
-
-    /** 归档区：入口就是三个页签（已保存历史、书签、截图），因此没有索引页。 */
-    Archive(
-        labelResource = R.string.navigation_section_archive,
-        landingRoute = BurpRemoteRoute.ARCHIVE_SECTION,
-        icon = Icons.Filled.DateRange,
-        indexEntries = emptyList(),
     ),
 
     /** 设置区：连接、外观、语言、安全、存储。 */
@@ -72,23 +66,33 @@ enum class TopLevelSection(
             listOf(
                 SectionMenuEntry(
                     labelResource = R.string.navigation_entry_settings_burp_connection,
+                    descriptionResource = R.string.navigation_entry_settings_burp_connection_detail,
                     route = BurpRemoteRoute.SETTINGS_BURP_CONNECTION,
+                    groupResource = R.string.navigation_group_connection,
                 ),
                 SectionMenuEntry(
                     labelResource = R.string.navigation_entry_settings_appearance,
+                    descriptionResource = R.string.navigation_entry_settings_appearance_detail,
                     route = BurpRemoteRoute.SETTINGS_APPEARANCE,
+                    groupResource = R.string.navigation_group_interface,
                 ),
                 SectionMenuEntry(
                     labelResource = R.string.navigation_entry_settings_language,
+                    descriptionResource = R.string.navigation_entry_settings_language_detail,
                     route = BurpRemoteRoute.SETTINGS_LANGUAGE,
+                    groupResource = R.string.navigation_group_interface,
                 ),
                 SectionMenuEntry(
                     labelResource = R.string.navigation_entry_settings_security,
+                    descriptionResource = R.string.navigation_entry_settings_security_detail,
                     route = BurpRemoteRoute.SETTINGS_SECURITY,
+                    groupResource = R.string.navigation_group_data,
                 ),
                 SectionMenuEntry(
                     labelResource = R.string.navigation_entry_settings_storage,
+                    descriptionResource = R.string.navigation_entry_settings_storage_detail,
                     route = BurpRemoteRoute.SETTINGS_STORAGE,
+                    groupResource = R.string.navigation_group_data,
                 ),
             ),
     ),

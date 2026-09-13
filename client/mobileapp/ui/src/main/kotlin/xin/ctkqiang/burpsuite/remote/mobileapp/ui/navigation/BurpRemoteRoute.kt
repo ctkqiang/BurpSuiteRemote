@@ -37,12 +37,6 @@ object BurpRemoteRoute {
     /** 重放。 */
     const val LIVE_REPEATER: String = "live/repeater"
 
-    /** 归档区索引；这一屏本身就是三个页签。 */
-    const val ARCHIVE_SECTION: String = "archive"
-
-    /** 截图工作区；从归档的截图页签进来。 */
-    const val ARCHIVE_SCREENSHOTS: String = "archive/screenshots"
-
     /** 分享与导出；带一条历史记录作导出对象。 */
     const val SHARING: String = "sharing/{$HISTORY_IDENTIFIER_ARGUMENT}"
 

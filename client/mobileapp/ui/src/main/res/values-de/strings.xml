@@ -5,6 +5,7 @@
     <string name="components_absent_value">—</string>
     <string name="components_navigate_back">Zurück</string>
     <string name="components_scanner_toggle_torch">Taschenlampe umschalten</string>
+    <string name="components_retry">Erneut versuchen</string>
 
     <!-- 实时与离线是全局口径（plan §59），因此写作固定词形，三种语言都不翻译。 -->
     <string name="components_mode_live">LIVE</string>
@@ -12,8 +13,12 @@
 
     <string name="navigation_section_dashboard">Übersicht</string>
     <string name="navigation_section_live">Live</string>
-    <string name="navigation_section_archive">Archiv</string>
     <string name="navigation_section_settings">Einstellungen</string>
+
+    <!-- 分区索引按组排列：每组一个标题，组内几行共用一个描边容器。 -->
+    <string name="navigation_group_connection">Verbindung</string>
+    <string name="navigation_group_interface">Oberfläche</string>
+    <string name="navigation_group_data">Daten und Sicherheit</string>
 
     <string name="navigation_entry_live_history">Verlauf</string>
     <string name="navigation_entry_live_intercept">Intercept</string>
@@ -23,6 +28,16 @@
     <string name="navigation_entry_settings_language">Sprache</string>
     <string name="navigation_entry_settings_security">Sicherheit</string>
     <string name="navigation_entry_settings_storage">Speicher</string>
+
+    <!-- 每一行补一句它通向什么：索引页的价值在于点之前就知道会去哪，而不是点进去再退回来。 -->
+    <string name="navigation_entry_live_history_detail">Jede vom Plug-in weitergeleitete Anfrage, neueste zuerst.</string>
+    <string name="navigation_entry_live_intercept_detail">Anfragen, die das Plug-in zurückhält, bis Sie entscheiden.</string>
+    <string name="navigation_entry_live_repeater_detail">Eine gespeicherte Anfrage erneut senden und Antworten vergleichen.</string>
+    <string name="navigation_entry_settings_burp_connection_detail">Adresse, Port, Kopplungsticket und aktueller Verbindungszustand.</string>
+    <string name="navigation_entry_settings_appearance_detail">Hell oder dunkel, und ob das System entscheiden soll.</string>
+    <string name="navigation_entry_settings_language_detail">Baut die Oberfläche einmal neu auf, damit jeder Text passt.</string>
+    <string name="navigation_entry_settings_security_detail">Was auf diesem Gerät liegt und wie es geschützt wird.</string>
+    <string name="navigation_entry_settings_storage_detail">Größe der lokalen Datenbank und Löschen erfasster Daten.</string>
 
     <string name="connection_state_disconnected">Nicht verbunden</string>
     <string name="connection_state_discovering">Wird gesucht</string>
@@ -39,12 +54,46 @@
 
     <!-- 配对结论逐条分开写：每一种都对应不同的下一步，合并成一句等于让用户自己猜。 -->
     <string name="pairing_conclusion_succeeded">Gekoppelt. Verbindung zu Burp läuft …</string>
-    <string name="pairing_conclusion_malformed_ticket">Dieser Code ist kein Burp-Remote-Kopplungsticket.</string>
+    <string name="pairing_conclusion_malformed_ticket">Dieser Code ist kein Burpsuite-Remote-Kopplungsticket.</string>
     <string name="pairing_conclusion_ticket_expired">Dieses Kopplungsticket ist abgelaufen. Bitte ein neues scannen.</string>
-    <string name="pairing_conclusion_protocol_version_unsupported">Protokollversion passt nicht. Bitte Burp Remote oder die Erweiterung aktualisieren.</string>
+    <string name="pairing_conclusion_protocol_version_unsupported">Protokollversion passt nicht. Bitte Burpsuite Remote oder die Erweiterung aktualisieren.</string>
     <string name="pairing_conclusion_device_not_paired">Burp akzeptiert dieses Gerät nicht. Bitte die Kopplung in der Erweiterung starten.</string>
     <string name="pairing_conclusion_pairing_code_mismatch">Der Kopplungscode passt nicht. Bitte prüfen und erneut versuchen.</string>
     <string name="pairing_conclusion_pairing_session_expired">Die Kopplungssitzung in Burp ist abgelaufen. Bitte ein neues Ticket scannen.</string>
     <string name="pairing_conclusion_unreachable">Burp ist nicht erreichbar. Adresse, Port und Netzwerk prüfen.</string>
     <string name="pairing_conclusion_failed">Kopplung fehlgeschlagen. Die genaue Ursache steht im technischen Log.</string>
+
+    <!-- 日志面板的级别标签。级别同时用颜色与文字表达，不以颜色作为唯一线索。 -->
+    <string name="components_severity_debug">Debug</string>
+    <string name="components_severity_information">Info</string>
+    <string name="components_severity_warning">Warnung</string>
+    <string name="components_severity_error">Fehler</string>
+
+    <!-- 日志分类标签。故障与「错误」级别区分开，避免同一屏出现两个「Fehler」。 -->
+    <string name="components_category_pairing">Kopplung</string>
+    <string name="components_category_transport">Transport</string>
+    <string name="components_category_event_stream">Ereignisstrom</string>
+    <string name="components_category_event_ingestion">Ereignisaufnahme</string>
+    <string name="components_category_navigation">Navigation</string>
+    <string name="components_category_user_interface">Oberfläche</string>
+    <string name="components_category_failure">Störung</string>
+
+    <!-- 相对时间：全应用共用一套，各屏不再各写一份。 -->
+    <string name="components_relative_just_now">Gerade eben</string>
+    <plurals name="components_relative_seconds">
+        <item quantity="one">vor %d Sekunde</item>
+        <item quantity="other">vor %d Sekunden</item>
+    </plurals>
+    <plurals name="components_relative_minutes">
+        <item quantity="one">vor %d Minute</item>
+        <item quantity="other">vor %d Minuten</item>
+    </plurals>
+    <plurals name="components_relative_hours">
+        <item quantity="one">vor %d Stunde</item>
+        <item quantity="other">vor %d Stunden</item>
+    </plurals>
+    <plurals name="components_relative_days">
+        <item quantity="one">vor %d Tag</item>
+        <item quantity="other">vor %d Tagen</item>
+    </plurals>
 </resources>

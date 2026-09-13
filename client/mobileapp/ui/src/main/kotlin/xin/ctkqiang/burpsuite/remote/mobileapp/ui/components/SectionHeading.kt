@@ -20,7 +20,7 @@ fun SectionHeading(
     val tokens = LocalBurpRemoteDesignTokens.current
     BurpRemoteText(
         text = stringResource(titleResource),
-        style = tokens.typography.title,
+        style = tokens.typography.subtitle,
         colour = tokens.colourScheme.contentPrimary,
         modifier = modifier,
     )

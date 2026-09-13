@@ -1,8 +1,8 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component
 
-import android.os.Build
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,12 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -44,21 +42,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteDesignTokens
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteHaptics
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteMotion
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSizing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
 /**
- * 浮动底栏：圆角 20、玻璃质感、左右留边距，浮在内容之上。
+ * 浮动底栏：圆角 30、左右边距 20、抬离手势条 12、各项等分、高 60dp。
  *
- * 真模糊只在 API 31 起可用（RenderEffect）。低版本退化为半透明加渐变加描边——照抄高版本的透明度
- * 会让底栏在低版本上透成一团糊，而直接画成实心块又丢掉了「浮在内容之上」这件事。
+ * 圆角与高度相等的一半（30dp = 60dp / 2），两端因此是两个完整的半圆；这是半径的上限，
+ * 再大也只是被裁掉，所以它同时是「最圆」的那一档。
  *
- * 选中项背后有一块滑动的胶囊指示器：只靠颜色变化，用户在余光里看不出「刚才从哪一栏切到了哪一栏」。
- * 条目为空时整条底栏不画——二级页面本来就不该有它，画一条空壳等于告诉用户这里少了点什么。
+ * 分层靠三样真实存在的东西：不透明的抬升表面色、1dp 描边、一道浅投影。这里刻意不做「玻璃模糊」——
+ * Compose 的 `Modifier.blur` 模糊的是自己画出来的内容，没接系统背景模糊 API 的情况下，对一块底色做模糊
+ * 得到的仍是那块底色，只会让代码看起来比它实际做的多。
+ *
+ * 选中胶囊画在条目之下的独立一层：它只改自己的位置，不参与布局，因此切分区时没有任何一项会位移。
+ * 选中项的图标同时放大一档，这样在只有两三个分区的底栏上也能一眼看出当前在哪。
+ *
+ * @param items 分区条目；为空时整条底栏不画。
+ * @param selectedRoute 当前选中的路由；它决定胶囊停在哪一项下面。
+ * @param onSelect 选中回调，交回被点那一条的路由。
  */
 @Composable
 fun BurpRemoteBottomBar(
@@ -71,7 +77,6 @@ fun BurpRemoteBottomBar(
     val tokens = LocalBurpRemoteDesignTokens.current
     val haptics = rememberBurpRemoteHaptics()
     val shape = RoundedCornerShape(BurpRemoteRadius.FloatingNavigation)
-    val isBlurAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     var trackWidthPixels by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
     val entryWidth: Dp = with(density) { (trackWidthPixels / items.size).toDp() }
@@ -79,30 +84,25 @@ fun BurpRemoteBottomBar(
     val indicatorOffset by
         animateDpAsState(
             targetValue = entryWidth * selectedIndex,
-            animationSpec = tween(BurpRemoteMotion.DURATION_REGULAR, easing = BurpRemoteMotion.EasingStandard),
+            animationSpec = BurpRemoteMotion.SpringIndicator,
             label = "bottom-bar-indicator-offset",
         )
 
     Box(
         modifier =
             Modifier
-                .padding(horizontal = BurpRemoteSpacing.Large, vertical = BurpRemoteSpacing.Small)
+                .padding(
+                    start = BurpRemoteSizing.BottomBarHorizontalMargin,
+                    end = BurpRemoteSizing.BottomBarHorizontalMargin,
+                    bottom = BurpRemoteSizing.BottomBarGestureGap,
+                )
                 .fillMaxWidth()
-                .height(BAR_HEIGHT)
+                .height(BurpRemoteSizing.BottomBarHeight)
                 .shadow(elevation = BAR_SHADOW_ELEVATION, shape = shape, clip = false)
                 .clip(shape)
-                .burpRemoteGlassSurface(tokens = tokens, shape = shape, isBlurAvailable = isBlurAvailable),
+                .background(color = tokens.colourScheme.surfaceElevated, shape = shape)
+                .border(width = BurpRemoteSizing.Divider, color = tokens.colourScheme.outline, shape = shape),
     ) {
-        if (isBlurAvailable) {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .blur(GLASS_BLUR_RADIUS)
-                        .background(tokens.colourScheme.surfaceElevated.copy(alpha = GLASS_SHEEN_ALPHA)),
-            )
-        }
-
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier =
@@ -111,7 +111,7 @@ fun BurpRemoteBottomBar(
                         .offset(x = indicatorOffset)
                         .width(entryWidth)
                         .fillMaxHeight()
-                        .padding(horizontal = ENTRY_GAP / 2, vertical = INDICATOR_INSET)
+                        .padding(BurpRemoteSizing.BottomBarIndicatorInset)
                         .clip(RoundedCornerShape(BurpRemoteRadius.Capsule))
                         .background(tokens.colourScheme.accent.copy(alpha = INDICATOR_FILL_ALPHA)),
             )
@@ -150,13 +150,18 @@ private fun RowScope.BottomBarEntry(
             animationSpec = tween(BurpRemoteMotion.DURATION_FAST, easing = BurpRemoteMotion.EasingStandard),
             label = "bottom-bar-entry-colour",
         )
+    val iconScale by
+        animateFloatAsState(
+            targetValue = if (isSelected) SELECTED_ICON_SCALE else UNSELECTED_ICON_SCALE,
+            animationSpec = tween(BurpRemoteMotion.DURATION_FAST, easing = BurpRemoteMotion.EasingStandard),
+            label = "bottom-bar-icon-scale",
+        )
 
     Column(
         modifier =
             Modifier
                 .weight(weight = 1f, fill = true)
                 .fillMaxHeight()
-                .padding(horizontal = ENTRY_GAP / 2)
                 .clip(RoundedCornerShape(BurpRemoteRadius.Capsule))
                 .clickable {
                     haptics.select()
@@ -169,12 +174,18 @@ private fun RowScope.BottomBarEntry(
             painter = rememberVectorPainter(item.icon),
             contentDescription = null,
             colorFilter = ColorFilter.tint(entryColour),
-            modifier = Modifier.size(ENTRY_ICON_SIZE),
+            modifier =
+                Modifier
+                    .size(BurpRemoteSizing.Icon)
+                    .graphicsLayer {
+                        scaleX = iconScale
+                        scaleY = iconScale
+                    },
         )
         Spacer(modifier = Modifier.height(BurpRemoteSpacing.ExtraSmall))
         BurpRemoteText(
             text = stringResource(item.labelResource),
-            style = tokens.typography.label,
+            style = tokens.typography.caption,
             colour = entryColour,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -182,42 +193,9 @@ private fun RowScope.BottomBarEntry(
     }
 }
 
-// 玻璃层只做两件事：给底色，给描边；高版本的柔化由上面的模糊层负责。
-@Composable
-private fun Modifier.burpRemoteGlassSurface(
-    tokens: BurpRemoteDesignTokens,
-    shape: Shape,
-    isBlurAvailable: Boolean,
-): Modifier {
-    val glassAlpha = if (isBlurAvailable) GLASS_ALPHA_BLURRED else GLASS_ALPHA_PLAIN
-    return this
-        .background(
-            brush =
-                Brush.verticalGradient(
-                    colors =
-                        listOf(
-                            tokens.colourScheme.surfaceElevated.copy(alpha = glassAlpha),
-                            tokens.colourScheme.surface.copy(alpha = glassAlpha),
-                        ),
-                ),
-            shape = shape,
-        )
-        .border(
-            width = GLASS_BORDER_WIDTH,
-            color = tokens.colourScheme.outline.copy(alpha = GLASS_BORDER_ALPHA),
-            shape = shape,
-        )
-}
+// 投影只用来把底栏从内容里抬起来；纯黑底上看不见它，也没有害处。
+private val BAR_SHADOW_ELEVATION = 10.dp
 
-private val BAR_HEIGHT = 64.dp
-private val ENTRY_ICON_SIZE = 22.dp
-private val BAR_SHADOW_ELEVATION = 12.dp
-private val ENTRY_GAP = 4.dp
-private val INDICATOR_INSET = 6.dp
-private val GLASS_BORDER_WIDTH = 1.dp
-private val GLASS_BLUR_RADIUS = 24.dp
-private const val GLASS_ALPHA_BLURRED = 0.82f
-private const val GLASS_ALPHA_PLAIN = 0.96f
-private const val GLASS_SHEEN_ALPHA = 0.04f
-private const val GLASS_BORDER_ALPHA = 0.6f
-private const val INDICATOR_FILL_ALPHA = 0.14f
+private const val INDICATOR_FILL_ALPHA = 0.12f
+private const val SELECTED_ICON_SCALE = 1.1f
+private const val UNSELECTED_ICON_SCALE = 1f

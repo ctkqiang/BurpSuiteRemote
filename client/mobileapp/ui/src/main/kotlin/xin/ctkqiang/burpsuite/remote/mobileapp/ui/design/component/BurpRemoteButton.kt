@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSizing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
@@ -54,7 +56,8 @@ fun BurpRemoteButton(
                     onClick()
                 }
                 .alpha(if (isEnabled) ENABLED_ALPHA else DISABLED_ALPHA)
-                .padding(horizontal = BurpRemoteSpacing.Large, vertical = BurpRemoteSpacing.Medium),
+                .defaultMinSize(minHeight = BurpRemoteSizing.MinimumTouchTarget)
+                .padding(horizontal = BurpRemoteSpacing.ScreenEdge, vertical = BurpRemoteSpacing.Medium),
         contentAlignment = Alignment.Center,
     ) {
         BurpRemoteText(

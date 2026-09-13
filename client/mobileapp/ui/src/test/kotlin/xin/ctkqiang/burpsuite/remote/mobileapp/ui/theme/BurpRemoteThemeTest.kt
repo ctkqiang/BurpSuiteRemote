@@ -2,15 +2,14 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 /**
  * 主题里被点名要求的几条视觉事实。
  *
- * 这些断言替掉了「装到机器上凭肉眼确认」：底色到底是纯白还是带灰的「白」、深色是不是纯黑，
- * 只差几个十六进制位，截图里看不出来，但读数一眼就能分。
+ * 这些断言替掉了「装到机器上凭肉眼确认」：底色到底是纯白还是带灰的「白」、深色是不是纯黑、
+ * 抬起来的表面有没有真的亮过下面那层，只差几个十六进制位，截图里看不出来，但读数一眼就能分。
  */
 class BurpRemoteThemeTest {
     @Test
@@ -19,12 +18,20 @@ class BurpRemoteThemeTest {
     }
 
     @Test
-    fun `the dark background is a lifted near black`() {
-        val background = BurpRemoteDarkColourScheme.background
-        // 纯黑会让相邻层级差不可见，也会让 OLED 上的滚动拖影更明显，因此这里必须不是纯黑。
-        assertNotEquals(Color(0xFF000000), background)
-        assertTrue(brightestChannelOf(background) <= NEAR_BLACK_CHANNEL_LIMIT)
-        assertTrue(brightestChannelOf(background) > PURE_BLACK_HEADROOM)
+    fun `the dark background is pure black`() {
+        // 纯黑是点名要的：OLED 上不发光的那一档最省电，等宽技术值在纯黑上对比度也最高。
+        assertEquals(Color(0xFF000000), BurpRemoteDarkColourScheme.background)
+    }
+
+    @Test
+    fun `every raised surface is lifted off the black background`() {
+        // 底色纯黑之后，「抬起来」这件事只能靠表面色真的比下面那层亮：卡片要亮过页面，底栏要亮过卡片。
+        // 少了这条约束，卡片与页面会糊成一片纯黑，描边就成了唯一的层级线索。
+        val background = brightestChannelOf(BurpRemoteDarkColourScheme.background)
+        val surface = brightestChannelOf(BurpRemoteDarkColourScheme.surface)
+        val surfaceElevated = brightestChannelOf(BurpRemoteDarkColourScheme.surfaceElevated)
+        assertTrue(surface > background)
+        assertTrue(surfaceElevated > surface)
     }
 
     @Test
@@ -56,6 +63,7 @@ class BurpRemoteThemeTest {
                     scheme.warning,
                     scheme.danger,
                     scheme.information,
+                    scheme.onScrim,
                 )
             // 漏配的槽位会取到 Color.Unspecified，它画出来是透明；这里把「漏配」变成一条断言。
             assertTrue(slots.none { colour -> colour == Color.Unspecified })
@@ -86,7 +94,5 @@ private fun channelSpreadOf(colour: Color): Float =
     brightestChannelOf(colour) - minOf(colour.red, colour.green, colour.blue)
 
 private const val OPAQUE_ALPHA = 1f
-private const val NEAR_BLACK_CHANNEL_LIMIT = 0.1f
-private const val PURE_BLACK_HEADROOM = 0.02f
 private const val NEUTRAL_CHANNEL_TOLERANCE = 0.03f
 private const val BACKGROUND_LIGHT_LIMIT = 0.5f

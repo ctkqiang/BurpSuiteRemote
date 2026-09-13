@@ -24,7 +24,7 @@ fun EmptyStateText(
     val tokens = LocalBurpRemoteDesignTokens.current
     BurpRemoteText(
         text = stringResource(messageResource),
-        style = tokens.typography.body,
+        style = tokens.typography.label,
         colour = tokens.colourScheme.contentSecondary,
         modifier = modifier,
     )

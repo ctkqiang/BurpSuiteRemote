@@ -8,36 +8,37 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.R
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSizing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
 /**
- * 空态：32dp 图标 + 一行标题 + 一行说明 + 可选动作。
+ * 错误态：危险色图标 + 可读原因 + 重试按钮。
  *
- * 空列表必须回答「为什么空、下一步做什么」：只写一句「暂无数据」，用户会以为是自己把数据弄丢了。
- * [icon] 不给就只画文字——有的空态本来就没有合适的图，硬凑一个反而更吵。
+ * 失败必须写成「发生了什么」，而不是「出错了」：用户据此才知道重试有没有意义。
+ * 图标与空态共用同一档 32dp，一列里两种状态因此不会一高一矮。
  */
 @Composable
-fun BurpRemoteEmptyState(
-    headline: String,
+fun BurpRemoteErrorState(
     detail: String,
-    actionText: String? = null,
-    onAction: (() -> Unit)? = null,
-    icon: ImageVector? = null,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val tokens = LocalBurpRemoteDesignTokens.current
 
     Column(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .padding(
                     horizontal = BurpRemoteSpacing.ExtraLarge,
@@ -46,35 +47,24 @@ fun BurpRemoteEmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        if (icon != null) {
-            Image(
-                painter = rememberVectorPainter(icon),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(tokens.colourScheme.contentSecondary),
-                modifier = Modifier.size(BurpRemoteSizing.StateIcon),
-            )
-            Spacer(modifier = Modifier.height(BurpRemoteSpacing.Large))
-        }
-        BurpRemoteText(
-            text = headline,
-            style = tokens.typography.subtitle,
-            colour = tokens.colourScheme.contentPrimary,
-            textAlign = TextAlign.Center,
+        Image(
+            painter = rememberVectorPainter(Icons.Filled.Warning),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(tokens.colourScheme.danger),
+            modifier = Modifier.size(BurpRemoteSizing.StateIcon),
         )
-        Spacer(modifier = Modifier.height(BurpRemoteSpacing.Small))
+        Spacer(modifier = Modifier.height(BurpRemoteSpacing.Large))
         BurpRemoteText(
             text = detail,
             style = tokens.typography.label,
-            colour = tokens.colourScheme.contentSecondary,
+            colour = tokens.colourScheme.contentPrimary,
             textAlign = TextAlign.Center,
         )
-        if (actionText != null && onAction != null) {
-            Spacer(modifier = Modifier.height(BurpRemoteSpacing.Large))
-            BurpRemoteButton(
-                text = actionText,
-                onClick = onAction,
-                style = BurpRemoteButtonStyle.Secondary,
-            )
-        }
+        Spacer(modifier = Modifier.height(BurpRemoteSpacing.Large))
+        BurpRemoteButton(
+            text = stringResource(R.string.components_retry),
+            onClick = onRetry,
+            style = BurpRemoteButtonStyle.Secondary,
+        )
     }
 }

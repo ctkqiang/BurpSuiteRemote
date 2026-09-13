@@ -35,7 +35,7 @@ fun BurpRemoteSectionHeading(
         Column(modifier = Modifier.weight(weight = 1f, fill = true)) {
             BurpRemoteText(
                 text = text,
-                style = tokens.typography.title,
+                style = tokens.typography.subtitle,
                 colour = tokens.colourScheme.contentPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

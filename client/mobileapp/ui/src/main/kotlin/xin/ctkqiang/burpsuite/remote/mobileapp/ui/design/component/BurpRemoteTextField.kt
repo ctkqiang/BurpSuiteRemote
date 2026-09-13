@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSizing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
@@ -25,6 +27,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTok
  * 单行输入框。
  *
  * [isMonospace] 给技术值用：主机、端口、配对码这类内容要能逐字符比对，比例字体做不到这件事。
+ * 输入区高度按最小触控边长兜底，标签那一行因此不会把可点区域压到按不准。
  */
 @Composable
 fun BurpRemoteTextField(
@@ -59,6 +62,7 @@ fun BurpRemoteTextField(
             modifier =
                 Modifier
                     .fillMaxWidth()
+                    .defaultMinSize(minHeight = BurpRemoteSizing.MinimumTouchTarget)
                     .clip(shape)
                     .background(color = tokens.colourScheme.surfaceElevated, shape = shape)
                     .border(width = 1.dp, color = tokens.colourScheme.outline, shape = shape),
@@ -68,7 +72,7 @@ fun BurpRemoteTextField(
                         Modifier
                             .fillMaxWidth()
                             .padding(
-                                horizontal = BurpRemoteSpacing.Medium,
+                                horizontal = BurpRemoteSpacing.Large,
                                 vertical = BurpRemoteSpacing.Medium,
                             ),
                     contentAlignment = Alignment.CenterStart,
