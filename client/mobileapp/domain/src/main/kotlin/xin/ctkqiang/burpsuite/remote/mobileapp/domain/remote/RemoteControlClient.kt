@@ -37,11 +37,11 @@ interface RemoteControlClient {
     /** 读取远端历史列表原文，对应 GET /v1/history。 */
     suspend fun readRemoteHistory(configuration: RemoteConnectionConfiguration): RemoteResult<RemotePayload>
 
-    /** 按标识读取远端历史记录原文，对应 GET /v1/history/{historyIdentifier}。 */
+    /** 按标识取回单条历史报文的完整内容，对应 GET /v1/history/{historyIdentifier}。 */
     suspend fun readRemoteHistoryMessage(
         configuration: RemoteConnectionConfiguration,
         historyIdentifier: HistoryIdentifier,
-    ): RemoteResult<RemotePayload>
+    ): RemoteResult<RemoteHistoryMessage>
 
     /** 取当前状态快照，对应 GET /v1/snapshot；成功后本地续传基准一并推到快照那一刻。 */
     suspend fun requestSnapshot(configuration: RemoteConnectionConfiguration): RemoteResult<RemoteRuntimeState>
