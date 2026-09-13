@@ -1,6 +1,5 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.ui.components
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -16,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ConnectionState
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.R
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
@@ -70,24 +68,6 @@ private val FAILURE_STATES: Set<ConnectionState> =
         ConnectionState.ServerUnavailable,
         ConnectionState.ResynchronisationRequired,
     )
-
-@get:StringRes
-private val ConnectionState.labelResource: Int
-    get() =
-        when (this) {
-            ConnectionState.Disconnected -> R.string.connection_state_disconnected
-            ConnectionState.Discovering -> R.string.connection_state_discovering
-            ConnectionState.Connecting -> R.string.connection_state_connecting
-            ConnectionState.Authenticating -> R.string.connection_state_authenticating
-            ConnectionState.Synchronising -> R.string.connection_state_synchronising
-            ConnectionState.Connected -> R.string.connection_state_connected
-            ConnectionState.Reconnecting -> R.string.connection_state_reconnecting
-            ConnectionState.ResynchronisationRequired -> R.string.connection_state_resynchronisation_required
-            ConnectionState.AuthenticationFailed -> R.string.connection_state_authentication_failed
-            ConnectionState.ProtocolError -> R.string.connection_state_protocol_error
-            ConnectionState.TimedOut -> R.string.connection_state_timed_out
-            ConnectionState.ServerUnavailable -> R.string.connection_state_server_unavailable
-        }
 
 private val INDICATOR_SIZE = 10.dp
 private val INDICATOR_SPACING = 8.dp
