@@ -1,7 +1,7 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component
 
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,6 +35,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteMotion
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
@@ -43,6 +46,11 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTok
  *
  * 自己实现而不是取 Material 3 的那一个：设计系统不引 Material 3，而刷新指示器是第一个必须换掉的东西。
  * 指示器画在内容之上、内容整体下移，因此不存在「把列表项压扁」的中间态。
+ *
+ * 位移用一个普通的状态保存，而不是 `Animatable`：`Animatable` 自带互斥锁，后一次操作会取消前一次。
+ * 拖动的位移由滚动回调写（非挂起、每帧都发生），回弹由另一个协程动画写，两者一旦撞上，
+ * 回弹动画就会被取消 —— 而触发刷新恰恰写在回弹动画之后，于是「拉下去、指示器停在半路、刷新没发生」。
+ * 普通状态没有锁，写入是同步的；回弹则收敛到唯一一个协程入口，并在开始前取消上一次。
  */
 @Composable
 fun BurpRemotePullToRefresh(
@@ -52,26 +60,41 @@ fun BurpRemotePullToRefresh(
 ) {
     val tokens = LocalBurpRemoteDesignTokens.current
     val density = LocalDensity.current
-    val coroutineScope = rememberCoroutineScope()
-    val pullOffset = remember { Animatable(0f) }
+    val settleScope = rememberCoroutineScope()
+    val pullOffsetPixels = remember { mutableFloatStateOf(0f) }
+    val settleJob = remember { mutableStateOf<Job?>(null) }
+    // 这两个用 rememberUpdatedState 包住，下面那个 NestedScrollConnection 才能只建一次：
+    // 手势进行到一半换掉它，滚动分发会拿不准该把余下的位移交给谁。
+    val isRefreshingState = rememberUpdatedState(isRefreshing)
     val onRefreshState = rememberUpdatedState(onRefresh)
     val triggerOffsetPixels = with(density) { TRIGGER_OFFSET.toPx() }
     val restingOffsetPixels = with(density) { RESTING_OFFSET.toPx() }
     val maximumOffsetPixels = with(density) { MAXIMUM_OFFSET.toPx() }
 
+    // 回弹与收回都走这一个入口：先取消上一次，再动画到目标值。
+    val settleTo: (Float, Int) -> Unit =
+        remember(settleScope) {
+            { targetOffsetPixels, durationMillis ->
+                settleJob.value?.cancel()
+                settleJob.value =
+                    settleScope.launch {
+                        animate(
+                            initialValue = pullOffsetPixels.floatValue,
+                            targetValue = targetOffsetPixels,
+                            animationSpec =
+                                tween(durationMillis, easing = BurpRemoteMotion.EasingStandard),
+                        ) { currentOffsetPixels, _ -> pullOffsetPixels.floatValue = currentOffsetPixels }
+                    }
+            }
+        }
+
     // 刷新结束就把指示器收回去；不回头收的话它会在下一次下拉之前一直占着位置。
     LaunchedEffect(isRefreshing) {
-        if (!isRefreshing && pullOffset.value > 0f) {
-            pullOffset.animateTo(
-                targetValue = 0f,
-                animationSpec =
-                    tween(BurpRemoteMotion.DURATION_REGULAR, easing = BurpRemoteMotion.EasingStandard),
-            )
-        }
+        if (!isRefreshing) settleTo(0f, BurpRemoteMotion.DURATION_REGULAR)
     }
 
     val nestedScrollConnection =
-        remember(isRefreshing, coroutineScope) {
+        remember(settleTo, triggerOffsetPixels, restingOffsetPixels, maximumOffsetPixels) {
             object : NestedScrollConnection {
                 // 只有内容已经到顶、还在继续往下拉时才算下拉；否则会跟列表自身的滚动打架。
                 override fun onPostScroll(
@@ -79,11 +102,12 @@ fun BurpRemotePullToRefresh(
                     available: Offset,
                     source: NestedScrollSource,
                 ): Offset {
-                    if (isRefreshing || available.y <= 0f) return Offset.Zero
-                    coroutineScope.launch {
-                        val draggedOffset = pullOffset.value + available.y * DRAG_RESISTANCE
-                        pullOffset.snapTo(draggedOffset.coerceIn(0f, maximumOffsetPixels))
-                    }
+                    if (isRefreshingState.value || available.y <= 0f) return Offset.Zero
+                    // 手指重新抓住把手：正在进行的回弹立刻停下，位移改由手指决定。
+                    settleJob.value?.cancel()
+                    pullOffsetPixels.floatValue =
+                        (pullOffsetPixels.floatValue + available.y * DRAG_RESISTANCE)
+                            .coerceIn(0f, maximumOffsetPixels)
                     return Offset(x = 0f, y = available.y)
                 }
 
@@ -92,35 +116,22 @@ fun BurpRemotePullToRefresh(
                     available: Offset,
                     source: NestedScrollSource,
                 ): Offset {
-                    if (available.y >= 0f || pullOffset.value <= 0f) return Offset.Zero
-                    val consumedY = available.y.coerceAtLeast(-pullOffset.value)
-                    coroutineScope.launch { pullOffset.snapTo((pullOffset.value + consumedY).coerceAtLeast(0f)) }
+                    val currentOffsetPixels = pullOffsetPixels.floatValue
+                    if (available.y >= 0f || currentOffsetPixels <= 0f) return Offset.Zero
+                    settleJob.value?.cancel()
+                    val consumedY = available.y.coerceAtLeast(-currentOffsetPixels)
+                    pullOffsetPixels.floatValue = (currentOffsetPixels + consumedY).coerceAtLeast(0f)
                     return Offset(x = 0f, y = consumedY)
                 }
 
                 override suspend fun onPreFling(available: Velocity): Velocity {
-                    when {
-                        pullOffset.value >= triggerOffsetPixels -> {
-                            pullOffset.animateTo(
-                                targetValue = restingOffsetPixels,
-                                animationSpec =
-                                    tween(
-                                        BurpRemoteMotion.DURATION_FAST,
-                                        easing = BurpRemoteMotion.EasingStandard,
-                                    ),
-                            )
-                            onRefreshState.value()
-                        }
-
-                        pullOffset.value > 0f ->
-                            pullOffset.animateTo(
-                                targetValue = 0f,
-                                animationSpec =
-                                    tween(
-                                        BurpRemoteMotion.DURATION_REGULAR,
-                                        easing = BurpRemoteMotion.EasingStandard,
-                                    ),
-                            )
+                    if (pullOffsetPixels.floatValue >= triggerOffsetPixels) {
+                        // 先把刷新发出去，再让指示器回到停靠位。顺序反过来的话，
+                        // 回弹一旦被手指重新抓住而取消，这次刷新就跟着一起没了。
+                        onRefreshState.value()
+                        settleTo(restingOffsetPixels, BurpRemoteMotion.DURATION_FAST)
+                    } else {
+                        settleTo(0f, BurpRemoteMotion.DURATION_REGULAR)
                     }
                     return Velocity.Zero
                 }
@@ -129,8 +140,8 @@ fun BurpRemotePullToRefresh(
 
     // 下拉进度只驱动指示器；内容整体下移走的 graphicsLayer，因此拖动期间不会重建列表布局。
     val pullProgress by
-        produceState(initialValue = 0f, pullOffset, triggerOffsetPixels) {
-            snapshotFlow { (pullOffset.value / triggerOffsetPixels).coerceIn(0f, 1f) }
+        produceState(initialValue = 0f, pullOffsetPixels, triggerOffsetPixels) {
+            snapshotFlow { (pullOffsetPixels.floatValue / triggerOffsetPixels).coerceIn(0f, 1f) }
                 .collect { progress -> value = progress }
         }
 
@@ -152,7 +163,7 @@ fun BurpRemotePullToRefresh(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .graphicsLayer { translationY = pullOffset.value },
+                    .graphicsLayer { translationY = pullOffsetPixels.floatValue },
         ) {
             content()
         }
