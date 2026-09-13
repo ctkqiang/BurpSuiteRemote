@@ -46,8 +46,6 @@ dependencies {
     implementation(project(":feature:connection"))
     implementation(project(":feature:intercept"))
     implementation(project(":feature:repeater"))
-    implementation(project(":feature:archive"))
-    implementation(project(":feature:screenshot"))
     implementation(project(":feature:sharing"))
 
     implementation(platform(libs.compose.bom))
