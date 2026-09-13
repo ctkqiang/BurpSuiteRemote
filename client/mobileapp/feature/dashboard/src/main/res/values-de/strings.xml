@@ -3,38 +3,19 @@
     <string name="dashboard_target_host_label">Zielhost</string>
     <string name="dashboard_absent_value">—</string>
 
-    <string name="dashboard_scan_headline">Noch nicht gekoppelt?</string>
-    <string name="dashboard_scan_detail">Der Kopplungscode enthält Adresse, Port und einen einmaligen Code und ist damit der einzige Weg, dieses Gerät auf eine Burp-Instanz zu richten.</string>
-    <string name="dashboard_action_scan_pairing">Kopplungscode scannen</string>
-
     <string name="dashboard_live_request_label">Live-Anfragen</string>
     <string name="dashboard_intercepted_label">Abgefangen</string>
     <string name="dashboard_saved_label">Gespeichert</string>
 
-    <string name="dashboard_entry_history">Verlauf</string>
-    <string name="dashboard_entry_intercept">Abfangen</string>
-    <string name="dashboard_entry_repeater">Repeater</string>
-
-    <string name="dashboard_actions_heading">Live-Bereich</string>
-    <string name="dashboard_entry_history_detail">Jede vom Plug-in weitergeleitete Anfrage, die neueste zuerst.</string>
-    <string name="dashboard_entry_intercept_detail">Anfragen, die das Plug-in zurückhält, bis Sie entscheiden.</string>
-    <string name="dashboard_entry_repeater_detail">Eine gespeicherte Anfrage erneut senden und die Antworten vergleichen.</string>
-
     <string name="dashboard_recent_heading">Letzte Anfragen</string>
-    <string name="dashboard_recent_observed_at_label">Beobachtet</string>
     <string name="dashboard_last_observed_label">Zuletzt beobachtet · %1$s</string>
 
     <string name="dashboard_recent_empty_live_headline">Noch nichts beobachtet</string>
     <string name="dashboard_recent_empty_live_detail">Burp ist verbunden, aber es hat noch keine Anfrage dieses Gerät erreicht. Sobald das Plug-in weiterleitet, erscheint sie hier.</string>
     <string name="dashboard_recent_empty_offline_headline">Burp ist nicht verbunden</string>
-    <string name="dashboard_recent_empty_offline_detail">Scannen Sie den Kopplungscode aus dem Burp-Remote-Tab, um hier Live-Verkehr zu sehen. Gespeicherter Verlauf und Screenshots bleiben offline lesbar.</string>
+    <string name="dashboard_recent_empty_offline_detail">Scannen Sie den Kopplungscode aus dem Burp-Remote-Tab, um hier Live-Verkehr zu sehen. Gespeicherter Verlauf bleibt offline lesbar.</string>
 
-    <string name="dashboard_loading_headline">Lokale Daten werden gelesen</string>
-    <string name="dashboard_loading_detail">Ereignisjournal und Projektionen werden auf diesem Gerät gelesen.</string>
-
-    <string name="dashboard_error_headline">Lokale Daten konnten nicht gelesen werden</string>
     <string name="dashboard_error_read_failed">das Ereignisjournal oder eine seiner Projektionen ließ sich nicht lesen</string>
-    <string name="dashboard_error_action">Erneut versuchen</string>
 
     <string name="dashboard_relative_just_now">gerade eben</string>
     <plurals name="dashboard_relative_seconds">

@@ -68,26 +68,6 @@ class DashboardViewModel(
         when (intent) {
             is DashboardUserInterfaceIntent.Refresh -> requestRefresh()
 
-            is DashboardUserInterfaceIntent.OpenPairingScanner -> {
-                record(category = TechnicalLogCategory.Navigation, message = "从主面板内容区进入扫码配对")
-                effectChannel.trySend(DashboardUserInterfaceEffect.OpenPairingScanner)
-            }
-
-            is DashboardUserInterfaceIntent.OpenLiveHistory -> {
-                record(category = TechnicalLogCategory.Navigation, message = "进入实时历史")
-                effectChannel.trySend(DashboardUserInterfaceEffect.OpenLiveHistory)
-            }
-
-            is DashboardUserInterfaceIntent.OpenLiveIntercept -> {
-                record(category = TechnicalLogCategory.Navigation, message = "进入拦截队列")
-                effectChannel.trySend(DashboardUserInterfaceEffect.OpenLiveIntercept)
-            }
-
-            is DashboardUserInterfaceIntent.OpenLiveRepeater -> {
-                record(category = TechnicalLogCategory.Navigation, message = "进入重放")
-                effectChannel.trySend(DashboardUserInterfaceEffect.OpenLiveRepeater)
-            }
-
             is DashboardUserInterfaceIntent.OpenHistoryRecord -> {
                 record(category = TechnicalLogCategory.Navigation, message = "打开最近请求的详情")
                 effectChannel.trySend(

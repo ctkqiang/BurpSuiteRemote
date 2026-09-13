@@ -67,6 +67,7 @@
     <string name="connection_manual_pairing_hint">把插件里二维码旁边那段配对文本粘进来。它和扫到的码走的是同一条链路，两条路最后发出的是同一个配对请求。</string>
     <string name="connection_manual_pairing_text_label">配对文本</string>
     <string name="connection_manual_pairing_action">配对</string>
+    <string name="connection_pairing_text_required_hint">先粘贴或输入配对文本</string>
 
     <string name="connection_pairing_result_heading">配对结果</string>
     <string name="connection_pairing_succeeded_headline">插件已接受本机</string>
@@ -102,10 +103,13 @@
     <string name="connection_endpoint_detail">默认端口是 %1$d。配对时会用票据里的值写这两项；要连另一台机器就在这里改完保存。</string>
     <string name="connection_endpoint_host_label">主机</string>
     <string name="connection_endpoint_port_label">端口</string>
+    <string name="connection_endpoint_default_port_hint">默认端口 %1$d</string>
+    <string name="connection_endpoint_invalid_port_hint">端口要填 1 到 65535 之间的整数</string>
     <string name="connection_endpoint_save_action">保存</string>
 
     <string name="connection_retry_heading">建立连接</string>
     <string name="connection_retry_headline">打开与 Burp 的会话</string>
     <string name="connection_retry_detail">连接会保持一条长会话，把事件持续写入本机的事件日志。失败之后可以在这里重试。</string>
     <string name="connection_retry_action">重试连接</string>
+    <string name="connection_retry_disabled_hint">先保存地址与端口</string>
 </resources>

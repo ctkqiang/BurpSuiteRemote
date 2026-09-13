@@ -1,5 +1,3 @@
-
-
 package xin.ctkqiang.burpsuite.remote.mobileapp.feature.dashboard
 
 /**
@@ -12,18 +10,6 @@ sealed interface DashboardUserInterfaceIntent {
     /** 用户下拉刷新。 */
     data object Refresh : DashboardUserInterfaceIntent
 
-    /** 用户从顶部动作里打开了扫码配对。 */
-    data object OpenPairingScanner : DashboardUserInterfaceIntent
-
-    /** 打开实时历史。 */
-    data object OpenLiveHistory : DashboardUserInterfaceIntent
-
-    /** 打开拦截队列。 */
-    data object OpenLiveIntercept : DashboardUserInterfaceIntent
-
-    /** 打开重放。 */
-    data object OpenLiveRepeater : DashboardUserInterfaceIntent
-
-    /** 打开 Recent 列表里某一条的详情。 */
+    /** 打开最近请求里某一条的详情。 */
     data class OpenHistoryRecord(val historyIdentifier: String) : DashboardUserInterfaceIntent
 }

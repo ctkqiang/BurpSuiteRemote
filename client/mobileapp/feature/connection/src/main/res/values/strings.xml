@@ -67,6 +67,7 @@
     <string name="connection_manual_pairing_hint">Paste the pairing text the extension shows next to the QR code. It goes through exactly the same pipeline as a scanned code, so both routes end in the same pairing request.</string>
     <string name="connection_manual_pairing_text_label">Pairing text</string>
     <string name="connection_manual_pairing_action">Pair</string>
+    <string name="connection_pairing_text_required_hint">Paste or type the pairing text first</string>
 
     <string name="connection_pairing_result_heading">Pairing result</string>
     <string name="connection_pairing_succeeded_headline">The plug-in accepted this device</string>
@@ -102,10 +103,13 @@
     <string name="connection_endpoint_detail">The default port is %1$d. Pairing writes these two values from the ticket; edit them here to point at a different host, then save.</string>
     <string name="connection_endpoint_host_label">Host</string>
     <string name="connection_endpoint_port_label">Port</string>
+    <string name="connection_endpoint_default_port_hint">Default port %1$d</string>
+    <string name="connection_endpoint_invalid_port_hint">The port must be a whole number between 1 and 65535</string>
     <string name="connection_endpoint_save_action">Save</string>
 
     <string name="connection_retry_heading">Connect</string>
     <string name="connection_retry_headline">Open the session to Burp</string>
     <string name="connection_retry_detail">Connecting keeps a session open and streams events into the local journal. Pull down on the dashboard, or retry here after a failure.</string>
     <string name="connection_retry_action">Retry connection</string>
+    <string name="connection_retry_disabled_hint">Save an address and a port first</string>
 </resources>

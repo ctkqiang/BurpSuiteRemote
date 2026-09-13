@@ -40,5 +40,5 @@
     <string name="sharing_state_failed">导出失败</string>
     <string name="sharing_export_failed">导出包写不进去，请换一个位置再试。</string>
 
-    <string name="sharing_export_notice">Burp Remote 导出包\n\n本归档由 Burp Remote 移动客户端生成。\n包含 manifest.json、redaction-report.json 与本说明。\n\n范围：只包含本机存下来的字段。请求与响应的字节尚未被本客户端捕获，\n因此不属于本次导出。\n\n脱敏：敏感值只在这份导出副本里被掩码；归档的原始记录未被修改。</string>
+    <string name="sharing_export_notice">Burpsuite Remote 导出包\n\n本归档由 Burpsuite Remote 移动客户端生成。\n包含 manifest.json、redaction-report.json 与本说明。\n\n范围：只包含本机存下来的字段。请求与响应的字节尚未被本客户端捕获，\n因此不属于本次导出。\n\n脱敏：敏感值只在这份导出副本里被掩码；归档的原始记录未被修改。</string>
 </resources>

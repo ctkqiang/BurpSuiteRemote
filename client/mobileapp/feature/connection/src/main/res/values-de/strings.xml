@@ -67,6 +67,7 @@
     <string name="connection_manual_pairing_hint">Fügen Sie den Kopplungstext ein, den das Plug-in neben dem QR-Code anzeigt. Er läuft durch dieselbe Kette wie ein gescannter Code; beide Wege enden in derselben Kopplungsanfrage.</string>
     <string name="connection_manual_pairing_text_label">Kopplungstext</string>
     <string name="connection_manual_pairing_action">Koppeln</string>
+    <string name="connection_pairing_text_required_hint">Fügen Sie zuerst den Kopplungstext ein</string>
 
     <string name="connection_pairing_result_heading">Kopplungsergebnis</string>
     <string name="connection_pairing_succeeded_headline">Das Plug-in hat dieses Gerät akzeptiert</string>
@@ -102,10 +103,13 @@
     <string name="connection_endpoint_detail">Der Standardport ist %1$d. Die Kopplung schreibt diese beiden Werte aus dem Ticket; ändern Sie sie hier, um auf einen anderen Host zu zeigen, und speichern Sie.</string>
     <string name="connection_endpoint_host_label">Host</string>
     <string name="connection_endpoint_port_label">Port</string>
+    <string name="connection_endpoint_default_port_hint">Standardport %1$d</string>
+    <string name="connection_endpoint_invalid_port_hint">Der Port muss eine ganze Zahl zwischen 1 und 65535 sein</string>
     <string name="connection_endpoint_save_action">Speichern</string>
 
     <string name="connection_retry_heading">Verbindung</string>
     <string name="connection_retry_headline">Sitzung zu Burp öffnen</string>
     <string name="connection_retry_detail">Eine Verbindung hält eine Sitzung offen und schreibt Ereignisse fortlaufend ins lokale Journal. Nach einem Fehler können Sie es hier erneut versuchen.</string>
     <string name="connection_retry_action">Verbindung erneut versuchen</string>
+    <string name="connection_retry_disabled_hint">Speichern Sie zuerst Adresse und Port</string>
 </resources>

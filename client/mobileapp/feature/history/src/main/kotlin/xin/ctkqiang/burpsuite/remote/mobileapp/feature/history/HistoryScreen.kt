@@ -1,49 +1,58 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.feature.history
 
 import android.content.res.Resources
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.HistoryArchiveState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.HistoryRecord
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteErrorState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteListItem
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteListItemGroup
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemotePullToRefresh
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSkeletonRow
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.burpRemoteStaggeredEntry
 import java.time.Duration
 import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 /**
  * 实时历史（plan §20）。
  *
- * 无状态：列表只显示元数据，正文按需另取；每一行以历史标识作稳定 key（rules.md §8.3），
- * 顺序变化时靠 [Modifier.animateItem] 平滑落位、靠错峰入场交代「这是同一批新记录」。
- * 行结构与拦截、归档三处保持同一套：方法色标 + 状态码色标在上，主机与路径等宽在下，
- * 时刻既给精确值（可长按复制）也给相对值（扫一眼就知道有多新）。
+ * 无状态：列表只显示元数据，正文按需另取。
  *
- * 交互全在这一层：下拉刷新、点击进详情、长按复制技术值、触感分档。
+ * 一屏记录是同一串历史里按时间排下来的相邻几条，因此整块共用一个描边容器、行间只画一条 1dp 分隔线；
+ * 一行一张各自带描边的卡片读起来是「一堆互不相干的东西」，每张卡还要各撑一圈内边距，一屏只剩两三条。
+ * 行内的三段固定为：方法色标、请求行（方法 + 主机 + 路径，等宽）、状态胶囊，第二行是相对时间。
+ * 行内不再逐条摆技术值，也不再做行内的长按复制：整行的按下归「进详情」，再挂一个长按会与它抢同一串事件；
+ * 精确时刻、长度与耗时都在详情页，那里仍然逐条可复制。
+ *
+ * 交互全在这一层：下拉刷新、点击整行进详情。
  */
 @Composable
 fun HistoryScreen(
@@ -61,10 +70,10 @@ fun HistoryScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding =
                     PaddingValues(
-                        horizontal = BurpRemoteSpacing.Large,
-                        vertical = BurpRemoteSpacing.Large,
+                        horizontal = BurpRemoteSpacing.ScreenEdge,
+                        vertical = BurpRemoteSpacing.ExtraLarge,
                     ),
-                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ListItemGap),
             ) {
                 recordItems(uiState = uiState, onIntent = onIntent)
             }
@@ -72,7 +81,11 @@ fun HistoryScreen(
     }
 }
 
-/** 列表区的三态：等待、可重试的失败、要么空要么有内容。 */
+/**
+ * 列表区的三态：等待、可重试的失败、要么空要么有内容。
+ *
+ * 还没读出来时给骨架行而不是一句「加载中」：列表的形状先落位，数据到了只是把灰块换成文字。
+ */
 private fun LazyListScope.recordItems(
     uiState: HistoryUserInterfaceState,
     onIntent: (HistoryUserInterfaceIntent) -> Unit,
@@ -81,20 +94,20 @@ private fun LazyListScope.recordItems(
     when {
         failureReasonResource != null ->
             item(key = ERROR_KEY) {
-                BurpRemoteEmptyState(
-                    headline = stringResource(R.string.history_error_headline),
+                BurpRemoteErrorState(
                     detail = stringResource(failureReasonResource),
-                    actionText = stringResource(R.string.history_error_action),
-                    onAction = { onIntent(HistoryUserInterfaceIntent.Refresh) },
+                    onRetry = { onIntent(HistoryUserInterfaceIntent.Refresh) },
                 )
             }
 
         !uiState.hasLoaded ->
-            item(key = LOADING_KEY) {
-                BurpRemoteEmptyState(
-                    headline = stringResource(R.string.history_loading_headline),
-                    detail = stringResource(R.string.history_loading_detail),
-                )
+            items(
+                count = SKELETON_ROW_COUNT,
+                key = { index -> "$LOADING_KEY-$index" },
+            ) { index ->
+                Box(modifier = Modifier.burpRemoteStaggeredEntry(index = index)) {
+                    BurpRemoteSkeletonRow()
+                }
             }
 
         uiState.records.isEmpty() ->
@@ -106,25 +119,13 @@ private fun LazyListScope.recordItems(
             }
 
         else ->
-            itemsIndexed(
-                items = uiState.records,
-                key = { _, record -> record.historyIdentifier.value },
-            ) { index, record ->
-                Box(
-                    modifier =
-                        Modifier
-                            .animateItem()
-                            .burpRemoteStaggeredEntry(index = index),
-                ) {
-                    HistoryRecordCard(
-                        record = record,
+            item(key = RECORDS_KEY) {
+                Box(modifier = Modifier.animateItem()) {
+                    HistoryRecordGroup(
+                        records = uiState.records,
                         now = uiState.now,
-                        onOpen = {
-                            onIntent(
-                                HistoryUserInterfaceIntent.OpenHistoryRecord(
-                                    record.historyIdentifier.value,
-                                ),
-                            )
+                        onOpenRecord = { identifier ->
+                            onIntent(HistoryUserInterfaceIntent.OpenHistoryRecord(identifier))
                         },
                     )
                 }
@@ -132,70 +133,80 @@ private fun LazyListScope.recordItems(
     }
 }
 
+/**
+ * 一屏记录共用的分组容器：整组一张描边卡，行与行之间只画一条分隔线。
+ *
+ * 一屏记录互相之间的关系是「同一串历史里前后相邻的几条」，共用一张容器才读得成一条时间线；
+ * 每行各自一张卡片时，这一层关系就没了，取而代之的是一堆各自独立的方框。
+ *
+ * 行内的错峰入场挂在每一行上，因此新记录仍然是一条条落下，而不是整组一起弹出来。
+ *
+ * @param records 这一屏仍在实时投影里的记录，按事件序号升序。
+ * @param now 相对时间的参照点。
+ * @param onOpenRecord 打开某条记录的详情；参数是这条记录的历史标识。
+ */
 @Composable
-private fun HistoryRecordCard(
-    record: HistoryRecord,
+private fun HistoryRecordGroup(
+    records: List<HistoryRecord>,
     now: Instant,
-    onOpen: () -> Unit,
+    onOpenRecord: (String) -> Unit,
 ) {
     val absentValue = stringResource(R.string.history_absent_value)
-    BurpRemoteCard(isInteractive = true, onClick = onOpen) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            BurpRemoteStatusPill(
-                text = record.method ?: absentValue,
-                tone = methodToneOf(record.method),
-            )
-            BurpRemoteStatusPill(
-                text = record.statusCode?.toString() ?: absentValue,
-                tone = statusToneOf(record.statusCode),
+
+    BurpRemoteListItemGroup {
+        records.forEachIndexed { index, record ->
+            BurpRemoteListItem(
+                title = requestLineOf(record = record, absentValue = absentValue),
+                modifier = Modifier.burpRemoteStaggeredEntry(index = index),
+                subtitle = relativeTimeText(now = now, moment = record.occurredAt),
+                titleIsTechnical = true,
+                leading = { MethodMarker(tone = methodToneOf(record.method)) },
+                trailing = {
+                    BurpRemoteStatusPill(
+                        text = record.statusCode?.toString() ?: absentValue,
+                        tone = statusToneOf(record.statusCode),
+                    )
+                },
+                showsDivider = index != records.lastIndex,
+                onClick = { onOpenRecord(record.historyIdentifier.value) },
             )
         }
-        BurpRemoteTechnicalValue(text = targetTextOf(record = record, absentValue = absentValue))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
-        ) {
-            Box(modifier = Modifier.weight(weight = 1f, fill = true)) {
-                BurpRemoteTechnicalValue(
-                    text = responseLengthTextOf(record = record, absentValue = absentValue),
-                    label = stringResource(R.string.history_response_length_label),
-                )
-            }
-            Box(modifier = Modifier.weight(weight = 1f, fill = true)) {
-                BurpRemoteTechnicalValue(
-                    text = durationTextOf(record = record, absentValue = absentValue),
-                    label = stringResource(R.string.history_duration_label),
-                )
-            }
-        }
-        BurpRemoteTechnicalValue(
-            text = RECORD_TIME_FORMATTER.format(record.occurredAt),
-            label = relativeTimeText(now = now, moment = record.occurredAt),
-        )
     }
 }
 
+/** 方法色标：一竖条按方法语义着色，与拦截、归档两个列表是同一个意思。 */
 @Composable
-private fun responseLengthTextOf(
-    record: HistoryRecord,
-    absentValue: String,
-): String =
-    record.responseLength?.let { responseLength ->
-        stringResource(R.string.history_response_length_value, responseLength)
-    } ?: absentValue
+private fun MethodMarker(tone: BurpRemoteStatusTone) {
+    val tokens = LocalBurpRemoteDesignTokens.current
+    val shape = RoundedCornerShape(BurpRemoteRadius.Capsule)
 
-@Composable
-private fun durationTextOf(
+    Box(
+        modifier =
+            Modifier
+                .width(METHOD_MARKER_WIDTH)
+                .height(METHOD_MARKER_HEIGHT)
+                .clip(shape)
+                .background(
+                    color = toneColourOf(tone = tone, colourScheme = tokens.colourScheme),
+                    shape = shape,
+                ),
+    )
+}
+
+/**
+ * 请求行：方法在前，后面跟主机与路径。
+ *
+ * 一行里同时给出方法、主机与路径，是因为列表行只剩一行标题——少了主机就没法在同一屏上区分
+ * 两个相同路径的请求。缺失的段落在原处留空位，不把 `null` 拼进字符串。
+ */
+private fun requestLineOf(
     record: HistoryRecord,
     absentValue: String,
-): String =
-    record.durationMilliseconds?.let { durationMilliseconds ->
-        stringResource(R.string.history_duration_value, durationMilliseconds)
-    } ?: absentValue
+): String {
+    val method = record.method ?: absentValue
+    val target = targetTextOf(record = record, absentValue = absentValue)
+    return "$method $target"
+}
 
 /**
  * 方法色标按动词语义分档：读类方法不改服务端状态，写类方法会改状态，删除不可逆。
@@ -219,6 +230,18 @@ private fun statusToneOf(statusCode: Int?): BurpRemoteStatusTone =
         else -> BurpRemoteStatusTone.Neutral
     }
 
+/** 语气到语义色的映射：界面里所有色值都从主题取，不自己写色号。 */
+private fun toneColourOf(
+    tone: BurpRemoteStatusTone,
+    colourScheme: BurpRemoteColourScheme,
+): Color =
+    when (tone) {
+        BurpRemoteStatusTone.Neutral -> colourScheme.contentSecondary
+        BurpRemoteStatusTone.Live -> colourScheme.success
+        BurpRemoteStatusTone.Warning -> colourScheme.warning
+        BurpRemoteStatusTone.Danger -> colourScheme.danger
+    }
+
 private fun targetTextOf(
     record: HistoryRecord,
     absentValue: String,
@@ -233,7 +256,7 @@ private fun targetTextOf(
     }
 }
 
-// 相对时间给人扫一眼「多久之前」；精确时刻是主文本，长按可复制。
+// 相对时间给人扫一眼「多久之前」，行内第二行只放它；精确时刻在详情页。
 @Composable
 private fun relativeTimeText(
     now: Instant,
@@ -279,9 +302,10 @@ private fun quantityText(
     value: Long,
 ): String = resources.getQuantityString(pluralResource, value.toInt(), value.toInt())
 
-// 时刻按设备时区与当前语言格式化；列表要能跟插件上的记录对上，因此精确到秒。
-private val RECORD_TIME_FORMATTER: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault())
+private val METHOD_MARKER_WIDTH = 4.dp
+private val METHOD_MARKER_HEIGHT = 20.dp
+
+private const val SKELETON_ROW_COUNT = 4
 
 private const val METHOD_GET = "GET"
 private const val METHOD_HEAD = "HEAD"
@@ -307,6 +331,9 @@ private const val ERROR_KEY = "error"
 private const val LOADING_KEY = "loading"
 private const val EMPTY_KEY = "empty"
 
+// 整块记录是一个懒惰列表项：一组的描边与底色只有一份，行是它内部的几行。
+private const val RECORDS_KEY = "records"
+
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。
 @Preview(name = "有记录浅色", showBackground = true)
 @Composable
@@ -321,6 +348,22 @@ private fun HistoryScreenLightPreview() {
 private fun HistoryScreenDarkPreview() {
     BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
         HistoryScreen(uiState = populatedPreviewState(), onIntent = {})
+    }
+}
+
+@Preview(name = "读取中浅色", showBackground = true)
+@Composable
+private fun HistoryScreenLoadingLightPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Light) {
+        HistoryScreen(uiState = HistoryUserInterfaceState(), onIntent = {})
+    }
+}
+
+@Preview(name = "读取中深色", showBackground = true)
+@Composable
+private fun HistoryScreenLoadingDarkPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
+        HistoryScreen(uiState = HistoryUserInterfaceState(), onIntent = {})
     }
 }
 

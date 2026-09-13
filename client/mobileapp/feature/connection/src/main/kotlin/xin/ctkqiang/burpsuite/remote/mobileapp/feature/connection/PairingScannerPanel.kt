@@ -29,8 +29,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButton
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButtonStyle
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteScannerOverlay
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
@@ -42,7 +40,7 @@ import androidx.camera.core.Preview as CameraPreviewUseCase
  *
  * 只画取景与权限两件事，不画标题栏也不画返回箭头：它是扫码弹窗的内容，弹窗由装配层用
  * `Dialog(usePlatformDefaultWidth = false)` 承载，因此这里再顶一条 Action Bar 就变成了三层。
- * 退出入口是右上角那一枚悬浮的关闭按钮——没有顶栏，但任何时候都得能退出去。
+ * 退出入口由弹窗自己的顶部控件行给出（模式切换 + 圆形关闭），这里不重复一份。
  *
  * 相机是危险权限，被拒绝时这里给出可读说明与再次申请入口，而不是一片空白；识别本身不在这里做，
  * 只把每一帧交给调用方。取景框铺满可用空间，四角括号、扫描线与手电筒开关由设计系统的
@@ -56,7 +54,6 @@ fun PairingScannerPanel(
     onFrameCaptured: (ImageProxy) -> Unit,
     onToggleTorch: () -> Unit,
     onRequestPermission: () -> Unit,
-    onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -90,20 +87,6 @@ fun PairingScannerPanel(
                     actionResource = null,
                     onAction = onRequestPermission,
                 )
-        }
-
-        // 悬浮的关闭入口：不是顶栏，但一个全屏弹窗必须随时能退出去。
-        Box(
-            modifier =
-                Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(BurpRemoteSpacing.Large),
-        ) {
-            BurpRemoteButton(
-                text = stringResource(R.string.connection_scanner_close_action),
-                onClick = onClose,
-                style = BurpRemoteButtonStyle.Ghost,
-            )
         }
     }
 }
@@ -214,7 +197,6 @@ private fun PairingScannerPanelDeniedLightPreview() {
             onFrameCaptured = {},
             onToggleTorch = {},
             onRequestPermission = {},
-            onClose = {},
         )
     }
 }
@@ -230,7 +212,6 @@ private fun PairingScannerPanelDeniedDarkPreview() {
             onFrameCaptured = {},
             onToggleTorch = {},
             onRequestPermission = {},
-            onClose = {},
         )
     }
 }
@@ -246,7 +227,6 @@ private fun PairingScannerPanelPendingLightPreview() {
             onFrameCaptured = {},
             onToggleTorch = {},
             onRequestPermission = {},
-            onClose = {},
         )
     }
 }
@@ -262,7 +242,6 @@ private fun PairingScannerPanelPendingDarkPreview() {
             onFrameCaptured = {},
             onToggleTorch = {},
             onRequestPermission = {},
-            onClose = {},
         )
     }
 }

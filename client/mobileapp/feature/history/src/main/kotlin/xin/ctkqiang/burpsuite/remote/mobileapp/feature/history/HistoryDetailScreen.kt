@@ -18,18 +18,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.HistoryArchiveState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.HistoryRecord
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteHistoryMessage
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButton
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButtonStyle
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSectionHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSkeletonRow
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.technical.BurpRemoteCodeBlock
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.technical.BurpRemoteCodeLanguage
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -38,11 +44,15 @@ import java.time.format.FormatStyle
 /**
  * 历史详情（plan §20、plan §22）。
  *
- * 只画投影里真有的字段：报文本体要按标识另取，客户端目前没有这条通路，因此那一节写明缺口，
+ * 元数据与报文本体分两段画：元数据来自本机投影，立刻就有；本体是向插件按标识取回的一次读取，
+ * 因此它有自己的三种状态——还在取、取到了、取失败了。取失败时把失败归类的原文摆出来并给一次重试，
+ * 不给重试的那几类（插件不支持、记录已不在）说明白为什么，而不是留一个按了没用处的按钮。
+ *
+ * 本体里四个文本项各自可为空：插件确实可能没捕获到响应。那种情况下摆一行「没有捕获到这一段」，
  * 不填占位内容冒充正文（rules.md §5.1）。所有技术值等宽显示，长按可整条复制，
  * 排版上不为了好看截断任何一项——赏金猎人的证据链不能被省略号吃掉。
  *
- * 标题与返回都归装配层的壳；这一屏只负责内容，因此方法、状态码这类一眼判读的标签放在内容第一行。
+ * 标题与返回都归装配层的壳；这一屏只负责内容。
  */
 @Composable
 fun HistoryDetailScreen(
@@ -69,6 +79,12 @@ fun HistoryDetailScreen(
                 record != null ->
                     RecordDetail(
                         record = record,
+                        message = uiState.message,
+                        messageFailure = uiState.messageFailure,
+                        onReloadMessage = {
+                            haptics.tap()
+                            onIntent(HistoryDetailUserInterfaceIntent.ReloadHistoryMessage)
+                        },
                         onShare = {
                             haptics.tap()
                             onIntent(HistoryDetailUserInterfaceIntent.ShareHistoryRecord)
@@ -94,11 +110,14 @@ fun HistoryDetailScreen(
 @Composable
 private fun RecordDetail(
     record: HistoryRecord,
+    message: RemoteHistoryMessage?,
+    messageFailure: HistoryMessageReadFailure?,
+    onReloadMessage: () -> Unit,
     onShare: () -> Unit,
 ) {
     val absentValue = stringResource(R.string.history_absent_value)
 
-    // 第一行先给判读结果：方法、状态码、归档语义，往下才是逐项明细。
+    // 第一行先给判读结果：方法与状态码，往下才是逐项明细。
     Section(titleResource = R.string.history_detail_summary_heading) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -112,15 +131,6 @@ private fun RecordDetail(
             BurpRemoteStatusPill(
                 text = record.statusCode?.toString() ?: absentValue,
                 tone = statusToneOf(record.statusCode),
-            )
-            BurpRemoteStatusPill(
-                text = stringResource(record.archiveState.labelResource),
-                tone =
-                    if (record.archiveState == HistoryArchiveState.Archived) {
-                        BurpRemoteStatusTone.Neutral
-                    } else {
-                        BurpRemoteStatusTone.Live
-                    },
             )
         }
         BurpRemoteTechnicalValue(
@@ -172,15 +182,6 @@ private fun RecordDetail(
     }
 
     Section(titleResource = R.string.history_detail_record_heading) {
-        BurpRemoteStatusPill(
-            text = stringResource(record.archiveState.labelResource),
-            tone =
-                if (record.archiveState == HistoryArchiveState.Archived) {
-                    BurpRemoteStatusTone.Neutral
-                } else {
-                    BurpRemoteStatusTone.Live
-                },
-        )
         BurpRemoteTechnicalValue(
             text = record.savedAt?.let { savedAt -> RECORD_TIME_FORMATTER.format(savedAt) } ?: absentValue,
             label = stringResource(R.string.history_detail_saved_at_label),
@@ -216,16 +217,11 @@ private fun RecordDetail(
         )
     }
 
-    Section(titleResource = R.string.history_detail_message_heading) {
-        BurpRemoteEmptyState(
-            headline = stringResource(R.string.history_detail_message_headline),
-            detail = stringResource(R.string.history_detail_message_unavailable),
-        )
-        BurpRemoteEmptyState(
-            headline = stringResource(R.string.history_detail_reason_headline),
-            detail = stringResource(R.string.history_detail_reason_message),
-        )
-    }
+    MessageSection(
+        message = message,
+        messageFailure = messageFailure,
+        onReloadMessage = onReloadMessage,
+    )
 
     Section(titleResource = R.string.history_detail_actions_heading) {
         BurpRemoteButton(
@@ -244,6 +240,108 @@ private fun RecordDetail(
             headline = stringResource(R.string.history_detail_reason_headline),
             detail = stringResource(R.string.history_detail_reason_send_to_repeater),
         )
+    }
+}
+
+/**
+ * 报文本体那一节。
+ *
+ * 这一节不套卡片：四段正文各自就是一个代码块，代码块自带表面色与描边，再套一层卡片只会
+ * 出现两层边框套在一起。所以标题照旧，内容直接落在页面上。
+ */
+@Composable
+private fun MessageSection(
+    message: RemoteHistoryMessage?,
+    messageFailure: HistoryMessageReadFailure?,
+    onReloadMessage: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+        BurpRemoteSectionHeading(text = stringResource(R.string.history_detail_message_heading))
+        when {
+            message != null -> MessageBodies(message = message)
+
+            messageFailure != null ->
+                BurpRemoteCard {
+                    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+                        BurpRemoteStatusPill(
+                            text = stringResource(messageFailure.messageResource),
+                            tone = toneOf(messageFailure),
+                        )
+                        if (messageFailure.isRetryable) {
+                            BurpRemoteButton(
+                                text = stringResource(R.string.history_detail_message_retry),
+                                onClick = onReloadMessage,
+                                style = BurpRemoteButtonStyle.Secondary,
+                            )
+                        }
+                    }
+                }
+
+            // 还没读到结果：骨架行先说清「马上要出现什么」，而不是把空白留在那里。
+            else ->
+                BurpRemoteCard {
+                    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+                        BurpRemoteSkeletonRow()
+                        BurpRemoteSkeletonRow()
+                    }
+                }
+        }
+    }
+}
+
+@Composable
+private fun MessageBodies(message: RemoteHistoryMessage) {
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium)) {
+        BodyBlock(
+            labelResource = R.string.history_detail_request_headers_label,
+            text = message.requestHeaders,
+        )
+        BodyBlock(
+            labelResource = R.string.history_detail_request_body_label,
+            text = message.requestBody,
+        )
+        BodyBlock(
+            labelResource = R.string.history_detail_response_headers_label,
+            text = message.responseHeaders,
+        )
+        BodyBlock(
+            labelResource = R.string.history_detail_response_body_label,
+            text = message.responseBody,
+        )
+    }
+}
+
+/**
+ * 一段正文：标签加代码块。
+ *
+ * [text] 为空表示插件没有捕获到这一段，此时摆一行说明而留空——空代码块看起来像「这段是空的」，
+ * 那是另一件事。
+ */
+@Composable
+private fun BodyBlock(
+    @StringRes labelResource: Int,
+    text: String?,
+) {
+    val tokens = LocalBurpRemoteDesignTokens.current
+
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ExtraSmall)) {
+        BurpRemoteText(
+            text = stringResource(labelResource),
+            style = tokens.typography.label,
+            colour = tokens.colourScheme.contentSecondary,
+        )
+        if (text.isNullOrEmpty()) {
+            BurpRemoteText(
+                text = stringResource(R.string.history_detail_message_absent),
+                style = tokens.typography.technical,
+                colour = tokens.colourScheme.contentSecondary,
+            )
+        } else {
+            BurpRemoteCodeBlock(
+                text = text,
+                language = codeLanguageOf(text),
+            )
+        }
     }
 }
 
@@ -307,13 +405,31 @@ private fun statusToneOf(statusCode: Int?): BurpRemoteStatusTone =
         else -> BurpRemoteStatusTone.Neutral
     }
 
-@get:StringRes
-private val HistoryArchiveState.labelResource: Int
-    get() =
-        when (this) {
-            HistoryArchiveState.Live -> R.string.history_detail_archive_state_live
-            HistoryArchiveState.Archived -> R.string.history_detail_archive_state_archived
-        }
+/** 失败归类的色标：分不清是谁的错就危险；确定没法重试的中性；其余警告。 */
+private fun toneOf(failure: HistoryMessageReadFailure): BurpRemoteStatusTone =
+    when (failure) {
+        HistoryMessageReadFailure.MalformedResponse -> BurpRemoteStatusTone.Danger
+        HistoryMessageReadFailure.NotSupported,
+        HistoryMessageReadFailure.RecordMissing,
+        -> BurpRemoteStatusTone.Neutral
+
+        HistoryMessageReadFailure.NotPaired,
+        HistoryMessageReadFailure.Unreachable,
+        HistoryMessageReadFailure.Refused,
+        -> BurpRemoteStatusTone.Warning
+    }
+
+/**
+ * 挑语法着色：正文以 `{` 或 `[` 开头就按 JSON 上色。
+ *
+ * 请求头与响应头是 HTTP 文本，走纯文本；这一条判断只为了让响应体的 JSON 有字段名、字符串、
+ * 数字的分色——赏金猎人扫一眼响应体，分色比一整片同色字快得多。
+ */
+private fun codeLanguageOf(text: String): BurpRemoteCodeLanguage =
+    when (text.trimStart().firstOrNull()) {
+        JSON_OBJECT_OPEN, JSON_ARRAY_OPEN -> BurpRemoteCodeLanguage.Json
+        else -> BurpRemoteCodeLanguage.PlainText
+    }
 
 private const val METHOD_GET = "GET"
 private const val METHOD_HEAD = "HEAD"
@@ -330,7 +446,10 @@ private const val STATUS_CODE_CLASS_REDIRECTION = 3
 private const val STATUS_CODE_CLASS_CLIENT_ERROR = 4
 private const val STATUS_CODE_CLASS_SERVER_ERROR = 5
 
-// 时刻按设备时区与当前语言格式化；归档语义靠秒级时间区分，所以这里带日期。
+private const val JSON_OBJECT_OPEN = '{'
+private const val JSON_ARRAY_OPEN = '['
+
+// 时刻按设备时区与当前语言格式化；同一秒内的多条记录靠秒级时间区分，所以这里带日期。
 private val RECORD_TIME_FORMATTER: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault())
 
@@ -367,6 +486,32 @@ private fun HistoryDetailScreenMissingDarkPreview() {
     }
 }
 
+@Preview(name = "读取中浅色", showBackground = true)
+@Composable
+private fun HistoryDetailScreenLoadingMessageLightPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Light) {
+        HistoryDetailScreen(
+            uiState = previewState().copy(message = null),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview(name = "读取失败深色", showBackground = true)
+@Composable
+private fun HistoryDetailScreenFailedMessageDarkPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
+        HistoryDetailScreen(
+            uiState =
+                previewState().copy(
+                    message = null,
+                    messageFailure = HistoryMessageReadFailure.Unreachable,
+                ),
+            onIntent = {},
+        )
+    }
+}
+
 // 预览样本：只在 @Preview 里用，正式界面一律读领域端口。
 private fun previewState(): HistoryDetailUserInterfaceState =
     HistoryDetailUserInterfaceState(
@@ -394,4 +539,21 @@ private fun previewState(): HistoryDetailUserInterfaceState =
                 savedAt = Instant.parse("2026-09-13T08:01:00Z"),
             ),
         hasLoaded = true,
+        message =
+            RemoteHistoryMessage(
+                historyIdentifier = "history_123",
+                method = "GET",
+                host = "api.example.com",
+                path = "/api/user",
+                statusCode = 200,
+                requestHeaders =
+                    "GET /api/user HTTP/1.1\r\nHost: api.example.com\r\n" +
+                        "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.example\r\n" +
+                        "Accept: application/json\r\n",
+                requestBody = null,
+                responseHeaders =
+                    "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n" +
+                        "Content-Length: 1024\r\n",
+                responseBody = """{"identifier":"user_1","displayName":"小哪吒","roles":["admin"]}""",
+            ),
     )

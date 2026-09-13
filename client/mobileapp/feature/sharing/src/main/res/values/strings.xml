@@ -41,5 +41,5 @@
     <string name="sharing_export_failed">The export could not be written. Try again with another location.</string>
 
     <!-- 写进导出包 notice.txt 的说明；导出文件是给用户看的，因此文案同样走资源。 -->
-    <string name="sharing_export_notice">Burp Remote export bundle\n\nThis archive was produced by the Burp Remote mobile client.\nIt contains manifest.json, redaction-report.json and this notice.\n\nScope: only the fields stored on the device are included. Request and response\nbytes are not captured by this client yet, so they are not part of the export.\n\nRedaction: sensitive values were masked in this exported copy only. The\narchived original was not modified.</string>
+    <string name="sharing_export_notice">Burpsuite Remote export bundle\n\nThis archive was produced by the Burpsuite Remote mobile client.\nIt contains manifest.json, redaction-report.json and this notice.\n\nScope: only the fields stored on the device are included. Request and response\nbytes are not captured by this client yet, so they are not part of the export.\n\nRedaction: sensitive values were masked in this exported copy only. The\narchived original was not modified.</string>
 </resources>

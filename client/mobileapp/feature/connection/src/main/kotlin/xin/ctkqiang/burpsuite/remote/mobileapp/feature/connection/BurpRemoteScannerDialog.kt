@@ -6,12 +6,28 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.camera.core.ImageProxy
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -19,6 +35,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,10 +55,15 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteBut
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButtonStyle
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteScannerCloseButton
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTextField
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSizing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -51,8 +74,8 @@ import java.time.format.FormatStyle
  *
  * 契约由装配层冻结：`BurpRemoteScannerDialog(onDismiss, onScannedTicketText)`。装配层用
  * `Dialog(usePlatformDefaultWidth = false)` 全屏承载它，因此这里**没有 Action Bar**——标题、返回
- * 与状态栏都由壳负责；它自己带的是：关闭按钮、取景遮罩（四角括号与扫描线）、手电筒开关、
- * 各阶段状态文案，以及手输配对码这条兜底路径。
+ * 与状态栏都由壳负责；它自己带的是：顶部的分段控件（相机 / 手输）与圆形关闭入口、取景遮罩
+ * （四角括号与扫描线）、手电筒开关、各阶段状态文案，以及手输配对码这条兜底路径。
  *
  * 票据在本地先校验：解不出、协议版本不符、已过期三类各自给出可执行的中文原因，协议不符时
  * 两个版本号都写出来——等服务端拒一次再告诉用户「其实这张票早过期了」没有任何好处（plan §55）。
@@ -227,10 +250,40 @@ fun BurpRemoteScannerDialog(
 }
 
 /**
+ * 叠在取景画面上的控件要躲开的顶部安全区：状态栏，以及刘海、挖孔装置所占的那一条。
+ *
+ * 返回的是这一块留白的并集。取景画面本身铺满整屏（相机画面是背景，缩进去就会在状态栏与手势条
+ * 两侧露出黑边），因此这份留白不施加在弹窗根节点上，只由控件层消费；`Modifier.windowInsetsPadding`
+ * 会把它施加过的 inset 对子树标记为已消费，内层再取一次只会拿到零，不会叠成两倍。
+ */
+@Composable
+private fun scannerControlsTopSafeArea(): WindowInsets =
+    WindowInsets.systemBars
+        .only(WindowInsetsSides.Top)
+        .union(WindowInsets.displayCutout)
+
+/**
+ * 手输面板整条流程要躲开的安全区：顶部同 [scannerControlsTopSafeArea]，底部是手势条与键盘的并集。
+ *
+ * 返回的是三者的并集。键盘弹起时 `ime` 比 `navigationBars` 高，取并集即取两者中更高的那一个，
+ * 因此面板底部的配对按钮在手势条上不会被压住，键盘弹出时也会跟着抬起来。
+ */
+@Composable
+private fun manualTicketTextPanelSafeArea(): WindowInsets =
+    scannerControlsTopSafeArea()
+        .union(WindowInsets.navigationBars)
+        .union(WindowInsets.ime)
+
+/**
  * 弹窗内容的无状态形式。
  *
  * 单独拆出来是为了两件事：一是相机那一支要拿去跑 @Preview 会真的开相机，于是预览只覆盖能安全
  * 渲染的处境；二是「哪些控件在哪些状态下出现」这件事可以在这里一眼看完，不必穿过状态持有看。
+ *
+ * 取景面是沉浸式的：相机那一支把控件叠在预览之上（顶部一行、手电筒在底部），手输那一支则是
+ * 一条正常的纵向流程——输入框要能被键盘推上来，叠在取景框上的做法在这里只会挡住自己。两处的
+ * 留白来源也不同：取景面铺满整屏，只有叠在它上面的控件消费顶部安全区；手输面没有背景画面，
+ * 于是整条流程直接消费顶部、手势条与键盘三处，同一次 inset 不会在别处被加第二遍。
  */
 @Composable
 internal fun BurpRemoteScannerDialogContent(
@@ -240,23 +293,24 @@ internal fun BurpRemoteScannerDialogContent(
     onFrameCaptured: (ImageProxy) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        when (state.mode) {
-            PairingScannerMode.ManualTicketText ->
-                ManualTicketTextPanel(
-                    state = state,
-                    onTicketTextChange = { manualTicketText ->
-                        onIntent(
-                            BurpRemoteScannerDialogUserInterfaceIntent.UpdateManualTicketText(
-                                manualTicketText,
-                            ),
-                        )
-                    },
-                    onSubmit = { onIntent(BurpRemoteScannerDialogUserInterfaceIntent.SubmitManualTicketText) },
-                    onDismiss = onDismiss,
-                )
+    when (state.mode) {
+        PairingScannerMode.ManualTicketText ->
+            ManualTicketTextPanel(
+                state = state,
+                onSelectMode = { mode ->
+                    onIntent(BurpRemoteScannerDialogUserInterfaceIntent.SelectMode(mode))
+                },
+                onTicketTextChange = { manualTicketText ->
+                    onIntent(
+                        BurpRemoteScannerDialogUserInterfaceIntent.UpdateManualTicketText(manualTicketText),
+                    )
+                },
+                onSubmit = { onIntent(BurpRemoteScannerDialogUserInterfaceIntent.SubmitManualTicketText) },
+                onDismiss = onDismiss,
+            )
 
-            PairingScannerMode.Camera ->
+        PairingScannerMode.Camera ->
+            Box(modifier = Modifier.fillMaxSize()) {
                 PairingScannerPanel(
                     cameraPermission = state.cameraPermission,
                     isTorchEnabled = state.isTorchEnabled,
@@ -264,75 +318,157 @@ internal fun BurpRemoteScannerDialogContent(
                     onFrameCaptured = onFrameCaptured,
                     onToggleTorch = { onIntent(BurpRemoteScannerDialogUserInterfaceIntent.ToggleTorch) },
                     onRequestPermission = onRequestCameraPermission,
-                    onClose = onDismiss,
                 )
-        }
+                Column(
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopStart)
+                            .windowInsetsPadding(scannerControlsTopSafeArea())
+                            .padding(BurpRemoteSpacing.Large),
+                    verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+                ) {
+                    ScannerControlRow(
+                        selectedMode = state.mode,
+                        onSelectMode = { mode ->
+                            onIntent(BurpRemoteScannerDialogUserInterfaceIntent.SelectMode(mode))
+                        },
+                        onDismiss = onDismiss,
+                    )
+                    if (state.rejection != null) {
+                        TicketRejectionCard(state = state, rejection = state.rejection)
+                    }
+                }
+            }
+    }
+}
 
-        Column(
-            modifier =
-                Modifier
-                    .align(Alignment.TopStart)
-                    .padding(BurpRemoteSpacing.Large),
-            verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
-        ) {
-            PairingScannerModeSelector(
-                selectedMode = state.mode,
-                onSelectMode = { mode ->
-                    onIntent(BurpRemoteScannerDialogUserInterfaceIntent.SelectMode(mode))
-                },
-            )
-            if (state.rejection != null) {
-                TicketRejectionCard(state = state, rejection = state.rejection)
+/**
+ * 弹窗顶部的一行控件：左边是模式切换，右边是关闭。
+ *
+ * 两者不做进同一个分段控件：分段控件是「这份输入用哪种方式」，关闭是「离开这里」，语义不同层，
+ * 混在一起用户会以为关闭也是第三种输入方式。
+ */
+@Composable
+private fun ScannerControlRow(
+    selectedMode: PairingScannerMode,
+    onSelectMode: (PairingScannerMode) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium),
+    ) {
+        PairingScannerModeSelector(
+            selectedMode = selectedMode,
+            onSelectMode = onSelectMode,
+            modifier = Modifier.weight(weight = 1f, fill = true),
+        )
+        BurpRemoteScannerCloseButton(
+            contentDescription = stringResource(R.string.connection_scanner_close_action),
+            onClick = onDismiss,
+        )
+    }
+}
+
+/**
+ * 相机与手输是同一件事的两种输入，放在同一个分段控件里二选一。
+ *
+ * 做成两枚并排按钮时，未选中那枚是透明底加强调色文字，与关闭连在一起就读成一条 Action Bar；
+ * 分段控件只有一个容器与一个选中胶囊，选中的是哪一个不必再猜。
+ */
+@Composable
+private fun PairingScannerModeSelector(
+    selectedMode: PairingScannerMode,
+    onSelectMode: (PairingScannerMode) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val tokens = LocalBurpRemoteDesignTokens.current
+    val haptics = rememberBurpRemoteHaptics()
+    val containerShape = RoundedCornerShape(BurpRemoteRadius.Control)
+    val segmentShape = RoundedCornerShape(BurpRemoteRadius.Capsule)
+
+    Row(
+        modifier =
+            modifier
+                .height(BurpRemoteSizing.MinimumTouchTarget)
+                .clip(containerShape)
+                .background(color = tokens.colourScheme.surfaceElevated, shape = containerShape)
+                .border(width = BurpRemoteSizing.Divider, color = tokens.colourScheme.outline, shape = containerShape)
+                .padding(BurpRemoteSpacing.ExtraSmall),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        PairingScannerMode.entries.forEach { mode ->
+            val isSelected = mode == selectedMode
+            Box(
+                modifier =
+                    Modifier
+                        .weight(weight = 1f, fill = true)
+                        .fillMaxHeight()
+                        .clip(segmentShape)
+                        .background(
+                            color = if (isSelected) tokens.colourScheme.accent else Color.Transparent,
+                            shape = segmentShape,
+                        )
+                        .clickable {
+                            haptics.select()
+                            onSelectMode(mode)
+                        },
+                contentAlignment = Alignment.Center,
+            ) {
+                BurpRemoteText(
+                    text = stringResource(mode.labelResource),
+                    style = tokens.typography.label,
+                    colour =
+                        if (isSelected) {
+                            tokens.colourScheme.onAccent
+                        } else {
+                            tokens.colourScheme.contentSecondary
+                        },
+                    maxLines = 1,
+                )
             }
         }
     }
 }
 
-/** 相机与手输是同一件事的两种输入，放在一起切换，别做成两屏。 */
-@Composable
-private fun PairingScannerModeSelector(
-    selectedMode: PairingScannerMode,
-    onSelectMode: (PairingScannerMode) -> Unit,
-) {
-    Row(horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
-        PairingScannerMode.entries.forEach { mode ->
-            BurpRemoteButton(
-                text = stringResource(mode.labelResource),
-                onClick = { onSelectMode(mode) },
-                style =
-                    if (mode == selectedMode) {
-                        BurpRemoteButtonStyle.Primary
-                    } else {
-                        BurpRemoteButtonStyle.Ghost
-                    },
-            )
-        }
-    }
-}
-
+/**
+ * 手输配对文本：一条与分段控件同风格的纵向流程。
+ *
+ * 输入框、主操作、一行说明，前两件是用户要做的，第三件只在按钮不可用时出来说一句为什么；
+ * 兜底路径不需要一段居中空状态来解释自己存在的原因。
+ *
+ * 整条流程按安全区内缩一次（顶部状态栏与挖孔、底部手势条与键盘），这次内缩施加在流程根节点上，
+ * 控件本身不再各自取一遍，因此底部的主操作既不会压在手势条上，也不会被键盘挡住。
+ */
 @Composable
 private fun ManualTicketTextPanel(
     state: BurpRemoteScannerDialogUserInterfaceState,
+    onSelectMode: (PairingScannerMode) -> Unit,
     onTicketTextChange: (String) -> Unit,
     onSubmit: () -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val tokens = LocalBurpRemoteDesignTokens.current
+    val isSubmittable = state.manualTicketText.isNotBlank()
+
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(
-                    start = BurpRemoteSpacing.Large,
-                    end = BurpRemoteSpacing.Large,
-                    top = BurpRemoteSpacing.ExtraExtraLarge * CONTROL_ROWS_RESERVED_FACTOR,
-                    bottom = BurpRemoteSpacing.ExtraExtraLarge,
-                ),
+                .windowInsetsPadding(manualTicketTextPanelSafeArea())
+                .padding(BurpRemoteSpacing.Large),
         verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium),
     ) {
-        BurpRemoteEmptyState(
-            headline = stringResource(R.string.connection_scanner_manual_headline),
-            detail = stringResource(R.string.connection_scanner_manual_detail),
+        ScannerControlRow(
+            selectedMode = state.mode,
+            onSelectMode = onSelectMode,
+            onDismiss = onDismiss,
         )
+        if (state.rejection != null) {
+            TicketRejectionCard(state = state, rejection = state.rejection)
+        }
         BurpRemoteTextField(
             value = state.manualTicketText,
             onValueChange = onTicketTextChange,
@@ -344,13 +480,15 @@ private fun ManualTicketTextPanel(
             text = stringResource(R.string.connection_manual_pairing_action),
             onClick = onSubmit,
             style = BurpRemoteButtonStyle.Primary,
-            isEnabled = state.manualTicketText.isNotBlank(),
+            isEnabled = isSubmittable,
         )
-        BurpRemoteButton(
-            text = stringResource(R.string.connection_scanner_close_action),
-            onClick = { onDismiss() },
-            style = BurpRemoteButtonStyle.Ghost,
-        )
+        if (!isSubmittable) {
+            BurpRemoteText(
+                text = stringResource(R.string.connection_pairing_text_required_hint),
+                style = tokens.typography.caption,
+                colour = tokens.colourScheme.contentSecondary,
+            )
+        }
     }
 }
 
@@ -439,9 +577,6 @@ private class BarcodeDecodingGuard {
 // 票据失效时刻按设备时区与当前语言格式化：用户要拿它跟插件界面上显示的时间对齐。
 private val TICKET_EXPIRY_FORMATTER: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault())
-
-// 顶部两枚悬浮控件（模式切换 + 可能出现的失败卡片）占掉的高度：手输面板整体的上留白要避开它们。
-private const val CONTROL_ROWS_RESERVED_FACTOR = 2
 
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。
 // 相机那一支会真的去开相机，因此预览只覆盖手输与票据被拒两种可以安全渲染的处境。

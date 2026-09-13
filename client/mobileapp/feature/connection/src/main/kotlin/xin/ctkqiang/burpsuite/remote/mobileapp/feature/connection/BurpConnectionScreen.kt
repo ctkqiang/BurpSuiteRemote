@@ -15,7 +15,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.PairingChallengeIdentifier
@@ -28,15 +27,18 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButton
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButtonStyle
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSectionHeading
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTextField
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.technical.colourIn
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemotePairingConclusion
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -47,8 +49,9 @@ import java.time.format.FormatStyle
  *
  * 无状态：状态由外面传进来，用户意图往外抛。扫码面板打开时整屏让给它——取景框太小二维码对不上焦。
  *
- * 说明性段落一律用 [BurpRemoteEmptyState] 承载：设计系统里它是唯一能容纳整句文案的组件，而且
- * 「缺什么、下一步做什么」正是它要表达的东西。
+ * 每一节只留「标题 + 真正能操作的东西」：说明一律压到 caption 一档的一行，按钮为什么按不动就在
+ * 按钮下面那一行里说完。[BurpRemoteEmptyState] 因此不在这块版面上出现——这一屏任何时候都有可读的
+ * 状态、可填的输入与可点的动作，不存在「整屏确实没有任何内容」的处境。
  */
 @Composable
 fun BurpConnectionScreen(
@@ -60,10 +63,16 @@ fun BurpConnectionScreen(
 
     // 扫码是弹窗不是页面：装配层用同一个全屏 Dialog 承载它，退出后落回本屏内容。
     // 冻结契约只认两个回调，因此这里不把 ViewModel 的状态灌进去——识别、校验、权限都在弹窗内闭环。
+    // 窗口不参与系统栏的内缩：取景画面是整屏背景，缩进去会在状态栏与手势条两侧露黑边；弹窗内部的
+    // 控件层自己按 WindowInsets 让开安全区，因此这里必须让窗口铺满。
     if (uiState.isScannerOpen) {
         Dialog(
             onDismissRequest = { onIntent(BurpConnectionUserInterfaceIntent.ClosePairingScanner) },
-            properties = DialogProperties(usePlatformDefaultWidth = false),
+            properties =
+                DialogProperties(
+                    usePlatformDefaultWidth = false,
+                    decorFitsSystemWindows = false,
+                ),
         ) {
             BurpRemoteScannerDialog(
                 onDismiss = { onIntent(BurpConnectionUserInterfaceIntent.ClosePairingScanner) },
@@ -84,48 +93,53 @@ fun BurpConnectionScreen(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        // 顶栏与底栏由装配层的壳统一提供，各屏不再画第二层标题。
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = SCREEN_PADDING, vertical = SCREEN_PADDING),
-            verticalArrangement = Arrangement.spacedBy(SECTION_SPACING),
-        ) {
-            ConnectionStateSection(uiState = uiState)
-            ManualPairingSection(
-                uiState = uiState,
-                onIntent = onIntent,
-                onAction = { haptics.tap() },
-            )
-            PairingTicketSection(uiState = uiState)
-            PairingOutcomeSection(uiState = uiState)
-            PairedDeviceSection(
-                uiState = uiState,
-                onIntent = onIntent,
-                onAction = { haptics.tap() },
-            )
-            EndpointSection(
-                uiState = uiState,
-                onIntent = onIntent,
-                onAction = { haptics.tap() },
-            )
-            RetrySection(
-                uiState = uiState,
-                onRetry = {
-                    haptics.tap()
-                    onIntent(BurpConnectionUserInterfaceIntent.RetryConnection)
-                },
-            )
-        }
+    // 顶栏与底栏由装配层的壳统一提供，各屏不再画第二层标题；区块之间只用一档更大的间距拉开，
+    // 不靠把某一节撑满高度来分隔。
+    Column(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = BurpRemoteSpacing.ScreenEdge, vertical = BurpRemoteSpacing.ExtraLarge),
+        verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ExtraLarge),
+    ) {
+        ConnectionStateSection(uiState = uiState)
+        PairingTicketSection(
+            uiState = uiState,
+            onOpenScanner = {
+                haptics.tap()
+                onIntent(BurpConnectionUserInterfaceIntent.OpenPairingScanner)
+            },
+        )
+        ManualPairingSection(
+            uiState = uiState,
+            onIntent = onIntent,
+            onAction = { haptics.tap() },
+        )
+        PairingOutcomeSection(uiState = uiState)
+        PairedDeviceSection(
+            uiState = uiState,
+            onIntent = onIntent,
+            onAction = { haptics.tap() },
+        )
+        EndpointSection(
+            uiState = uiState,
+            onIntent = onIntent,
+            onAction = { haptics.tap() },
+        )
+        RetrySection(
+            uiState = uiState,
+            onRetry = {
+                haptics.tap()
+                onIntent(BurpConnectionUserInterfaceIntent.RetryConnection)
+            },
+        )
     }
 }
 
 @Composable
 private fun ConnectionStateSection(uiState: BurpConnectionUserInterfaceState) {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
         BurpRemoteSectionHeading(text = stringResource(R.string.connection_status_heading))
         BurpRemoteCard {
             BurpRemoteStatusPill(
@@ -148,50 +162,21 @@ private fun ConnectionStateSection(uiState: BurpConnectionUserInterfaceState) {
     }
 }
 
+/**
+ * 配对票据：配对的主路径。
+ *
+ * 扫到就照实显示票据里的那份值；没扫到就把「去扫一张」这个动作直接摆在标题下面，而不是先写一段
+ * 解释「为什么现在什么都没有」。用不了的原因分成两行：一行说是什么，一行说下一步做什么。
+ */
 @Composable
-private fun ManualPairingSection(
+private fun PairingTicketSection(
     uiState: BurpConnectionUserInterfaceState,
-    onIntent: (BurpConnectionUserInterfaceIntent) -> Unit,
-    onAction: () -> Unit,
+    onOpenScanner: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-        BurpRemoteSectionHeading(text = stringResource(R.string.connection_manual_pairing_heading))
-        BurpRemoteEmptyState(
-            headline = stringResource(R.string.connection_manual_pairing_headline),
-            detail = stringResource(R.string.connection_manual_pairing_hint),
-        )
-        BurpRemoteTextField(
-            value = uiState.pairingTextInput,
-            onValueChange = { pairingTextInput ->
-                onIntent(BurpConnectionUserInterfaceIntent.UpdatePairingTextInput(pairingTextInput))
-            },
-            label = stringResource(R.string.connection_manual_pairing_text_label),
-            // 配对文本要能逐字符比对，比例字体做不到这件事。
-            isMonospace = true,
-        )
-        BurpRemoteButton(
-            text = stringResource(R.string.connection_manual_pairing_action),
-            onClick = {
-                onAction()
-                onIntent(BurpConnectionUserInterfaceIntent.StartPairing)
-            },
-            style = BurpRemoteButtonStyle.Primary,
-            isEnabled = uiState.canStartPairing && uiState.unavailableReasonResource == null,
-        )
-        uiState.unavailableReasonResource?.let { reasonResource ->
-            BurpRemoteEmptyState(
-                headline = stringResource(R.string.connection_unavailable_headline),
-                detail = stringResource(reasonResource),
-            )
-        }
-    }
-}
-
-@Composable
-private fun PairingTicketSection(uiState: BurpConnectionUserInterfaceState) {
     val ticket = uiState.scannedTicket
     val rejection = uiState.ticketRejection
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
+
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
         BurpRemoteSectionHeading(text = stringResource(R.string.connection_ticket_heading))
         if (ticket != null) {
             BurpRemoteCard {
@@ -212,17 +197,53 @@ private fun PairingTicketSection(uiState: BurpConnectionUserInterfaceState) {
                     label = stringResource(R.string.connection_ticket_expires_at_label),
                 )
             }
-        }
-        if (rejection == null) {
-            BurpRemoteEmptyState(
-                headline = stringResource(R.string.connection_ticket_absent_headline),
-                detail = stringResource(R.string.connection_ticket_absent_detail),
-            )
         } else {
-            BurpRemoteEmptyState(
-                headline = stringResource(ticketRejectionHeadlineResource(rejection)),
-                detail = ticketRejectionDetail(uiState = uiState, rejection = rejection),
+            SectionNote(text = stringResource(R.string.connection_ticket_absent_headline))
+        }
+        if (rejection != null) {
+            SectionNote(
+                text = stringResource(ticketRejectionHeadlineResource(rejection)),
+                tone = BurpRemoteStatusTone.Danger,
             )
+            SectionNote(text = ticketRejectionDetail(uiState = uiState, rejection = rejection))
+        }
+        BurpRemoteButton(
+            text = stringResource(R.string.connection_scan_action),
+            onClick = onOpenScanner,
+            style = BurpRemoteButtonStyle.Secondary,
+        )
+    }
+}
+
+/** 扫不出来时的兜底：一个输入框、一个主操作，按不动的理由写在按钮下面那一行。 */
+@Composable
+private fun ManualPairingSection(
+    uiState: BurpConnectionUserInterfaceState,
+    onIntent: (BurpConnectionUserInterfaceIntent) -> Unit,
+    onAction: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+        BurpRemoteSectionHeading(text = stringResource(R.string.connection_manual_pairing_heading))
+        BurpRemoteTextField(
+            value = uiState.pairingTextInput,
+            onValueChange = { pairingTextInput ->
+                onIntent(BurpConnectionUserInterfaceIntent.UpdatePairingTextInput(pairingTextInput))
+            },
+            label = stringResource(R.string.connection_manual_pairing_text_label),
+            // 配对文本要能逐字符比对，比例字体做不到这件事。
+            isMonospace = true,
+        )
+        BurpRemoteButton(
+            text = stringResource(R.string.connection_manual_pairing_action),
+            onClick = {
+                onAction()
+                onIntent(BurpConnectionUserInterfaceIntent.StartPairing)
+            },
+            style = BurpRemoteButtonStyle.Primary,
+            isEnabled = uiState.canStartPairing && uiState.unavailableReasonResource == null,
+        )
+        pairingNoteResourceOf(uiState = uiState)?.let { noteResource ->
+            SectionNote(text = stringResource(noteResource))
         }
     }
 }
@@ -230,8 +251,7 @@ private fun PairingTicketSection(uiState: BurpConnectionUserInterfaceState) {
 /**
  * 配对结果。
  *
- * 标题是这次尝试的结论本身——每一种结论都对应不同的下一步；下面再把这份结论的归类写清楚，
- * 于是既没有「统一成一句失败」，也没有两处重复同一句话。
+ * 结论本身就是那一行胶囊——每一种结论都对应不同的下一步；具体原因再补一行，两处分工不重不漏。
  */
 @Composable
 private fun PairingOutcomeSection(uiState: BurpConnectionUserInterfaceState) {
@@ -239,20 +259,22 @@ private fun PairingOutcomeSection(uiState: BurpConnectionUserInterfaceState) {
     val conclusion = uiState.pairingConclusion
     if (pairingOutcome == null || conclusion == null) return
 
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
         BurpRemoteSectionHeading(text = stringResource(R.string.connection_pairing_result_heading))
-        when (pairingOutcome) {
-            PairingOutcome.Succeeded ->
-                BurpRemoteEmptyState(
-                    headline = stringResource(R.string.connection_pairing_succeeded_headline),
-                    detail = stringResource(R.string.connection_pairing_succeeded_detail),
-                )
-
-            PairingOutcome.Rejected ->
-                BurpRemoteEmptyState(
-                    headline = stringResource(conclusion.messageResource),
-                    detail = stringResource(pairingRejectionResourceOf(uiState.pairingRejectionReason)),
-                )
+        BurpRemoteStatusPill(
+            text = stringResource(conclusion.messageResource),
+            tone =
+                if (pairingOutcome == PairingOutcome.Succeeded) {
+                    BurpRemoteStatusTone.Live
+                } else {
+                    BurpRemoteStatusTone.Danger
+                },
+        )
+        if (pairingOutcome == PairingOutcome.Rejected) {
+            SectionNote(
+                text = stringResource(pairingRejectionResourceOf(uiState.pairingRejectionReason)),
+                tone = BurpRemoteStatusTone.Danger,
+            )
         }
     }
 }
@@ -264,7 +286,7 @@ private fun PairedDeviceSection(
     onIntent: (BurpConnectionUserInterfaceIntent) -> Unit,
     onAction: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
         BurpRemoteSectionHeading(text = stringResource(R.string.connection_paired_heading))
         BurpRemoteCard {
             BurpRemoteStatusPill(
@@ -289,18 +311,7 @@ private fun PairedDeviceSection(
                 )
             }
         }
-        BurpRemoteEmptyState(
-            headline = stringResource(R.string.connection_paired_headline),
-            detail =
-                stringResource(
-                    if (uiState.isPaired) {
-                        R.string.connection_paired_detail_paired
-                    } else {
-                        R.string.connection_paired_detail_unpaired
-                    },
-                ),
-        )
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
             Box(modifier = Modifier.weight(1f)) {
                 BurpRemoteButton(
                     text = stringResource(R.string.connection_paired_re_pair_action),
@@ -333,12 +344,8 @@ private fun EndpointSection(
     onIntent: (BurpConnectionUserInterfaceIntent) -> Unit,
     onAction: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
         BurpRemoteSectionHeading(text = stringResource(R.string.connection_endpoint_heading))
-        BurpRemoteEmptyState(
-            headline = stringResource(R.string.connection_endpoint_headline),
-            detail = stringResource(R.string.connection_endpoint_detail, DEFAULT_REMOTE_PORT),
-        )
         BurpRemoteTextField(
             value = uiState.hostInput,
             onValueChange = { hostInput ->
@@ -355,6 +362,7 @@ private fun EndpointSection(
             label = stringResource(R.string.connection_endpoint_port_label),
             isMonospace = true,
         )
+        SectionNote(text = stringResource(R.string.connection_endpoint_default_port_hint, DEFAULT_REMOTE_PORT))
         BurpRemoteButton(
             text = stringResource(R.string.connection_endpoint_save_action),
             onClick = {
@@ -364,6 +372,13 @@ private fun EndpointSection(
             style = BurpRemoteButtonStyle.Secondary,
             isEnabled = uiState.isEndpointSavable,
         )
+        // 空字段不必解释，填错格式才需要：端口这一行只在值本身不合法时才出来。
+        if (uiState.hasInvalidPort) {
+            SectionNote(
+                text = stringResource(R.string.connection_endpoint_invalid_port_hint),
+                tone = BurpRemoteStatusTone.Warning,
+            )
+        }
     }
 }
 
@@ -372,30 +387,59 @@ private fun RetrySection(
     uiState: BurpConnectionUserInterfaceState,
     onRetry: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
+    Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
         BurpRemoteSectionHeading(text = stringResource(R.string.connection_retry_heading))
-        BurpRemoteEmptyState(
-            headline = stringResource(R.string.connection_retry_headline),
-            detail = stringResource(R.string.connection_retry_detail),
+        BurpRemoteButton(
+            text = stringResource(R.string.connection_retry_action),
+            onClick = onRetry,
+            style = BurpRemoteButtonStyle.Secondary,
+            isEnabled = uiState.canRetryConnection && uiState.unavailableReasonResource == null,
         )
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ROW_SPACING)) {
-            Box(modifier = Modifier.weight(1f)) {
-                BurpRemoteButton(
-                    text = stringResource(R.string.connection_retry_action),
-                    onClick = onRetry,
-                    style = BurpRemoteButtonStyle.Secondary,
-                    isEnabled = uiState.canRetryConnection && uiState.unavailableReasonResource == null,
-                )
-            }
-            if (uiState.isPairingInFlight) {
-                BurpRemoteStatusPill(
-                    text = stringResource(R.string.connection_pairing_in_flight),
-                    tone = BurpRemoteStatusTone.Neutral,
-                )
-            }
+        retryNoteResourceOf(uiState = uiState)?.let { noteResource ->
+            SectionNote(text = stringResource(noteResource))
         }
     }
 }
+
+/**
+ * 标题下面、控件旁边的一行说明。
+ *
+ * 只承载一句话：为什么这个按钮按不动、这张票据为什么用不了。整段解释原先由空状态承载，于是每一节
+ * 都先来一堵文字墙；压到 caption 一档之后，正文与控件才是版面上的主角。
+ *
+ * @param text 要说的那一句话。
+ * @param tone 语气，决定字色；默认中性，只有需要用户立刻处理时才换成危险或警告档。
+ */
+@Composable
+private fun SectionNote(
+    text: String,
+    tone: BurpRemoteStatusTone = BurpRemoteStatusTone.Neutral,
+) {
+    val tokens = LocalBurpRemoteDesignTokens.current
+
+    BurpRemoteText(
+        text = text,
+        style = tokens.typography.caption,
+        colour = tone.colourIn(tokens.colourScheme),
+    )
+}
+
+/** 配对按钮为什么按不动：正在飞的配对最先说，其次才是传输层与票据那两类原因。 */
+@StringRes
+private fun pairingNoteResourceOf(uiState: BurpConnectionUserInterfaceState): Int? =
+    when {
+        uiState.isPairingInFlight -> R.string.connection_pairing_in_flight
+        else -> uiState.unavailableReasonResource
+    }
+
+/** 连接按钮为什么按不动：先说要先有什么，再说传输层此刻能不能发命令。 */
+@StringRes
+private fun retryNoteResourceOf(uiState: BurpConnectionUserInterfaceState): Int? =
+    when {
+        !uiState.canRetryConnection -> R.string.connection_retry_disabled_hint
+        uiState.unavailableReasonResource != null -> uiState.unavailableReasonResource
+        else -> null
+    }
 
 private fun modeLabelResource(isLive: Boolean): Int =
     if (isLive) R.string.connection_mode_live else R.string.connection_mode_offline
@@ -486,10 +530,6 @@ internal val ConnectionState.labelResource: Int
             ConnectionState.ServerUnavailable -> R.string.connection_state_server_unavailable
         }
 
-private val SCREEN_PADDING = 16.dp
-private val SECTION_SPACING = 20.dp
-private val ROW_SPACING = 8.dp
-
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。
 @Preview(name = "待配对浅色", showBackground = true)
 @Composable
@@ -546,7 +586,10 @@ private fun previewState(): BurpConnectionUserInterfaceState =
         savedEndpoint = RemoteServerEndpoint(host = "192.0.2.10", port = 9000),
         hostInput = "192.0.2.10",
         portInput = "9000",
+        pairingTextInput = "BURP-PAIR-1-192.0.2.10-9000",
         scannedTicket = previewTicket(expiresAt = Instant.parse("2026-09-13T09:00:00Z")),
+        // 这个构建里配对链路还没接上：按钮因此不可用，而原因就写在按钮下面那一行。
+        unavailableReasonResource = R.string.connection_reason_no_transport,
     )
 
 private fun previewExpiredState(): BurpConnectionUserInterfaceState =

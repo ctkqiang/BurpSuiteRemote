@@ -40,5 +40,5 @@
     <string name="sharing_state_failed">Export fehlgeschlagen</string>
     <string name="sharing_export_failed">Das Exportpaket konnte nicht geschrieben werden. Versuchen Sie es mit einem anderen Ort.</string>
 
-    <string name="sharing_export_notice">Burp-Remote-Exportpaket\n\nDieses Archiv wurde vom mobilen Burp-Remote-Client erzeugt.\nEs enthält manifest.json, redaction-report.json und diesen Hinweis.\n\nUmfang: nur die auf dem Gerät gespeicherten Felder. Anfrage- und Antwortbytes\nwerden von diesem Client noch nicht erfasst und sind daher nicht Teil des Exports.\n\nRedaktion: sensible Werte wurden nur in dieser Exportkopie maskiert. Das\narchivierte Original wurde nicht verändert.</string>
+    <string name="sharing_export_notice">Burpsuite-Remote-Exportpaket\n\nDieses Archiv wurde vom mobilen Burpsuite-Remote-Client erzeugt.\nEs enthält manifest.json, redaction-report.json und diesen Hinweis.\n\nUmfang: nur die auf dem Gerät gespeicherten Felder. Anfrage- und Antwortbytes\nwerden von diesem Client noch nicht erfasst und sind daher nicht Teil des Exports.\n\nRedaktion: sensible Werte wurden nur in dieser Exportkopie maskiert. Das\narchivierte Original wurde nicht verändert.</string>
 </resources>

@@ -2,33 +2,49 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.feature.intercept
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.InterceptIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.InterceptRecord
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.InterceptState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteErrorState
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemotePullToRefresh
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSkeletonRow
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.burpRemoteStaggeredEntry
 import java.time.Duration
 import java.time.Instant
@@ -40,7 +56,7 @@ import java.time.format.FormatStyle
  * 拦截队列（plan §43 的 Live/Intercept）。
  *
  * 无状态：只显示投影，每一行以拦截标识作稳定 key。队列的看点全在「这条现在是什么状态」，
- * 因此状态做成带语义色的标签；行结构与实时历史、归档保持同一套，方法也用同一种色标，
+ * 因此状态做成带语义色的胶囊；行结构与实时历史、归档保持同一套，方法用同一种色标，
  * 于是三个列表在配色与节奏上是一个产品，而不是三张各写各的表。
  */
 @Composable
@@ -59,10 +75,10 @@ fun InterceptScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding =
                     PaddingValues(
-                        horizontal = BurpRemoteSpacing.Large,
-                        vertical = BurpRemoteSpacing.Large,
+                        horizontal = BurpRemoteSpacing.ScreenEdge,
+                        vertical = BurpRemoteSpacing.ExtraLarge,
                     ),
-                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ListItemGap),
             ) {
                 recordItems(uiState = uiState, onIntent = onIntent)
             }
@@ -70,7 +86,11 @@ fun InterceptScreen(
     }
 }
 
-/** 列表区的三态：等待、可重试的失败、要么空要么有内容。 */
+/**
+ * 列表区的三态：等待、可重试的失败、要么空要么有内容。
+ *
+ * 还没读出来时给骨架行：队列的形状先落位，数据到了只是把灰块换成文字。
+ */
 private fun LazyListScope.recordItems(
     uiState: InterceptUserInterfaceState,
     onIntent: (InterceptUserInterfaceIntent) -> Unit,
@@ -79,20 +99,20 @@ private fun LazyListScope.recordItems(
     when {
         failureReasonResource != null ->
             item(key = ERROR_KEY) {
-                BurpRemoteEmptyState(
-                    headline = stringResource(R.string.intercept_error_headline),
+                BurpRemoteErrorState(
                     detail = stringResource(failureReasonResource),
-                    actionText = stringResource(R.string.intercept_error_action),
-                    onAction = { onIntent(InterceptUserInterfaceIntent.Refresh) },
+                    onRetry = { onIntent(InterceptUserInterfaceIntent.Refresh) },
                 )
             }
 
         !uiState.hasLoaded ->
-            item(key = LOADING_KEY) {
-                BurpRemoteEmptyState(
-                    headline = stringResource(R.string.intercept_loading_headline),
-                    detail = stringResource(R.string.intercept_loading_detail),
-                )
+            items(
+                count = SKELETON_ROW_COUNT,
+                key = { index -> "$LOADING_KEY-$index" },
+            ) { index ->
+                Box(modifier = Modifier.burpRemoteStaggeredEntry(index = index)) {
+                    BurpRemoteSkeletonRow()
+                }
             }
 
         uiState.records.isEmpty() ->
@@ -130,6 +150,11 @@ private fun LazyListScope.recordItems(
     }
 }
 
+/**
+ * 拦截项的一行：左方法色标、中目标（等宽）、右状态胶囊，往下两行给创建与最近变更时刻。
+ *
+ * 与实时历史的行逐项对齐，因此同一个请求在两屏之间可以直接对照。
+ */
 @Composable
 private fun InterceptRecordCard(
     record: InterceptRecord,
@@ -137,27 +162,101 @@ private fun InterceptRecordCard(
     onOpen: () -> Unit,
 ) {
     val absentValue = stringResource(R.string.intercept_absent_value)
+
     BurpRemoteCard(isInteractive = true, onClick = onOpen) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            BurpRemoteStatusPill(
-                text = stringResource(record.state.labelResource),
-                tone = toneOf(state = record.state),
-            )
-            BurpRemoteStatusPill(
-                text = record.method ?: absentValue,
-                tone = methodToneOf(record.method),
-            )
-        }
-        BurpRemoteTechnicalValue(text = targetTextOf(record = record, absentValue = absentValue))
+        RequestHeadlineRow(
+            method = record.method,
+            target = targetTextOf(record = record, absentValue = absentValue),
+            absentValue = absentValue,
+        )
+        BurpRemoteStatusPill(
+            text = stringResource(record.state.labelResource),
+            tone = toneOf(state = record.state),
+        )
+        BurpRemoteTechnicalValue(
+            text = RECORD_TIME_FORMATTER.format(record.createdAt),
+            label = relativeTimeText(now = now, moment = record.createdAt),
+        )
         BurpRemoteTechnicalValue(
             text = RECORD_TIME_FORMATTER.format(record.updatedAt),
-            label = relativeTimeText(now = now, moment = record.updatedAt),
+            label = stringResource(R.string.intercept_detail_updated_at_label),
         )
     }
+}
+
+/**
+ * 列表共用的头两行：方法色标 + 方法名 + 目标（等宽），状态胶囊紧随其后。
+ *
+ * 色标与方法名同色，读类、写类、删除三种动词语义各成一组，与实时历史、归档完全一致。
+ */
+@Composable
+private fun RequestHeadlineRow(
+    method: String?,
+    target: String,
+    absentValue: String,
+) {
+    val tokens = LocalBurpRemoteDesignTokens.current
+    val methodTone = methodToneOf(method)
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MethodMarker(tone = methodTone)
+        ScreenText(
+            text = method ?: absentValue,
+            style = tokens.typography.technical,
+            colour = toneColourOf(tone = methodTone, colourScheme = tokens.colourScheme),
+            maxLines = 1,
+        )
+        ScreenText(
+            text = target,
+            style = tokens.typography.technical,
+            colour = tokens.colourScheme.contentPrimary,
+            modifier = Modifier.weight(weight = 1f, fill = true),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/** 方法色标：一竖条按方法语义着色，与实时历史、归档是同一个意思。 */
+@Composable
+private fun MethodMarker(tone: BurpRemoteStatusTone) {
+    val tokens = LocalBurpRemoteDesignTokens.current
+    val shape = RoundedCornerShape(BurpRemoteRadius.Capsule)
+
+    Box(
+        modifier =
+            Modifier
+                .width(METHOD_MARKER_WIDTH)
+                .height(METHOD_MARKER_HEIGHT)
+                .clip(shape)
+                .background(
+                    color = toneColourOf(tone = tone, colourScheme = tokens.colourScheme),
+                    shape = shape,
+                ),
+    )
+}
+
+// 设计系统只发布具名控件；列表内部的自由排版在这里用主题字阶直接渲染，色值仍取自主题。
+@Composable
+private fun ScreenText(
+    text: String,
+    style: TextStyle,
+    colour: Color,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
+) {
+    BasicText(
+        text = text,
+        modifier = modifier,
+        style = style.copy(color = colour),
+        maxLines = maxLines,
+        overflow = overflow,
+    )
 }
 
 /**
@@ -179,6 +278,18 @@ private fun toneOf(state: InterceptState): BurpRemoteStatusTone =
         InterceptState.Modified -> BurpRemoteStatusTone.Warning
         InterceptState.Forwarded -> BurpRemoteStatusTone.Live
         InterceptState.Dropped -> BurpRemoteStatusTone.Neutral
+    }
+
+/** 语气到语义色的映射：界面里所有色值都从主题取，不自己写色号。 */
+private fun toneColourOf(
+    tone: BurpRemoteStatusTone,
+    colourScheme: BurpRemoteColourScheme,
+): Color =
+    when (tone) {
+        BurpRemoteStatusTone.Neutral -> colourScheme.contentSecondary
+        BurpRemoteStatusTone.Live -> colourScheme.success
+        BurpRemoteStatusTone.Warning -> colourScheme.warning
+        BurpRemoteStatusTone.Danger -> colourScheme.danger
     }
 
 private fun targetTextOf(
@@ -259,6 +370,11 @@ internal val InterceptState.isWaiting: Boolean
 private val RECORD_TIME_FORMATTER: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault())
 
+private val METHOD_MARKER_WIDTH = 4.dp
+private val METHOD_MARKER_HEIGHT = 20.dp
+
+private const val SKELETON_ROW_COUNT = 4
+
 private const val METHOD_GET = "GET"
 private const val METHOD_HEAD = "HEAD"
 private const val METHOD_OPTIONS = "OPTIONS"
@@ -290,6 +406,22 @@ private fun InterceptScreenLightPreview() {
 private fun InterceptScreenDarkPreview() {
     BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
         InterceptScreen(uiState = populatedPreviewState(), onIntent = {})
+    }
+}
+
+@Preview(name = "读取中浅色", showBackground = true)
+@Composable
+private fun InterceptScreenLoadingLightPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Light) {
+        InterceptScreen(uiState = InterceptUserInterfaceState(), onIntent = {})
+    }
+}
+
+@Preview(name = "读取中深色", showBackground = true)
+@Composable
+private fun InterceptScreenLoadingDarkPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
+        InterceptScreen(uiState = InterceptUserInterfaceState(), onIntent = {})
     }
 }
 

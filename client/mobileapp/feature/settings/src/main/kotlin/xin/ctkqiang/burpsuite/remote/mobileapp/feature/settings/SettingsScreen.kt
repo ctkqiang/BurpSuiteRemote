@@ -60,8 +60,8 @@ fun SettingsScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(
-                        horizontal = BurpRemoteSpacing.Large,
-                        vertical = BurpRemoteSpacing.Large,
+                        horizontal = BurpRemoteSpacing.ScreenEdge,
+                        vertical = BurpRemoteSpacing.ScreenEdge,
                     ),
             verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium),
         ) {

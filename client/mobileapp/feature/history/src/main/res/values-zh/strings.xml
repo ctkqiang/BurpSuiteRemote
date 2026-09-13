@@ -43,8 +43,6 @@
     <string name="history_detail_duration_label">耗时</string>
 
     <string name="history_detail_record_heading">本机记录</string>
-    <string name="history_detail_archive_state_live">实时</string>
-    <string name="history_detail_archive_state_archived">已归档</string>
     <string name="history_detail_saved_at_label">归档时刻</string>
     <string name="history_detail_annotation_count_label">注解条数</string>
     <string name="history_detail_last_annotated_at_label">最后一条注解</string>
@@ -56,12 +54,22 @@
     <string name="history_detail_occurred_at_label">观测时刻</string>
 
     <string name="history_detail_message_heading">报文</string>
-    <string name="history_detail_message_headline">本机没有报文本体</string>
-    <string name="history_detail_message_unavailable">请求与响应的字节没有被本机捕获，因此这一屏只显示元数据。缺的东西就空着——填个占位内容会让人以为是证据。</string>
-    <string name="history_detail_reason_headline">为什么缺</string>
-    <string name="history_detail_reason_message">客户端还没有取报文本体的端口</string>
+    <string name="history_detail_request_headers_label">请求头</string>
+    <string name="history_detail_request_body_label">请求体</string>
+    <string name="history_detail_response_headers_label">响应头</string>
+    <string name="history_detail_response_body_label">响应体</string>
+    <string name="history_detail_message_absent">Burp 没有捕获到这一段</string>
+    <string name="history_detail_message_retry">重新获取</string>
+
+    <string name="history_detail_message_failure_not_paired">这台设备还没和 Burp 建立可用配对</string>
+    <string name="history_detail_message_failure_unreachable">现在连不上 Burp</string>
+    <string name="history_detail_message_failure_not_supported">这版插件不提供报文本体</string>
+    <string name="history_detail_message_failure_record_missing">Burp 里已经没有这条记录</string>
+    <string name="history_detail_message_failure_malformed">Burp 回的字节客户端读不懂</string>
+    <string name="history_detail_message_failure_refused">Burp 拒绝了这次读取</string>
 
     <string name="history_detail_actions_heading">动作</string>
+    <string name="history_detail_reason_headline">为什么缺</string>
     <string name="history_detail_action_share">分享或导出</string>
     <string name="history_detail_action_send_to_repeater">送往重放</string>
     <string name="history_detail_reason_send_to_repeater">客户端还没有重放命令端口</string>

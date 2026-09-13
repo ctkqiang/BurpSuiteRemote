@@ -43,8 +43,6 @@
     <string name="history_detail_duration_label">Dauer</string>
 
     <string name="history_detail_record_heading">Lokaler Eintrag</string>
-    <string name="history_detail_archive_state_live">Live</string>
-    <string name="history_detail_archive_state_archived">Archiviert</string>
     <string name="history_detail_saved_at_label">Gespeichert am</string>
     <string name="history_detail_annotation_count_label">Anmerkungen</string>
     <string name="history_detail_last_annotated_at_label">Letzte Anmerkung</string>
@@ -56,12 +54,22 @@
     <string name="history_detail_occurred_at_label">Beobachtet am</string>
 
     <string name="history_detail_message_heading">Nachricht</string>
-    <string name="history_detail_message_headline">Keine Bytes auf diesem Gerät</string>
-    <string name="history_detail_message_unavailable">Die Bytes von Anfrage und Antwort wurden lokal nicht erfasst; diese Ansicht zeigt daher nur Metadaten. Es wird nichts ersatzweise angezeigt — ein Platzhalter sähe wie ein Beweis aus.</string>
-    <string name="history_detail_reason_headline">Warum das fehlt</string>
-    <string name="history_detail_reason_message">dem Client fehlt noch ein Port für Nachrichtenrümpfe</string>
+    <string name="history_detail_request_headers_label">Anfrage-Header</string>
+    <string name="history_detail_request_body_label">Anfragekörper</string>
+    <string name="history_detail_response_headers_label">Antwort-Header</string>
+    <string name="history_detail_response_body_label">Antwortkörper</string>
+    <string name="history_detail_message_absent">Burp hat diesen Teil nicht erfasst</string>
+    <string name="history_detail_message_retry">Erneut laden</string>
+
+    <string name="history_detail_message_failure_not_paired">Dieses Gerät ist nicht mit Burp gekoppelt</string>
+    <string name="history_detail_message_failure_unreachable">Burp ist derzeit nicht erreichbar</string>
+    <string name="history_detail_message_failure_not_supported">Diese Plug-in-Version liefert keine Nachrichtenrümpfe</string>
+    <string name="history_detail_message_failure_record_missing">Burp hat diesen Eintrag nicht mehr</string>
+    <string name="history_detail_message_failure_malformed">Burp lieferte Bytes, die dieser Client nicht lesen kann</string>
+    <string name="history_detail_message_failure_refused">Burp hat dieses Lesen abgelehnt</string>
 
     <string name="history_detail_actions_heading">Aktionen</string>
+    <string name="history_detail_reason_headline">Warum das fehlt</string>
     <string name="history_detail_action_share">Teilen oder exportieren</string>
     <string name="history_detail_action_send_to_repeater">An Repeater senden</string>
     <string name="history_detail_reason_send_to_repeater">dem Client fehlt noch ein Repeater-Befehlskanal</string>

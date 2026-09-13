@@ -43,8 +43,6 @@
     <string name="history_detail_duration_label">Duration</string>
 
     <string name="history_detail_record_heading">Local record</string>
-    <string name="history_detail_archive_state_live">Live</string>
-    <string name="history_detail_archive_state_archived">Archived</string>
     <string name="history_detail_saved_at_label">Saved at</string>
     <string name="history_detail_annotation_count_label">Annotations</string>
     <string name="history_detail_last_annotated_at_label">Last annotation</string>
@@ -56,12 +54,22 @@
     <string name="history_detail_occurred_at_label">Observed at</string>
 
     <string name="history_detail_message_heading">Message</string>
-    <string name="history_detail_message_headline">No bytes on this device</string>
-    <string name="history_detail_message_unavailable">The request and response bytes are not captured locally, so this screen shows metadata only. Nothing is shown in their place: a placeholder would look like evidence.</string>
-    <string name="history_detail_reason_headline">Why this is missing</string>
-    <string name="history_detail_reason_message">the client has no message-body port yet</string>
+    <string name="history_detail_request_headers_label">Request headers</string>
+    <string name="history_detail_request_body_label">Request body</string>
+    <string name="history_detail_response_headers_label">Response headers</string>
+    <string name="history_detail_response_body_label">Response body</string>
+    <string name="history_detail_message_absent">Burp did not capture this part</string>
+    <string name="history_detail_message_retry">Fetch again</string>
+
+    <string name="history_detail_message_failure_not_paired">This device is not paired with Burp</string>
+    <string name="history_detail_message_failure_unreachable">Burp is unreachable right now</string>
+    <string name="history_detail_message_failure_not_supported">This plug-in build cannot return message bodies</string>
+    <string name="history_detail_message_failure_record_missing">Burp no longer holds this record</string>
+    <string name="history_detail_message_failure_malformed">Burp returned bytes this client cannot read</string>
+    <string name="history_detail_message_failure_refused">Burp declined this read</string>
 
     <string name="history_detail_actions_heading">Actions</string>
+    <string name="history_detail_reason_headline">Why this is missing</string>
     <string name="history_detail_action_share">Share or export</string>
     <string name="history_detail_action_send_to_repeater">Send to Repeater</string>
     <string name="history_detail_reason_send_to_repeater">the client has no repeater-command port yet</string>

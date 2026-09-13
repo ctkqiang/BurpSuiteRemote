@@ -2,22 +2,41 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.feature.archive
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.HistoryArchiveState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.HistoryRecord
@@ -26,14 +45,21 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteBut
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteButtonStyle
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteErrorState
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemotePullToRefresh
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSectionHeading
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSkeletonRow
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteMotion
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSizing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.burpRemoteStaggeredEntry
 import java.time.Duration
 import java.time.Instant
@@ -45,10 +71,10 @@ import java.time.format.FormatStyle
  * 归档（plan §22、plan §43 的 Archive）。
  *
  * 三个页签各自说明自己的数据从哪来：已保存历史读真实投影，书签与截图两类投影客户端还没有端口，
- * 因此那两个页签写明缺口，不摆假条目。页签切换给一记选中触感，切换后新内容按错峰入场落下，
- * 于是「换了一组数据」这件事在视觉上有交代。
+ * 因此那两个页签写明缺口，不摆假条目。页签做成等宽三段的分段控件——选中段是实心胶囊，
+ * 指示器用 320ms 滑过去，切换时给一记选中触感，「换了一组数据」这件事于是有了交代。
  *
- * 整个页面只有一个滚动容器（[LazyColumn]），页签行是它的第一项——把页签放在 LazyColumn 外面
+ * 整个页面只有一个滚动容器（[LazyColumn]），分段控件是它的第一项——把页签放在 LazyColumn 外面
  * 再嵌一层滚动容器，会让内层列表拿不到有限高度。
  */
 @Composable
@@ -70,13 +96,13 @@ fun ArchiveScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding =
                     PaddingValues(
-                        horizontal = BurpRemoteSpacing.Large,
-                        vertical = BurpRemoteSpacing.Large,
+                        horizontal = BurpRemoteSpacing.ScreenEdge,
+                        vertical = BurpRemoteSpacing.ExtraLarge,
                     ),
-                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ExtraLarge),
             ) {
                 item(key = TABS_KEY) {
-                    ArchiveTabRow(
+                    ArchiveSegmentControl(
                         selectedTab = uiState.selectedTab,
                         onSelectTab = { tab ->
                             haptics.select()
@@ -125,30 +151,73 @@ fun ArchiveScreen(
 }
 
 /**
- * 页签行用按钮拼：选中态是实心的，未选中是幽灵按钮，一眼能分辨，也不需要 Material 的 Tab。
- * 三个页签等宽，位置固定，手指换页时不必重新找目标。
+ * 分段控件：三段等宽，选中段是实心胶囊，指示器在 320ms 内滑过去。
+ *
+ * 用滑动指示器而不是三枚按钮切换，是为了让「当前在哪一段」这件事由位置本身说明，
+ * 而不是靠哪一枚按钮底色变了去猜（plan §43）。
  */
 @Composable
-private fun ArchiveTabRow(
+private fun ArchiveSegmentControl(
     selectedTab: ArchiveTab,
     onSelectTab: (ArchiveTab) -> Unit,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+    val tokens = LocalBurpRemoteDesignTokens.current
+    val containerShape = RoundedCornerShape(BurpRemoteRadius.Capsule)
+    val selectedIndex = ArchiveTab.entries.indexOf(selectedTab)
+
+    BoxWithConstraints(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(containerShape)
+                .background(color = tokens.colourScheme.surfaceElevated, shape = containerShape)
+                .border(width = 1.dp, color = tokens.colourScheme.outline, shape = containerShape)
+                .padding(BurpRemoteSpacing.ExtraSmall),
     ) {
-        ArchiveTab.entries.forEach { tab ->
-            Box(modifier = Modifier.weight(weight = 1f, fill = true)) {
-                BurpRemoteButton(
-                    text = stringResource(tab.labelResource),
-                    onClick = { onSelectTab(tab) },
-                    style =
-                        if (tab == selectedTab) {
-                            BurpRemoteButtonStyle.Primary
-                        } else {
-                            BurpRemoteButtonStyle.Ghost
-                        },
-                )
+        val segmentWidth = (maxWidth - BurpRemoteSpacing.ExtraSmall * 2) / ArchiveTab.entries.size
+        val indicatorOffset by
+            animateDpAsState(
+                targetValue = segmentWidth * selectedIndex,
+                animationSpec =
+                    tween(
+                        durationMillis = BurpRemoteMotion.DURATION_EMPHASISED,
+                        easing = BurpRemoteMotion.EasingStandard,
+                    ),
+                label = "archive-segment-indicator",
+            )
+
+        Box(
+            modifier =
+                Modifier
+                    .offset(x = indicatorOffset)
+                    .width(segmentWidth)
+                    .height(BurpRemoteSizing.MinimumTouchTarget)
+                    .clip(containerShape)
+                    .background(color = tokens.colourScheme.accent, shape = containerShape),
+        )
+        Row(modifier = Modifier.fillMaxWidth()) {
+            ArchiveTab.entries.forEach { tab ->
+                Box(
+                    modifier =
+                        Modifier
+                            .weight(weight = 1f, fill = true)
+                            .height(BurpRemoteSizing.MinimumTouchTarget)
+                            .clip(containerShape)
+                            .clickable { onSelectTab(tab) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    ScreenText(
+                        text = stringResource(tab.labelResource),
+                        style = tokens.typography.label,
+                        colour =
+                            if (tab == selectedTab) {
+                                tokens.colourScheme.onAccent
+                            } else {
+                                tokens.colourScheme.contentSecondary
+                            },
+                        maxLines = 1,
+                    )
+                }
             }
         }
     }
@@ -162,20 +231,15 @@ private fun LazyListScope.savedHistoryItems(
     when {
         failureReasonResource != null ->
             item(key = ERROR_KEY) {
-                BurpRemoteEmptyState(
-                    headline = stringResource(R.string.archive_error_headline),
+                BurpRemoteErrorState(
                     detail = stringResource(failureReasonResource),
-                    actionText = stringResource(R.string.archive_error_action),
-                    onAction = { onIntent(ArchiveUserInterfaceIntent.Refresh) },
+                    onRetry = { onIntent(ArchiveUserInterfaceIntent.Refresh) },
                 )
             }
 
         !uiState.hasLoaded ->
             item(key = LOADING_KEY) {
-                BurpRemoteEmptyState(
-                    headline = stringResource(R.string.archive_loading_headline),
-                    detail = stringResource(R.string.archive_loading_detail),
-                )
+                BurpRemoteSkeletonRow()
             }
 
         uiState.savedRecords.isEmpty() ->
@@ -227,6 +291,11 @@ private fun LazyListScope.savedHistoryItems(
     }
 }
 
+/**
+ * 已保存的一行：与实时历史的行共用同一套方法色标与状态胶囊，但归档语义单独说清楚。
+ *
+ * 「归档」这一枚与列表语义分开：这里的副本不会再被后续事件改写，因此不能长得像一条实时记录。
+ */
 @Composable
 private fun SavedRecordCard(
     record: HistoryRecord,
@@ -235,43 +304,120 @@ private fun SavedRecordCard(
     onShare: () -> Unit,
 ) {
     val absentValue = stringResource(R.string.archive_absent_value)
+    val savedAt = record.savedAt ?: record.occurredAt
+
     BurpRemoteCard(isInteractive = true, onClick = onOpen) {
+        RequestHeadlineRow(
+            method = record.method,
+            statusCode = record.statusCode,
+            target = targetTextOf(record = record, absentValue = absentValue),
+            absentValue = absentValue,
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // 「已归档」这一枚与实时历史的行区分开：这里的副本不会再被后续事件改写。
             BurpRemoteStatusPill(
                 text = stringResource(R.string.archive_archived_pill),
                 tone = BurpRemoteStatusTone.Neutral,
             )
-            BurpRemoteStatusPill(
-                text = record.method ?: absentValue,
-                tone = methodToneOf(record.method),
-            )
-            BurpRemoteStatusPill(
-                text = record.statusCode?.toString() ?: absentValue,
-                tone = statusToneOf(record.statusCode),
+            Spacer(modifier = Modifier.weight(weight = 1f, fill = true))
+            BurpRemoteButton(
+                text = stringResource(R.string.archive_action_share),
+                onClick = onShare,
+                style = BurpRemoteButtonStyle.Secondary,
             )
         }
-        BurpRemoteTechnicalValue(text = targetTextOf(record = record, absentValue = absentValue))
         BurpRemoteTechnicalValue(
-            text =
-                record.savedAt?.let { savedAt -> RECORD_TIME_FORMATTER.format(savedAt) }
-                    ?: RECORD_TIME_FORMATTER.format(record.occurredAt),
+            text = RECORD_TIME_FORMATTER.format(savedAt),
             label =
                 stringResource(
                     R.string.archive_saved_at_label,
-                    relativeTimeText(now = now, moment = record.savedAt ?: record.occurredAt),
+                    relativeTimeText(now = now, moment = savedAt),
                 ),
         )
-        BurpRemoteButton(
-            text = stringResource(R.string.archive_action_share),
-            onClick = onShare,
-            style = BurpRemoteButtonStyle.Secondary,
+    }
+}
+
+/**
+ * 列表共用的第一行：左方法色标、中目标（等宽）、右状态胶囊。
+ *
+ * 与实时历史、拦截是同一套排列，归档里的副本因此也能和实时记录逐行对照。
+ */
+@Composable
+private fun RequestHeadlineRow(
+    method: String?,
+    statusCode: Int?,
+    target: String,
+    absentValue: String,
+) {
+    val tokens = LocalBurpRemoteDesignTokens.current
+    val methodTone = methodToneOf(method)
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MethodMarker(tone = methodTone)
+        ScreenText(
+            text = method ?: absentValue,
+            style = tokens.typography.technical,
+            colour = toneColourOf(tone = methodTone, colourScheme = tokens.colourScheme),
+            maxLines = 1,
+        )
+        ScreenText(
+            text = target,
+            style = tokens.typography.technical,
+            colour = tokens.colourScheme.contentPrimary,
+            modifier = Modifier.weight(weight = 1f, fill = true),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        BurpRemoteStatusPill(
+            text = statusCode?.toString() ?: absentValue,
+            tone = statusToneOf(statusCode),
         )
     }
+}
+
+/** 方法色标：一竖条按方法语义着色，与实时历史、拦截是同一个意思。 */
+@Composable
+private fun MethodMarker(tone: BurpRemoteStatusTone) {
+    val tokens = LocalBurpRemoteDesignTokens.current
+    val shape = RoundedCornerShape(BurpRemoteRadius.Capsule)
+
+    Box(
+        modifier =
+            Modifier
+                .width(METHOD_MARKER_WIDTH)
+                .height(METHOD_MARKER_HEIGHT)
+                .clip(shape)
+                .background(
+                    color = toneColourOf(tone = tone, colourScheme = tokens.colourScheme),
+                    shape = shape,
+                ),
+    )
+}
+
+// 设计系统只发布具名控件；列表内部的自由排版在这里用主题字阶直接渲染，色值仍取自主题。
+@Composable
+private fun ScreenText(
+    text: String,
+    style: TextStyle,
+    colour: Color,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
+) {
+    BasicText(
+        text = text,
+        modifier = modifier,
+        style = style.copy(color = colour),
+        maxLines = maxLines,
+        overflow = overflow,
+    )
 }
 
 /**
@@ -293,6 +439,18 @@ private fun statusToneOf(statusCode: Int?): BurpRemoteStatusTone =
         STATUS_CODE_CLASS_CLIENT_ERROR -> BurpRemoteStatusTone.Warning
         STATUS_CODE_CLASS_SERVER_ERROR -> BurpRemoteStatusTone.Danger
         else -> BurpRemoteStatusTone.Neutral
+    }
+
+/** 语气到语义色的映射：界面里所有色值都从主题取，不自己写色号。 */
+private fun toneColourOf(
+    tone: BurpRemoteStatusTone,
+    colourScheme: BurpRemoteColourScheme,
+): Color =
+    when (tone) {
+        BurpRemoteStatusTone.Neutral -> colourScheme.contentSecondary
+        BurpRemoteStatusTone.Live -> colourScheme.success
+        BurpRemoteStatusTone.Warning -> colourScheme.warning
+        BurpRemoteStatusTone.Danger -> colourScheme.danger
     }
 
 private fun targetTextOf(
@@ -384,6 +542,9 @@ private const val SECONDS_PER_MINUTE = 60L
 private const val SECONDS_PER_HOUR = 3_600L
 private const val SECONDS_PER_DAY = 86_400L
 
+private val METHOD_MARKER_WIDTH = 4.dp
+private val METHOD_MARKER_HEIGHT = 20.dp
+
 private const val TABS_KEY = "tabs"
 private const val SAVED_HEADING_KEY = "saved-heading"
 private const val SAVED_EMPTY_KEY = "saved-empty"
@@ -430,6 +591,28 @@ private fun ArchiveScreenBookmarksDarkPreview() {
     BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
         ArchiveScreen(
             uiState = ArchiveUserInterfaceState(selectedTab = ArchiveTab.Bookmarks, hasLoaded = true),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview(name = "截图浅色", showBackground = true)
+@Composable
+private fun ArchiveScreenScreenshotsLightPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Light) {
+        ArchiveScreen(
+            uiState = ArchiveUserInterfaceState(selectedTab = ArchiveTab.Screenshots, hasLoaded = true),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview(name = "截图深色", showBackground = true)
+@Composable
+private fun ArchiveScreenScreenshotsDarkPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
+        ArchiveScreen(
+            uiState = ArchiveUserInterfaceState(selectedTab = ArchiveTab.Screenshots, hasLoaded = true),
             onIntent = {},
         )
     }
