@@ -19,6 +19,7 @@
     <string name="navigation_group_connection">连接</string>
     <string name="navigation_group_interface">界面</string>
     <string name="navigation_group_data">数据与安全</string>
+    <string name="navigation_group_about">关于</string>
 
     <string name="navigation_entry_live_history">历史</string>
     <string name="navigation_entry_live_intercept">拦截</string>
@@ -28,6 +29,7 @@
     <string name="navigation_entry_settings_language">语言</string>
     <string name="navigation_entry_settings_security">安全</string>
     <string name="navigation_entry_settings_storage">存储</string>
+    <string name="navigation_entry_settings_about">关于</string>
 
     <!-- 每一行补一句它通向什么：索引页的价值在于点之前就知道会去哪，而不是点进去再退回来。 -->
     <string name="navigation_entry_live_history_detail">插件转发过来的每一个请求，最新的排在最前面。</string>
@@ -38,6 +40,7 @@
     <string name="navigation_entry_settings_language_detail">切换时会重建一次界面，让每个字都换成所选语言。</string>
     <string name="navigation_entry_settings_security_detail">本机存了什么，以及它们是怎么被保护的。</string>
     <string name="navigation_entry_settings_storage_detail">本地库占用多大，以及怎么清掉已捕获的数据。</string>
+    <string name="navigation_entry_settings_about_detail">作者、联系邮箱，以及源码放在哪。</string>
 
     <string name="connection_state_disconnected">未连接</string>
     <string name="connection_state_discovering">正在发现</string>

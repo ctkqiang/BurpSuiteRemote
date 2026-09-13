@@ -55,4 +55,20 @@
     <string name="settings_storage_maintenance_heading">Maintenance</string>
     <string name="settings_storage_reason_heading">What cannot be done yet</string>
     <string name="settings_storage_reason">clearing and migrating local data need storage ports that do not exist yet</string>
+
+    <!-- 关于与开发者信息。名字、邮箱与仓库地址是事实，交给翻译既没意义还会被拼错，因此不进翻译条目。 -->
+    <string name="about_application_name" translatable="false">Burpsuite Remote</string>
+    <string name="about_author_value" translatable="false">ctkqiang 钟智强</string>
+    <string name="about_email_value" translatable="false">johnmelodymel@qq.com</string>
+    <string name="about_source_value" translatable="false">https://github.com/ctkqiang/BurpSuiteRemote.git</string>
+
+    <string name="about_tagline">A mobile client for the Burp Remote extension</string>
+    <string name="about_developer_heading">Developer</string>
+    <string name="about_author_label">Author</string>
+    <string name="about_email_label">Email</string>
+    <string name="about_source_heading">Source</string>
+    <string name="about_source_label">Repository</string>
+    <string name="about_open_source_heading">Open source</string>
+    <string name="about_open_source_headline">Every claim this app makes can be checked against the code</string>
+    <string name="about_open_source_body">The source is public, so each behaviour described in this interface has a line behind it. Technical logs are written on this device only and are never uploaded anywhere.</string>
 </resources>

@@ -94,6 +94,12 @@ enum class TopLevelSection(
                     route = BurpRemoteRoute.SETTINGS_STORAGE,
                     groupResource = R.string.navigation_group_data,
                 ),
+                SectionMenuEntry(
+                    labelResource = R.string.navigation_entry_settings_about,
+                    descriptionResource = R.string.navigation_entry_settings_about_detail,
+                    route = BurpRemoteRoute.SETTINGS_ABOUT,
+                    groupResource = R.string.navigation_group_about,
+                ),
             ),
     ),
     ;

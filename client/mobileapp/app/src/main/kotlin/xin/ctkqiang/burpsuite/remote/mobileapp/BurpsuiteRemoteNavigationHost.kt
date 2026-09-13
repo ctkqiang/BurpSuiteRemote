@@ -1,6 +1,11 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -37,6 +43,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.feature.history.HistoryRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.intercept.InterceptDetailRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.intercept.InterceptRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.repeater.RepeaterRoute
+import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.AboutScreen
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguageRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.SecurityScreen
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.SettingsRoute
@@ -53,6 +60,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.NavigationDependenc
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemotePairingConclusion
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.SectionMenuScreen
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.TopLevelSection
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteMotion
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.R as UserInterfaceResources
 
@@ -230,6 +238,25 @@ fun BurpsuiteRemoteNavigationHost(
                 navController = navController,
                 startDestination = resolveStartRoute(requestedRoute = startRoute),
                 modifier = Modifier.padding(contentPadding),
+                // 切换用淡入加一点上浮，不用左右横推：底栏的三个分区是平级的，横推会暗示
+                // 「进入了更深一层」，与真实层级不符。抬起幅度只有屏高的二十分之一，
+                // 足以表达「新内容落位」，又不会让整屏文字在切换时大幅位移。
+                enterTransition = {
+                    fadeIn(SCREEN_FADE_IN) +
+                        slideInVertically(
+                            initialOffsetY = { height -> height / SCREEN_LIFT_DIVISOR },
+                            animationSpec = SCREEN_SETTLE,
+                        )
+                },
+                exitTransition = { fadeOut(SCREEN_FADE_OUT) },
+                popEnterTransition = { fadeIn(SCREEN_FADE_IN) },
+                popExitTransition = {
+                    fadeOut(SCREEN_FADE_OUT) +
+                        slideOutVertically(
+                            targetOffsetY = { height -> height / SCREEN_LIFT_DIVISOR },
+                            animationSpec = SCREEN_SETTLE,
+                        )
+                },
             ) {
                 composable(BurpRemoteRoute.DASHBOARD) {
                     DashboardRoute(
@@ -357,6 +384,7 @@ fun BurpsuiteRemoteNavigationHost(
                 }
                 composable(BurpRemoteRoute.SETTINGS_SECURITY) { SecurityScreen() }
                 composable(BurpRemoteRoute.SETTINGS_STORAGE) { StorageScreen() }
+                composable(BurpRemoteRoute.SETTINGS_ABOUT) { AboutScreen() }
             }
         }
 
@@ -430,6 +458,7 @@ private fun titleResourceOf(route: String?): Int =
         BurpRemoteRoute.SETTINGS_LANGUAGE -> UserInterfaceResources.string.navigation_entry_settings_language
         BurpRemoteRoute.SETTINGS_SECURITY -> UserInterfaceResources.string.navigation_entry_settings_security
         BurpRemoteRoute.SETTINGS_STORAGE -> UserInterfaceResources.string.navigation_entry_settings_storage
+        BurpRemoteRoute.SETTINGS_ABOUT -> UserInterfaceResources.string.navigation_entry_settings_about
         else -> UserInterfaceResources.string.navigation_section_dashboard
     }
 
@@ -448,6 +477,7 @@ private val SUPPORTED_START_ROUTES: Set<String> =
         BurpRemoteRoute.SETTINGS_LANGUAGE,
         BurpRemoteRoute.SETTINGS_SECURITY,
         BurpRemoteRoute.SETTINGS_STORAGE,
+        BurpRemoteRoute.SETTINGS_ABOUT,
     )
 
 // 调试注入的票据不再改落地屏：配对入口与扫码相同，落地屏照旧由 startRoute 决定。
@@ -463,3 +493,24 @@ private fun NavController.openRoute(route: String) {
     if (currentDestination?.route == route) return
     navigate(route) { launchSingleTop = true }
 }
+
+// 进入比退出慢一档：新内容淡入得从容一点，旧内容越早退场越好，两者不会在屏幕中间对峙。
+private val SCREEN_SETTLE =
+    tween<IntOffset>(
+        durationMillis = BurpRemoteMotion.DURATION_REGULAR,
+        easing = BurpRemoteMotion.EasingStandard,
+    )
+
+private val SCREEN_FADE_IN =
+    tween<Float>(
+        durationMillis = BurpRemoteMotion.DURATION_REGULAR,
+        easing = BurpRemoteMotion.EasingStandard,
+    )
+
+private val SCREEN_FADE_OUT =
+    tween<Float>(
+        durationMillis = BurpRemoteMotion.DURATION_FAST,
+        easing = BurpRemoteMotion.EasingStandard,
+    )
+
+private const val SCREEN_LIFT_DIVISOR = 20

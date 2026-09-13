@@ -58,6 +58,9 @@ object BurpRemoteRoute {
     /** 存储。 */
     const val SETTINGS_STORAGE: String = "settings/storage"
 
+    /** 关于与开发者信息。 */
+    const val SETTINGS_ABOUT: String = "settings/about"
+
     /** 某条历史记录的详情路由。 */
     fun liveHistoryDetail(historyIdentifier: String): String = "live/history/detail/${Uri.encode(historyIdentifier)}"
 

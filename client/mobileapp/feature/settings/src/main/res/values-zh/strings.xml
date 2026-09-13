@@ -55,4 +55,15 @@
     <string name="settings_storage_maintenance_heading">维护</string>
     <string name="settings_storage_reason_heading">暂时还做不了的项</string>
     <string name="settings_storage_reason">清空与迁移本地数据需要目前还不存在的存储端口</string>
+
+    <!-- 关于与开发者信息。名字、邮箱与仓库地址是事实，交给翻译既没意义还会被拼错，因此不进翻译条目。 -->
+    <string name="about_tagline">Burp Remote 插件的移动客户端</string>
+    <string name="about_developer_heading">开发者</string>
+    <string name="about_author_label">作者</string>
+    <string name="about_email_label">邮箱</string>
+    <string name="about_source_heading">源码</string>
+    <string name="about_source_label">仓库地址</string>
+    <string name="about_open_source_heading">开源</string>
+    <string name="about_open_source_headline">这个应用做的事，都能回到代码里核对</string>
+    <string name="about_open_source_body">源码是公开的，界面上每一句描述背后都有一行代码。技术日志只写在本机，不会上传到任何地方。</string>
 </resources>

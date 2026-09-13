@@ -19,6 +19,7 @@
     <string name="navigation_group_connection">Connection</string>
     <string name="navigation_group_interface">Interface</string>
     <string name="navigation_group_data">Data and security</string>
+    <string name="navigation_group_about">About</string>
 
     <string name="navigation_entry_live_history">History</string>
     <string name="navigation_entry_live_intercept">Intercept</string>
@@ -28,6 +29,7 @@
     <string name="navigation_entry_settings_language">Language</string>
     <string name="navigation_entry_settings_security">Security</string>
     <string name="navigation_entry_settings_storage">Storage</string>
+    <string name="navigation_entry_settings_about">About</string>
 
     <!-- 每一行补一句它通向什么：索引页的价值在于点之前就知道会去哪，而不是点进去再退回来。 -->
     <string name="navigation_entry_live_history_detail">Every request the plug-in has forwarded, newest first.</string>
@@ -38,6 +40,7 @@
     <string name="navigation_entry_settings_language_detail">Rebuilds the interface once so every string matches.</string>
     <string name="navigation_entry_settings_security_detail">What is stored on this device and how it is protected.</string>
     <string name="navigation_entry_settings_storage_detail">Local database size and how to clear captured data.</string>
+    <string name="navigation_entry_settings_about_detail">Author, contact address and where the source lives.</string>
 
     <string name="connection_state_disconnected">Disconnected</string>
     <string name="connection_state_discovering">Discovering</string>

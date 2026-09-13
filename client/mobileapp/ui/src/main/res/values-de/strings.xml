@@ -19,6 +19,7 @@
     <string name="navigation_group_connection">Verbindung</string>
     <string name="navigation_group_interface">Oberfläche</string>
     <string name="navigation_group_data">Daten und Sicherheit</string>
+    <string name="navigation_group_about">Über</string>
 
     <string name="navigation_entry_live_history">Verlauf</string>
     <string name="navigation_entry_live_intercept">Intercept</string>
@@ -28,6 +29,7 @@
     <string name="navigation_entry_settings_language">Sprache</string>
     <string name="navigation_entry_settings_security">Sicherheit</string>
     <string name="navigation_entry_settings_storage">Speicher</string>
+    <string name="navigation_entry_settings_about">Über</string>
 
     <!-- 每一行补一句它通向什么：索引页的价值在于点之前就知道会去哪，而不是点进去再退回来。 -->
     <string name="navigation_entry_live_history_detail">Jede vom Plug-in weitergeleitete Anfrage, neueste zuerst.</string>
@@ -38,6 +40,7 @@
     <string name="navigation_entry_settings_language_detail">Baut die Oberfläche einmal neu auf, damit jeder Text passt.</string>
     <string name="navigation_entry_settings_security_detail">Was auf diesem Gerät liegt und wie es geschützt wird.</string>
     <string name="navigation_entry_settings_storage_detail">Größe der lokalen Datenbank und Löschen erfasster Daten.</string>
+    <string name="navigation_entry_settings_about_detail">Autor, Kontaktadresse und wo der Quellcode liegt.</string>
 
     <string name="connection_state_disconnected">Nicht verbunden</string>
     <string name="connection_state_discovering">Wird gesucht</string>

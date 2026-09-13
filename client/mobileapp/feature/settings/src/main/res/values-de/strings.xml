@@ -55,4 +55,15 @@
     <string name="settings_storage_maintenance_heading">Wartung</string>
     <string name="settings_storage_reason_heading">Was noch nicht möglich ist</string>
     <string name="settings_storage_reason">Löschen und Migrieren lokaler Daten brauchen Speicher-Ports, die es noch nicht gibt</string>
+
+    <!-- 关于与开发者信息。名字、邮箱与仓库地址是事实，交给翻译既没意义还会被拼错，因此不进翻译条目。 -->
+    <string name="about_tagline">Ein mobiler Client für die Burp-Remote-Erweiterung</string>
+    <string name="about_developer_heading">Entwickler</string>
+    <string name="about_author_label">Autor</string>
+    <string name="about_email_label">E-Mail</string>
+    <string name="about_source_heading">Quellcode</string>
+    <string name="about_source_label">Repository</string>
+    <string name="about_open_source_heading">Open Source</string>
+    <string name="about_open_source_headline">Jede Aussage dieser App lässt sich im Code nachprüfen</string>
+    <string name="about_open_source_body">Der Quellcode ist öffentlich; hinter jeder Beschreibung in dieser Oberfläche steht eine Zeile Code. Technische Protokolle werden nur auf diesem Gerät geschrieben und nirgendwohin hochgeladen.</string>
 </resources>
