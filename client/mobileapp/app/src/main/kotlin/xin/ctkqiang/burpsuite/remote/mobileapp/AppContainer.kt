@@ -3,6 +3,8 @@ package xin.ctkqiang.burpsuite.remote.mobileapp
 import android.content.Context
 import androidx.room.Room
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -13,6 +15,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.AndroidTechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogSeverity
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.database.BurpRemoteDatabase
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.eventstore.JournalEventIngestor
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.eventstore.JournalEventRecordedEventMapper
@@ -48,6 +51,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.SettingsRepositor
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.sync.EventSynchronisationCoordinator
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.time.TimeProvider
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.NavigationDependencies
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryMessageReader
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemotePairingCoordinator
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
@@ -63,7 +67,20 @@ class AppContainer(context: Context) {
     /** 技术日志；装配层与导航壳都往这里写，界面自身不碰它。 */
     val technicalLog: TechnicalLog = AndroidTechnicalLog()
 
-    private val processScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    /**
+     * 后台链路所在的作用域。
+     *
+     * 除监督作用域之外还挂了一个异常处理器：这上面的子任务都不是从界面发起的，没人会在调用处接住异常。
+     * 缺了它，一次读盘失败或密钥库拒绝建钥就会沿着协程的默认路径冒到线程上，整个进程被系统收掉——
+     * 表现成「每次启动都崩」，而且用户看不到任何可排查的线索。有了它，出错只留下一条错误日志，
+     * 应用继续停在离线态，用户还能自己进设置去看发生了什么。
+     */
+    private val processScope =
+        CoroutineScope(
+            SupervisorJob() +
+                Dispatchers.Default +
+                processExceptionHandler(technicalLog),
+        )
 
     private val timeProvider = TimeProvider { Instant.now() }
 
@@ -190,6 +207,19 @@ class AppContainer(context: Context) {
             technicalLog = technicalLog,
         )
 
+    /**
+     * 报文本体读取端口。
+     *
+     * 地址端口就在 [connectionSettingsStore] 里，而它对本模块之外不可见，因此「取哪台机器的本体」
+     * 这件事只能在这里定。
+     */
+    val remoteHistoryMessageReader: RemoteHistoryMessageReader =
+        RestRemoteHistoryMessageReader(
+            remoteControlClient = remoteControlClient,
+            connectionSettingsStore = connectionSettingsStore,
+            technicalLog = technicalLog,
+        )
+
     private val hasStarted = AtomicBoolean(false)
 
     /** 启动后台链路：按本地日志校准续传基准，若已配对则直接建连。进程启动时调用一次。 */
@@ -214,13 +244,37 @@ class AppContainer(context: Context) {
             settingsRepository = settingsRepository,
             remoteControlClient = remoteControlClient,
             remotePairingCoordinator = remotePairingCoordinator,
+            remoteHistoryMessageReader = remoteHistoryMessageReader,
             // 日志端口由壳分给各屏，各屏不再各自去拿全局日志。
             technicalLog = technicalLog,
         )
 
+    /**
+     * 启动链路：读本机状态、建连。任何读不出来都只留下一条错误日志，应用照常起来并停在离线态。
+     *
+     * 读盘失败、库文件损坏、偏好文件读不出来都属于「重启也不一定好」的错误，但它们没有一个该让进程起不来：
+     * 用户至少还应该进得来，能看到 OFFLINE 与那条日志。
+     */
+    private suspend fun restoreSynchronisationBaselineAndConnect() {
+        try {
+            restoreSynchronisationBaselineAndConnectOrThrow()
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (unreadableLocalState: Exception) {
+            technicalLog.record(
+                TechnicalLogEvent(
+                    category = TechnicalLogCategory.Failure,
+                    message = "启动链路读不到本机状态，跳过自动连接并停在离线态",
+                    severity = TechnicalLogSeverity.Error,
+                    failure = unreadableLocalState,
+                ),
+            )
+        }
+    }
+
     // 续传基准必须以本地日志的最新序号为初值：用 0 起步会把「已经收到过」判成断洞，
     // 于是每次重启都会先卡在补齐状态（plan §9）。
-    private suspend fun restoreSynchronisationBaselineAndConnect() {
+    private suspend fun restoreSynchronisationBaselineAndConnectOrThrow() {
         val latestSequenceNumber = eventJournal.latestSequenceNumber()
         synchronisationCoordinator.markResynchronised(latestSequenceNumber)
         technicalLog.record(
@@ -231,6 +285,7 @@ class AppContainer(context: Context) {
             ),
         )
 
+        // 密文解不开时端口本身回 null（密钥被系统作废属于预期结局），与「读不出来」是两件事。
         if (connectionSettingsStore.readDeviceIdentifier() == null) {
             technicalLog.record(
                 TechnicalLogEvent(
@@ -260,3 +315,20 @@ class AppContainer(context: Context) {
         val REMOTE_TIMEOUTS = RemoteTimeouts()
     }
 }
+
+/**
+ * 进程级作用域的异常处理器。
+ *
+ * 抽成顶层函数而不是写进类里，是因为作用域在类属性初始化时就建出来了，那时还拿不到别的成员。
+ */
+private fun processExceptionHandler(technicalLog: TechnicalLog): CoroutineExceptionHandler =
+    CoroutineExceptionHandler { _, failure ->
+        technicalLog.record(
+            TechnicalLogEvent(
+                category = TechnicalLogCategory.Failure,
+                message = "后台链路出现未捕获异常，进程保持存活并停在离线态",
+                severity = TechnicalLogSeverity.Error,
+                failure = failure,
+            ),
+        )
+    }

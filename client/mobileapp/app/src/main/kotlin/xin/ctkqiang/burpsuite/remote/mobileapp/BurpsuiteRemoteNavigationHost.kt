@@ -30,7 +30,6 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ConnectionState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.RemoteServerEndpoint
-import xin.ctkqiang.burpsuite.remote.mobileapp.feature.archive.ArchiveRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.connection.BurpConnectionRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.dashboard.DashboardRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.history.HistoryDetailRoute
@@ -38,7 +37,6 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.feature.history.HistoryRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.intercept.InterceptDetailRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.intercept.InterceptRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.repeater.RepeaterRoute
-import xin.ctkqiang.burpsuite.remote.mobileapp.feature.screenshot.ScreenshotScreen
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguageRoute
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.SecurityScreen
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.SettingsRoute
@@ -182,11 +180,13 @@ fun BurpsuiteRemoteNavigationHost(
                         } else {
                             { navController.navigateUp() }
                         },
+                    showsBrandMark = isPrimaryDestination,
                     actions = {
                         // 连接状态是常驻事实，任何页面都在同一位置说同一件事；扫码只在主面板是动作。
                         LiveOfflineBadge(connectionState = currentConnectionState)
                         if (currentRoute == BurpRemoteRoute.DASHBOARD) {
-                            Spacer(modifier = Modifier.width(BurpRemoteSpacing.Medium))
+                            // 动作图标自带 48dp 触控区，这里只留最小的视觉间隔，否则图标看起来离状态胶囊很远。
+                            Spacer(modifier = Modifier.width(BurpRemoteSpacing.ExtraSmall))
                             BurpRemoteTopBarActionButton(
                                 icon = BurpRemoteScanIcon,
                                 contentDescription = stringResource(R.string.navigation_action_scan_pairing),
@@ -235,17 +235,8 @@ fun BurpsuiteRemoteNavigationHost(
                     DashboardRoute(
                         dashboardRepository = navigationDependencies.dashboardRepository,
                         historyRepository = navigationDependencies.historyRepository,
-                        onOpenLiveHistory = { navController.openRoute(BurpRemoteRoute.LIVE_HISTORY) },
-                        onOpenLiveIntercept = { navController.openRoute(BurpRemoteRoute.LIVE_INTERCEPT) },
-                        onOpenLiveRepeater = { navController.openRoute(BurpRemoteRoute.LIVE_REPEATER) },
                         onOpenHistoryRecord = { historyIdentifier ->
                             navController.openRoute(BurpRemoteRoute.liveHistoryDetail(historyIdentifier))
-                        },
-                        // 内容区入口与顶栏动作打开的是同一个弹窗：两条路只该有一个行为。
-                        onOpenPairingScanner = {
-                            submittedTicketText = null
-                            pairingConclusion = null
-                            isScannerOpen = true
                         },
                         technicalLog = technicalLog,
                     )
@@ -282,6 +273,7 @@ fun BurpsuiteRemoteNavigationHost(
                             onOpenSharing = { identifier ->
                                 navController.openRoute(BurpRemoteRoute.sharing(identifier))
                             },
+                            remoteHistoryMessageReader = navigationDependencies.remoteHistoryMessageReader,
                             technicalLog = technicalLog,
                         )
                     }
@@ -318,19 +310,6 @@ fun BurpsuiteRemoteNavigationHost(
                         technicalLog = technicalLog,
                     )
                 }
-
-                composable(BurpRemoteRoute.ARCHIVE_SECTION) {
-                    ArchiveRoute(
-                        historyRepository = navigationDependencies.historyRepository,
-                        onOpenHistoryRecord = { historyIdentifier ->
-                            navController.openRoute(BurpRemoteRoute.liveHistoryDetail(historyIdentifier))
-                        },
-                        onOpenSharing = { identifier -> navController.openRoute(BurpRemoteRoute.sharing(identifier)) },
-                        onOpenScreenshots = { navController.openRoute(BurpRemoteRoute.ARCHIVE_SCREENSHOTS) },
-                        technicalLog = technicalLog,
-                    )
-                }
-                composable(BurpRemoteRoute.ARCHIVE_SCREENSHOTS) { ScreenshotScreen() }
 
                 composable(
                     route = BurpRemoteRoute.SHARING,
@@ -415,12 +394,11 @@ private val CONNECTION_ROUTES: Set<String> =
         BurpRemoteRoute.SETTINGS_BURP_CONNECTION,
     )
 
-/** 四个一级目的地：只有它们配底栏，也只有它们不显示返回箭头。 */
+/** 三个一级目的地：只有它们配底栏，也只有它们不显示返回箭头。 */
 private val PRIMARY_DESTINATIONS: Set<String> =
     setOf(
         BurpRemoteRoute.DASHBOARD,
         BurpRemoteRoute.LIVE_SECTION,
-        BurpRemoteRoute.ARCHIVE_SECTION,
         BurpRemoteRoute.SETTINGS_SECTION,
     )
 
@@ -443,8 +421,6 @@ private fun titleResourceOf(route: String?): Int =
         -> UserInterfaceResources.string.navigation_entry_live_intercept
 
         BurpRemoteRoute.LIVE_REPEATER -> UserInterfaceResources.string.navigation_entry_live_repeater
-        BurpRemoteRoute.ARCHIVE_SECTION -> UserInterfaceResources.string.navigation_section_archive
-        BurpRemoteRoute.ARCHIVE_SCREENSHOTS -> R.string.navigation_title_screenshots
         BurpRemoteRoute.SHARING -> R.string.navigation_title_sharing
         BurpRemoteRoute.SETTINGS_SECTION -> UserInterfaceResources.string.navigation_section_settings
         BurpRemoteRoute.SETTINGS_BURP_CONNECTION ->
@@ -466,8 +442,6 @@ private val SUPPORTED_START_ROUTES: Set<String> =
         BurpRemoteRoute.LIVE_HISTORY,
         BurpRemoteRoute.LIVE_INTERCEPT,
         BurpRemoteRoute.LIVE_REPEATER,
-        BurpRemoteRoute.ARCHIVE_SECTION,
-        BurpRemoteRoute.ARCHIVE_SCREENSHOTS,
         BurpRemoteRoute.SETTINGS_SECTION,
         BurpRemoteRoute.SETTINGS_BURP_CONNECTION,
         BurpRemoteRoute.SETTINGS_APPEARANCE,

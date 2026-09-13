@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  启动图标的前景层：白描边的「中继」标记。
+
+  形状是自画的：一个右侧留缺口的方框（代表代理），加一支从框内穿出缺口的箭头（代表流量被转送到本机）。
+  刻意不用任何第三方产品的徽标——把别人的商标装成自家应用的启动图标，等于让用户以为这是官方出品，
+  那既不是这套代码该承担的风险，也不是这个应用真实的关系。
+
+  画布是自适应图标规定的 108dp，可见区只有中间 72dp，安全区是直径 66dp 的圆，因此所有图形都画在
+  距中心 33dp 以内。几何与 :ui 里的 BurpRemoteBrandMark 是同一套，放在两处是因为一处要 XML、
+  一处要 Compose 画布，跨模块的 R 类不互通。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 方框：从右边缘缺口的上沿起笔，逆时针绕一圈回到缺口下沿。 -->
+    <path
+        android:pathData="M76,47 L76,40 L68,32 L40,32 L32,40 L32,68 L40,76 L68,76 L76,68 L76,61"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- 箭头：杆从框内起笔，穿过缺口伸出框外。 -->
+    <path
+        android:pathData="M43,54 L78,54"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- 箭头：头部两笔，长度与杆同宽一档，小尺寸下仍读得出来。 -->
+    <path
+        android:pathData="M68,44 L78,54 L68,64"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

@@ -2,7 +2,11 @@
 <!--
   窗口底色：界面画出来之前只有它可见，因此它必须与主题的 background 是同一个值——两处不一致时，
   冷启动会先闪一下另一种底色。设计令牌在 ui/theme 里，这两份资源是平台层的对应物。
+
+  启动图标的底色同理：平台层要的不是 Compose 的 Color，而是一个资源色值，
+  因此品牌橙在这里有第二份字面量，取值必须与 ui/theme 里的 BurpRemoteColour 一致（#FF6633）。
 -->
 <resources>
     <color name="window_background">#FFFFFFFF</color>
+    <color name="ic_launcher_background">#FFFF6633</color>
 </resources>

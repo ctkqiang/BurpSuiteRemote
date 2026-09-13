@@ -3,6 +3,7 @@ package xin.ctkqiang.burpsuite.remote.mobileapp
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogSeverity
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.PairingTicket
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.PairingTicketDecoder
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.RemoteProtocolVersion
@@ -78,6 +79,8 @@ class EncodedTicketPairingCoordinator(
                 TechnicalLogEvent(
                     category = TechnicalLogCategory.Pairing,
                     message = "文本不是配对票据；不记原文，二维码内容属于用户数据",
+                    // 扫到一张不是配对票据的二维码：预期之内的一次拒绝，不是故障。
+                    severity = TechnicalLogSeverity.Warning,
                     failure = malformedTicket,
                 ),
             )

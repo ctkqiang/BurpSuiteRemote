@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  自适应启动图标。
+
+  只有 anydpi-v26 一份：本项目 minSdk 是 26，而自适应图标正是从 26 起才有的，
+  因此不需要任何位图回退档，也就不存在「几套不同分辨率要各自对一遍」的维护面。
+
+  monochrome 复用前景层：主题化图标是系统自己给它上色，图里那个白色不会被用上。
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>
