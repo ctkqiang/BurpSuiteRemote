@@ -4,6 +4,23 @@
     <!-- 远程控制走局域网上的 REST 与 WebSocket，没有这个权限连不上插件。 -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- 会话可用期间要挂一条常驻通知，因此需要一个前台服务。 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!--
+      connectedDevice 类型在 Android 14 起要求声明对应的类型权限；两者都是普通权限，安装即授予。
+      选这个类型而不是 dataSync：它描述的就是「通过网络连接与外部设备交互」，而且没有 dataSync
+      那样的每日累计时长上限，会话该持续多久就持续多久。
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <!--
+      connectedDevice 类型的运行时前提：下面这一组里的任意一个普通权限即可满足，安装时自动授予。
+      缺了它 startForeground 会抛 SecurityException，而且是在会话刚建立那一刻才炸。
+    -->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+    <!-- Android 13 起通知要用户授权；拒绝时服务照常运行，只是那条通知不会显示。 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".RemoteControlApplication"
         android:icon="@mipmap/ic_launcher"
@@ -21,6 +38,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+          会话可用期间的前台服务。不声明 stopWithTask：默认行为才会回调 onTaskRemoved，
+          而「用户把应用划掉」这件事的收尾（断开会话）正需要那个回调。
+        -->
+        <service
+            android:name=".ConnectionSessionService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
     </application>
 
 </manifest>

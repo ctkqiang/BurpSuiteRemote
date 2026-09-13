@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  通知栏里的小图标。
+
+  通知小图标必须是「白色剪影 + 透明底」，由系统统一上色，因此这里只画白色描边、不填任何底色。
+  几何与 ic_launcher_foreground 是同一套（108 见方画布），差别只在外面包了一层 group 放大：
+  启动图标那份必须把图形压在自适应图标的安全区里（只占画布的 47%），而通知栏只给 24dp，
+  照搬过来会小得几乎看不见，所以按中心放大 1.75 倍让它填满画布。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="1.75"
+        android:scaleY="1.75">
+
+        <path
+            android:pathData="M76,47 L76,40 L68,32 L40,32 L32,40 L32,68 L40,76 L68,76 L76,68 L76,61"
+            android:fillColor="#00000000"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="7"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+
+        <path
+            android:pathData="M43,54 L78,54"
+            android:fillColor="#00000000"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="7"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+
+        <path
+            android:pathData="M68,44 L78,54 L68,64"
+            android:fillColor="#00000000"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="7"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+</vector>

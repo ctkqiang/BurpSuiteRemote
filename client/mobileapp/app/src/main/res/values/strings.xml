@@ -10,4 +10,10 @@
 
     <!-- 弹窗容器在配对请求飞行期间说的话：那一段时间里界面必须有东西动，否则用户以为卡住了。 -->
     <string name="pairing_scanner_status_in_flight">Pairing…</string>
+
+    <!-- 会话前台服务的常驻通知；文案要能解释「为什么这里一直挂着一条通知」。 -->
+    <string name="connection_session_channel_name">Connection session</string>
+    <string name="connection_session_channel_description">Shown while a session with Burp is being kept alive.</string>
+    <string name="connection_session_title">Keeping the session with Burp</string>
+    <string name="connection_session_disconnect_action">Disconnect</string>
 </resources>

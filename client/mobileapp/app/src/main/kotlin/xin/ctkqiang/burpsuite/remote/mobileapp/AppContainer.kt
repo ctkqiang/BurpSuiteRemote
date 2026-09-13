@@ -228,6 +228,17 @@ class AppContainer(context: Context) {
         processScope.launch { restoreSynchronisationBaselineAndConnect() }
     }
 
+    /**
+     * 结束当前会话。
+     *
+     * 由会话前台服务在「用户把应用从最近任务里划掉」时调用：连接挂在进程级作用域上，任务被划掉
+     * 并不会让进程立刻消失，因此必须显式断开，否则事件流与重连退避会留在后台，而界面上已经
+     * 什么都看不到了。
+     */
+    fun endSession() {
+        processScope.launch { remoteControlClient.disconnect() }
+    }
+
     /** 干净停止：先收掉连接与事件摄入所在的作用域，再放掉传输栈与库。 */
     fun stop() {
         processScope.cancel()

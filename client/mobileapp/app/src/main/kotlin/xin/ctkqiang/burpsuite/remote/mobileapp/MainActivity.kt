@@ -1,9 +1,11 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
@@ -11,16 +13,23 @@ import android.os.Bundle
 import android.os.LocaleList
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import kotlinx.coroutines.flow.emptyFlow
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ConnectionState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguagePreference
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguagePreferenceRepository
@@ -125,6 +134,7 @@ private fun RemoteControlRoot(
 
     BurpsuiteRemoteTheme(themeMode = resolvedThemeMode) {
         ApplySystemBarIconAppearance()
+        ConnectionSessionEffect(navigationDependencies = navigationDependencies)
         CompositionLocalProvider(
             LocalLanguagePreferenceRepository provides languagePreferenceRepository,
         ) {
@@ -159,3 +169,48 @@ private fun ApplySystemBarIconAppearance() {
         }
     }
 }
+
+/**
+ * 让会话前台服务跟着会话走：会话离开「未连接」就把它拉起来，回到「未连接」就把它停掉。
+ *
+ * 启停都放在这里而不是装配容器里，原因是 Android 12 起禁止从后台启动前台服务。这个组合函数
+ * 只有在 Activity 已经进入前台、并且主题偏好读出来之后才会被组合，因此它是唯一安全的启动点；
+ * 放进容器的话，进程被广播之类的路径拉起来时会直接抛 ForegroundServiceStartNotAllowedException。
+ *
+ * 通知权限只在这里问、而且只在会话真的建立起来时问：冷启动就问「要不要发通知」，用户还没有
+ * 任何上下文去判断该不该给。
+ */
+@Composable
+private fun ConnectionSessionEffect(navigationDependencies: NavigationDependencies) {
+    val context = LocalContext.current
+    val notificationPermissionLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) { }
+
+    // 没有远程控制端口时拿一条空流顶上，这样下面几个可组合调用在任何一次组合里的位置都固定，
+    // 不会因为端口有无而改变槽位结构。
+    val connectionStateFlow = navigationDependencies.remoteControlClient?.connectionState ?: emptyFlow()
+    val connectionState by connectionStateFlow.collectAsState(initial = ConnectionState.Disconnected)
+
+    LaunchedEffect(connectionState) {
+        if (connectionState == ConnectionState.Disconnected) {
+            context.stopService(ConnectionSessionService.stopIntent(context))
+            return@LaunchedEffect
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !context.canPostNotifications()) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        ConnectionSessionNotification.ensureChannel(context)
+        ContextCompat.startForegroundService(
+            context,
+            ConnectionSessionService.startIntent(context = context, state = connectionState),
+        )
+    }
+}
+
+// 33 之前通知不需要授权；33 起要显式检查，否则那条常驻通知会被系统静默丢掉。
+private fun Context.canPostNotifications(): Boolean =
+    Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+        PackageManager.PERMISSION_GRANTED
