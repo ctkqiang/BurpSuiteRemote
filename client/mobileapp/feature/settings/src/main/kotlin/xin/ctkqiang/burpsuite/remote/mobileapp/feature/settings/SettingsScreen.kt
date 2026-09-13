@@ -3,14 +3,16 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,13 +25,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteListItem
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteListItemGroup
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSectionHeading
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteDarkColourScheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteLightColourScheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
@@ -39,10 +40,11 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 /**
  * 外观与主题（plan §45、plan §47 的 theme 一项）。
  *
- * 无状态：状态由外面传进来，用户意图往外抛。三种主题各自配一块真实预览块——预览用的是该主题
- * 真正的那套配色，而不是三张画出来的示意图，因此选之前看到什么，选之后就得到什么。
+ * 无状态：状态由外面传进来，用户意图往外抛。
  *
- * 每一档都写明它影响什么：主题、语言这类偏好一旦选了，界面立刻按新值重绘，用户得先知道这一点。
+ * 每个主题是一行列表项，右侧挂一小块**该主题真实的那套配色**：选之前看到什么，选之后就得到什么。
+ * 原先一个主题一张卡、卡里再摆一块大预览加一段居中空状态，一屏读下来是三张厚卡与三堵居中的字；
+ * 现在三种主题在同一张卡的三行里并排可比，色块放在行尾，眼睛一次就能扫完。
  */
 @Composable
 fun SettingsScreen(
@@ -52,133 +54,105 @@ fun SettingsScreen(
 ) {
     val haptics = rememberBurpRemoteHaptics()
 
-    Box(modifier = modifier.fillMaxSize()) {
-        // 顶栏与底栏由装配层的壳统一提供，各屏不再画第二层标题。
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(
-                        horizontal = BurpRemoteSpacing.ScreenEdge,
-                        vertical = BurpRemoteSpacing.ScreenEdge,
-                    ),
-            verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium),
-        ) {
-            BurpRemoteSectionHeading(text = stringResource(R.string.settings_theme_heading))
-            BurpRemoteEmptyState(
-                headline = stringResource(R.string.settings_theme_headline),
-                detail = stringResource(R.string.settings_theme_detail),
-            )
-            ThemeMode.entries.forEach { themeMode ->
-                ThemeModeOption(
-                    themeMode = themeMode,
-                    isSelected = themeMode == uiState.themeMode,
-                    onSelect = {
-                        haptics.select()
-                        onIntent(SettingsUserInterfaceIntent.SelectThemeMode(themeMode))
-                    },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ThemeModeOption(
-    themeMode: ThemeMode,
-    isSelected: Boolean,
-    onSelect: () -> Unit,
-) {
-    BurpRemoteCard(isInteractive = true, onClick = onSelect) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            BurpRemoteStatusPill(
-                text = stringResource(themeMode.labelResource),
-                tone = if (isSelected) BurpRemoteStatusTone.Live else BurpRemoteStatusTone.Neutral,
-            )
-            if (isSelected) {
-                BurpRemoteStatusPill(
-                    text = stringResource(R.string.settings_theme_selected),
-                    tone = BurpRemoteStatusTone.Live,
-                )
-            }
-        }
-        ThemeModePreview(themeMode = themeMode)
-        BurpRemoteEmptyState(
-            headline = stringResource(themeMode.headlineResource),
-            detail = stringResource(themeMode.detailResource),
-        )
-    }
-}
-
-/** 真实预览：取该主题真正的那套配色画一块缩小的界面，深色档不会拿浅色示意。 */
-@Composable
-private fun ThemeModePreview(themeMode: ThemeMode) {
-    when (themeMode) {
-        ThemeMode.Light -> ColourSchemePreview(colourScheme = BurpRemoteLightColourScheme)
-        ThemeMode.Dark -> ColourSchemePreview(colourScheme = BurpRemoteDarkColourScheme)
-        ThemeMode.Automatic ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
-            ) {
-                Box(modifier = Modifier.weight(weight = 1f, fill = true)) {
-                    ColourSchemePreview(colourScheme = BurpRemoteLightColourScheme)
-                }
-                Box(modifier = Modifier.weight(weight = 1f, fill = true)) {
-                    ColourSchemePreview(colourScheme = BurpRemoteDarkColourScheme)
-                }
-            }
-    }
-}
-
-// 预览块只画三样：底色、一块表面、一个强调色圆点——配色方案的三个关键档位都在这里，多画就是装饰。
-@Composable
-private fun ColourSchemePreview(colourScheme: BurpRemoteColourScheme) {
-    val shape = RoundedCornerShape(BurpRemoteRadius.Control)
-
     Column(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .clip(shape)
-                .background(colourScheme.background)
-                .border(width = 1.dp, color = colourScheme.outline, shape = shape)
-                .padding(BurpRemoteSpacing.Medium),
-        verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    horizontal = BurpRemoteSpacing.ScreenEdge,
+                    vertical = BurpRemoteSpacing.ExtraLarge,
+                ),
+        verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ExtraLarge),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
-        ) {
-            Box(
-                modifier =
-                    Modifier
-                        .width(PREVIEW_ACCENT_WIDTH)
-                        .height(PREVIEW_ACCENT_HEIGHT)
-                        .clip(RoundedCornerShape(BurpRemoteRadius.Capsule))
-                        .background(colourScheme.accent),
-            )
-            Box(
-                modifier =
-                    Modifier
-                        .width(PREVIEW_TEXT_WIDTH)
-                        .height(PREVIEW_TEXT_HEIGHT)
-                        .clip(RoundedCornerShape(BurpRemoteRadius.Capsule))
-                        .background(colourScheme.contentSecondary),
+        // 说明也走列表行：居中摆一大段话会让人找不到对齐线，而且它和下面的选项不是同一层级。
+        BurpRemoteListItemGroup {
+            BurpRemoteListItem(
+                title = stringResource(R.string.settings_theme_headline),
+                subtitle = stringResource(R.string.settings_theme_detail),
             )
         }
+
+        Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+            BurpRemoteSectionHeading(text = stringResource(R.string.settings_theme_heading))
+            BurpRemoteListItemGroup {
+                ThemeMode.entries.forEachIndexed { index, themeMode ->
+                    BurpRemoteListItem(
+                        title = stringResource(themeMode.labelResource),
+                        subtitle = stringResource(themeMode.detailResource),
+                        trailing = {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                ThemeSwatch(themeMode = themeMode)
+                                if (themeMode == uiState.themeMode) {
+                                    BurpRemoteStatusPill(
+                                        text = stringResource(R.string.settings_theme_selected),
+                                        tone = BurpRemoteStatusTone.Live,
+                                    )
+                                }
+                            }
+                        },
+                        showsDivider = index != ThemeMode.entries.lastIndex,
+                        onClick = {
+                            haptics.select()
+                            onIntent(SettingsUserInterfaceIntent.SelectThemeMode(themeMode))
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 主题色块：把一套配色缩成一小块。
+ *
+ * 只画三样——底色、强调色、次要字色。这三样正好是「这套主题长什么样」的全部结论，
+ * 多画一项就变成装饰，而装饰在小尺寸上只会糊成一团。
+ *
+ * 「跟随系统」没法用一块色块表示两种可能，因此画的是**此刻实际会生效**的那一套：
+ * 系统现在是深色就画深色。看到的仍然是真实结果，而不是两个半块的折中。
+ */
+@Composable
+private fun ThemeSwatch(themeMode: ThemeMode) {
+    val colourScheme =
+        when (themeMode) {
+            ThemeMode.Automatic ->
+                if (isSystemInDarkTheme()) BurpRemoteDarkColourScheme else BurpRemoteLightColourScheme
+
+            ThemeMode.Light -> BurpRemoteLightColourScheme
+            ThemeMode.Dark -> BurpRemoteDarkColourScheme
+        }
+    val shape = RoundedCornerShape(BurpRemoteRadius.Control)
+
+    Row(
+        modifier =
+            Modifier
+                .size(width = SWATCH_WIDTH, height = SWATCH_HEIGHT)
+                .clip(shape)
+                .background(color = colourScheme.background, shape = shape)
+                .border(width = 1.dp, color = colourScheme.outline, shape = shape)
+                .padding(BurpRemoteSpacing.ExtraSmall),
+        horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ExtraSmall),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Box(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .height(PREVIEW_SURFACE_HEIGHT)
-                    .clip(RoundedCornerShape(BurpRemoteRadius.Control))
-                    .background(colourScheme.surface),
+                    .width(SWATCH_ACCENT_WIDTH)
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(BurpRemoteRadius.Capsule))
+                    .background(colourScheme.accent),
+        )
+        Box(
+            modifier =
+                Modifier
+                    .width(SWATCH_TEXT_WIDTH)
+                    .height(SWATCH_TEXT_HEIGHT)
+                    .clip(RoundedCornerShape(BurpRemoteRadius.Capsule))
+                    .background(colourScheme.contentSecondary),
         )
     }
 }
@@ -193,15 +167,6 @@ private val ThemeMode.labelResource: Int
         }
 
 @get:StringRes
-private val ThemeMode.headlineResource: Int
-    get() =
-        when (this) {
-            ThemeMode.Automatic -> R.string.settings_theme_automatic_headline
-            ThemeMode.Light -> R.string.settings_theme_light_headline
-            ThemeMode.Dark -> R.string.settings_theme_dark_headline
-        }
-
-@get:StringRes
 private val ThemeMode.detailResource: Int
     get() =
         when (this) {
@@ -210,11 +175,11 @@ private val ThemeMode.detailResource: Int
             ThemeMode.Dark -> R.string.settings_theme_dark_detail
         }
 
-private val PREVIEW_ACCENT_WIDTH = 28.dp
-private val PREVIEW_ACCENT_HEIGHT = 10.dp
-private val PREVIEW_TEXT_WIDTH = 56.dp
-private val PREVIEW_TEXT_HEIGHT = 10.dp
-private val PREVIEW_SURFACE_HEIGHT = 28.dp
+private val SWATCH_WIDTH = 44.dp
+private val SWATCH_HEIGHT = 26.dp
+private val SWATCH_ACCENT_WIDTH = 8.dp
+private val SWATCH_TEXT_WIDTH = 16.dp
+private val SWATCH_TEXT_HEIGHT = 6.dp
 
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。
 @Preview(name = "浅色", showBackground = true)

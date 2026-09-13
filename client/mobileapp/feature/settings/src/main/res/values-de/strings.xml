@@ -9,13 +9,10 @@
     <string name="settings_theme_selected">Ausgewählt</string>
 
     <string name="settings_theme_automatic">Systemeinstellung folgen</string>
-    <string name="settings_theme_automatic_headline">Dem Betriebssystem folgen</string>
     <string name="settings_theme_automatic_detail">Hell, solange das System hell ist, dunkel, solange es dunkel ist — auch wenn das System selbst umschaltet.</string>
     <string name="settings_theme_light">Hell</string>
-    <string name="settings_theme_light_headline">Immer hell</string>
     <string name="settings_theme_light_detail">Behält die hellen Farben auch bei dunklem System. Draußen nützlich.</string>
     <string name="settings_theme_dark">Dunkel</string>
-    <string name="settings_theme_dark_headline">Immer dunkel</string>
     <string name="settings_theme_dark_detail">Behält die dunklen Farben auch bei hellem System. Nachts angenehmer für die Augen.</string>
 
     <string name="settings_language_title">Sprache</string>

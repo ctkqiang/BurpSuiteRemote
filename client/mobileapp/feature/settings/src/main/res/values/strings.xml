@@ -9,13 +9,10 @@
     <string name="settings_theme_selected">Selected</string>
 
     <string name="settings_theme_automatic">Follow system</string>
-    <string name="settings_theme_automatic_headline">Follow the operating system</string>
     <string name="settings_theme_automatic_detail">Light while the system is in light mode and dark while it is in dark mode, including when the system switches on its own schedule.</string>
     <string name="settings_theme_light">Light</string>
-    <string name="settings_theme_light_headline">Always light</string>
     <string name="settings_theme_light_detail">Keeps the light colours even when the system is dark. Useful outdoors.</string>
     <string name="settings_theme_dark">Dark</string>
-    <string name="settings_theme_dark_headline">Always dark</string>
     <string name="settings_theme_dark_detail">Keeps the dark colours even when the system is light. Softer on the eyes at night.</string>
 
     <string name="settings_language_title">Language</string>

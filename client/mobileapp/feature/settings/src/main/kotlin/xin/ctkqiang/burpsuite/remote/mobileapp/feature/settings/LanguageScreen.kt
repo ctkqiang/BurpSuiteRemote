@@ -2,7 +2,6 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteCard
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteListItem
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteListItemGroup
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSectionHeading
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
@@ -27,6 +26,9 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
  *
  * 无状态：状态由外面传进来，用户意图往外抛。换语言要重建界面才生效，那件事由装配层接效果去做
  * （rules.md §8.1：一次性动作走效果，不进状态）。
+ *
+ * 语言名一律用各自的语言书写：用户不确定「Nederlands 是哪个」时，看到的就是它自己的写法。
+ * 行里不再补说明文字 —— 语言名本身已经说完了这一行要说的全部内容，凑一句话只会拉长列表。
  */
 @Composable
 fun LanguageScreen(
@@ -36,56 +38,47 @@ fun LanguageScreen(
 ) {
     val haptics = rememberBurpRemoteHaptics()
 
-    Box(modifier = modifier.fillMaxSize()) {
-        // 顶栏与底栏由装配层的壳统一提供，各屏不再画第二层标题。
-        run {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(
-                            horizontal = BurpRemoteSpacing.Large,
-                            vertical = BurpRemoteSpacing.Large,
-                        ),
-                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Medium),
-            ) {
-                BurpRemoteSectionHeading(text = stringResource(R.string.settings_language_heading))
-                BurpRemoteEmptyState(
-                    headline = stringResource(R.string.settings_language_headline),
-                    detail = stringResource(R.string.settings_language_detail),
-                )
-                LanguagePreference.entries.forEach { language ->
-                    LanguageOption(
-                        language = language,
-                        isSelected = language == uiState.language,
-                        onSelect = {
+    Column(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    horizontal = BurpRemoteSpacing.ScreenEdge,
+                    vertical = BurpRemoteSpacing.ExtraLarge,
+                ),
+        verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ExtraLarge),
+    ) {
+        // 换语言会重建界面这件事必须先说：它是这一屏唯一有副作用的动作。
+        BurpRemoteListItemGroup {
+            BurpRemoteListItem(
+                title = stringResource(R.string.settings_language_headline),
+                subtitle = stringResource(R.string.settings_language_detail),
+            )
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+            BurpRemoteSectionHeading(text = stringResource(R.string.settings_language_heading))
+            BurpRemoteListItemGroup {
+                LanguagePreference.entries.forEachIndexed { index, language ->
+                    BurpRemoteListItem(
+                        title = stringResource(language.labelResource),
+                        trailing = {
+                            if (language == uiState.language) {
+                                BurpRemoteStatusPill(
+                                    text = stringResource(R.string.settings_language_selected),
+                                    tone = BurpRemoteStatusTone.Live,
+                                )
+                            }
+                        },
+                        showsDivider = index != LanguagePreference.entries.lastIndex,
+                        onClick = {
                             haptics.select()
                             onIntent(LanguageUserInterfaceIntent.SelectLanguage(language))
                         },
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun LanguageOption(
-    language: LanguagePreference,
-    isSelected: Boolean,
-    onSelect: () -> Unit,
-) {
-    BurpRemoteCard(isInteractive = true, onClick = onSelect) {
-        BurpRemoteStatusPill(
-            text = stringResource(language.labelResource),
-            tone = if (isSelected) BurpRemoteStatusTone.Live else BurpRemoteStatusTone.Neutral,
-        )
-        if (isSelected) {
-            BurpRemoteStatusPill(
-                text = stringResource(R.string.settings_language_selected),
-                tone = BurpRemoteStatusTone.Live,
-            )
         }
     }
 }

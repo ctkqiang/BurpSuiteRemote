@@ -9,13 +9,10 @@
     <string name="settings_theme_selected">当前选择</string>
 
     <string name="settings_theme_automatic">跟随系统</string>
-    <string name="settings_theme_automatic_headline">跟随操作系统</string>
     <string name="settings_theme_automatic_detail">系统是浅色就用浅色，系统是深色就用深色；系统按自己的时间表切换时也跟着切。</string>
     <string name="settings_theme_light">浅色</string>
-    <string name="settings_theme_light_headline">始终保持浅色</string>
     <string name="settings_theme_light_detail">即使系统是深色也保持浅色配色，适合在户外看。</string>
     <string name="settings_theme_dark">深色</string>
-    <string name="settings_theme_dark_headline">始终保持深色</string>
     <string name="settings_theme_dark_detail">即使系统是浅色也保持深色配色，夜里看着更舒服。</string>
 
     <string name="settings_language_title">语言</string>
