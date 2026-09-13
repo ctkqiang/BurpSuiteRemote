@@ -1,7 +1,11 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,12 +15,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteMotion
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSizing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
@@ -54,14 +62,30 @@ fun BurpRemoteListItem(
 ) {
     val tokens = LocalBurpRemoteDesignTokens.current
     val haptics = rememberBurpRemoteHaptics()
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    // 一行被按下时轻微内缩而不是整块变色：列表里一次只会动一行，扫读时不会被大色块打断。
+    val pressScale by
+        animateFloatAsState(
+            targetValue = if (isPressed) PRESSED_SCALE else RESTING_SCALE,
+            animationSpec = tween(BurpRemoteMotion.DURATION_FAST, easing = BurpRemoteMotion.EasingStandard),
+            label = "list-item-press-scale",
+        )
 
     Row(
         modifier =
             modifier
                 .fillMaxWidth()
+                .graphicsLayer {
+                    scaleX = pressScale
+                    scaleY = pressScale
+                }
                 .then(
                     if (onClick != null) {
-                        Modifier.clickable {
+                        Modifier.clickable(
+                            interactionSource = interactionSource,
+                            indication = null,
+                        ) {
                             haptics.tap()
                             onClick()
                         }
@@ -175,6 +199,9 @@ private fun ChevronGlyph(modifier: Modifier = Modifier) {
 
 // 说明最多两行：再长就不该塞进列表行，那说明这一行需要的是自己的屏。
 private const val SUBTITLE_MAX_LINES = 2
+
+private const val PRESSED_SCALE = 0.99f
+private const val RESTING_SCALE = 1f
 
 private const val CHEVRON_STROKE_RATIO = 0.12f
 private const val CHEVRON_START_RATIO = 0.3f
