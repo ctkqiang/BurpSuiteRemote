@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonElement
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.CommandResult
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteFailure
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteHistoryMessage
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemotePayload
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteResult
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteRuntimeState
@@ -41,7 +42,23 @@ object RemoteResponseDecoder {
             DeviceIdentifier(pairingResultPayload.deviceIdentifier)
         }
 
-    /** 原样承载历史类载荷的 JSON 文本；字段集未定下来之前，不替插件编一个形状。 */
+    /** 解单条历史报文载荷；/v1/history/{historyIdentifier} 用。 */
+    fun decodeHistoryMessage(payload: JsonElement?): RemoteResult<RemoteHistoryMessage> =
+        decodePayload(payload, RemoteHistoryMessagePayload.serializer()) { messagePayload ->
+            RemoteHistoryMessage(
+                historyIdentifier = messagePayload.historyIdentifier,
+                method = messagePayload.method,
+                host = messagePayload.host,
+                path = messagePayload.path,
+                statusCode = messagePayload.status,
+                requestHeaders = messagePayload.requestHeaders,
+                requestBody = messagePayload.requestBody,
+                responseHeaders = messagePayload.responseHeaders,
+                responseBody = messagePayload.responseBody,
+            )
+        }
+
+    /** 原样承载历史列表载荷的 JSON 文本；列表字段集未定下来之前，不替插件编一个形状。 */
     fun decodeHistoryPayload(payload: JsonElement?): RemoteResult<RemotePayload> {
         val presentPayload = payload ?: return RemoteResult.Failed(RemoteFailure.MalformedServerResponse)
         return RemoteResult.Succeeded(

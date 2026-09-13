@@ -1,12 +1,14 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.data.remote
 
 import android.os.Build
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogSeverity
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.settings.RemoteConnectionSettingsStore
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.PairingAttempt
@@ -58,8 +60,8 @@ class PersistingRemoteControlClient(
                         deviceName = Build.MODEL.orEmpty(),
                         isTlsEnabled = pairingAttempt.isTlsEnabled,
                     )
-                connectionSettingsStore.saveDeviceIdentifier(result.value)
                 connectionSettingsStore.saveConnectionConfiguration(configuration)
+                persistDeviceIdentity(deviceIdentifier = result.value)
                 technicalLog.record(
                     TechnicalLogEvent(
                         category = TechnicalLogCategory.Pairing,
@@ -82,6 +84,29 @@ class PersistingRemoteControlClient(
                 )
                 result
             }
+        }
+    }
+
+    /**
+     * 把设备身份落盘。
+     *
+     * 身份写不下去不该让配对流程炸掉：密钥库在个别设备上会拒绝建钥（用户改过锁屏、厂商实现缺陷），
+     * 而配对本身已经成功了。如实记一条错误日志，本次会话照常可用，代价只是重启后要重新配对。
+     */
+    private suspend fun persistDeviceIdentity(deviceIdentifier: DeviceIdentifier) {
+        try {
+            connectionSettingsStore.saveDeviceIdentifier(deviceIdentifier)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (unpersistableIdentity: Exception) {
+            technicalLog.record(
+                TechnicalLogEvent(
+                    category = TechnicalLogCategory.Failure,
+                    message = "设备身份写不进密钥库，本次配对仅对当前会话有效",
+                    severity = TechnicalLogSeverity.Error,
+                    failure = unpersistableIdentity,
+                ),
+            )
         }
     }
 }

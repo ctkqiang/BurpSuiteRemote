@@ -27,6 +27,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.RemoteProtocolVersi
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.PairingAttempt
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteConnectionConfiguration
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteFailure
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteHistoryMessage
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemotePayload
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteResult
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteRuntimeState
@@ -95,15 +96,15 @@ class RemoteRestClient(
     suspend fun readRemoteHistory(configuration: RemoteConnectionConfiguration): RemoteResult<RemotePayload> =
         readQuery(configuration, RemoteEndpointPath.HISTORY, RemoteResponseDecoder::decodeHistoryPayload)
 
-    /** 按标识读取远端历史记录原文，对应 GET /v1/history/{historyIdentifier}。 */
+    /** 按标识取回单条历史报文的完整内容，对应 GET /v1/history/{historyIdentifier}。 */
     suspend fun readRemoteHistoryMessage(
         configuration: RemoteConnectionConfiguration,
         historyIdentifier: HistoryIdentifier,
-    ): RemoteResult<RemotePayload> =
+    ): RemoteResult<RemoteHistoryMessage> =
         readQuery(
             configuration,
             RemoteEndpointPath.HISTORY + "/" + historyIdentifier.value.encodeURLPathPart(),
-            RemoteResponseDecoder::decodeHistoryPayload,
+            RemoteResponseDecoder::decodeHistoryMessage,
         )
 
     /** 放行一条被拦截的报文，对应 POST /v1/intercepts/{interceptIdentifier}/forward。 */

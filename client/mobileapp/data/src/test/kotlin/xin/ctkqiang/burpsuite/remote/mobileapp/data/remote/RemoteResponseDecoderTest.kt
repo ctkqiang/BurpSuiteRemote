@@ -12,6 +12,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.RejectionReason
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.RemoteError
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.RemoteErrorCode
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteFailure
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteHistoryMessage
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemotePayload
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteResult
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteRuntimeState
@@ -74,6 +75,77 @@ class RemoteResponseDecoderTest {
         val result = RemoteResponseDecoder.decodeHistoryPayload(payload)
 
         assertEquals(RemoteResult.Succeeded(RemotePayload("""{"historyIdentifier":"history_1"}""")), result)
+    }
+
+    @Test
+    fun `a history message payload is decoded into the domain shape`() {
+        val payload =
+            jsonPayload(
+                """{"historyIdentifier":"history_1","method":"GET","host":"api.example.com",""" +
+                    """"path":"/api/user","status":200,"requestHeaders":"GET /api/user HTTP/1.1\r\n",""" +
+                    """"requestBody":"a=1","responseHeaders":"HTTP/1.1 200 OK\r\n","responseBody":"{}"}""",
+            )
+
+        val result = RemoteResponseDecoder.decodeHistoryMessage(payload)
+
+        assertEquals(
+            RemoteResult.Succeeded(
+                RemoteHistoryMessage(
+                    historyIdentifier = "history_1",
+                    method = "GET",
+                    host = "api.example.com",
+                    path = "/api/user",
+                    statusCode = 200,
+                    requestHeaders = "GET /api/user HTTP/1.1\r\n",
+                    requestBody = "a=1",
+                    responseHeaders = "HTTP/1.1 200 OK\r\n",
+                    responseBody = "{}",
+                ),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `a history message payload without captured bytes keeps them absent`() {
+        // 插件在响应未到达时发的是 JSON null 或者干脆不发这两个键；两种都必须当成「没有这段字节」，
+        // 而不是当成契约错误，否则每一次被中断的请求都会显示成故障。
+        val payload =
+            jsonPayload(
+                """{"historyIdentifier":"history_1","method":"GET","host":"api.example.com",""" +
+                    """"path":"/api/user","status":200}""",
+            )
+
+        val result = RemoteResponseDecoder.decodeHistoryMessage(payload)
+
+        assertEquals(
+            RemoteResult.Succeeded(
+                RemoteHistoryMessage(
+                    historyIdentifier = "history_1",
+                    method = "GET",
+                    host = "api.example.com",
+                    path = "/api/user",
+                    statusCode = 200,
+                    requestHeaders = null,
+                    requestBody = null,
+                    responseHeaders = null,
+                    responseBody = null,
+                ),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `a history message payload missing an identifier is malformed`() {
+        assertEquals(
+            RemoteResult.Failed(RemoteFailure.MalformedServerResponse),
+            RemoteResponseDecoder.decodeHistoryMessage(jsonPayload("""{"method":"GET"}""")),
+        )
+        assertEquals(
+            RemoteResult.Failed(RemoteFailure.MalformedServerResponse),
+            RemoteResponseDecoder.decodeHistoryMessage(null),
+        )
     }
 
     @Test

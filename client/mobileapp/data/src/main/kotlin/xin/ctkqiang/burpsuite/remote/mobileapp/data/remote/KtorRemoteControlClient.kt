@@ -28,6 +28,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.PairingAttempt
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.ReconnectionPolicy
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteConnectionConfiguration
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteControlClient
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteHistoryMessage
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemotePayload
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteResult
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteRuntimeState
@@ -142,7 +143,7 @@ class KtorRemoteControlClient(
     override suspend fun readRemoteHistoryMessage(
         configuration: RemoteConnectionConfiguration,
         historyIdentifier: HistoryIdentifier,
-    ): RemoteResult<RemotePayload> = restClient.readRemoteHistoryMessage(configuration, historyIdentifier)
+    ): RemoteResult<RemoteHistoryMessage> = restClient.readRemoteHistoryMessage(configuration, historyIdentifier)
 
     override suspend fun requestSnapshot(
         configuration: RemoteConnectionConfiguration,
