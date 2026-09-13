@@ -17,17 +17,27 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.emptyFlow
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ConnectionState
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
@@ -35,6 +45,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguagePreferen
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguagePreferenceRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LocalLanguagePreferenceRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.NavigationDependencies
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteMotion
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.SystemBarIconAppearance
@@ -138,14 +149,39 @@ private fun RemoteControlRoot(
         CompositionLocalProvider(
             LocalLanguagePreferenceRepository provides languagePreferenceRepository,
         ) {
-            BurpsuiteRemoteNavigationHost(
-                navigationDependencies = navigationDependencies,
-                startRoute = startRoute,
-                pairingTicketText = pairingTicketText,
-            )
+            // 启动屏压在应用之上淡出，而不是替换它：底下的主面板在启动屏亮着的时候就已经开始读了，
+            // 抬手时数据通常已经到位，不会先闪一屏骨架。
+            var isSplashVisible by remember { mutableStateOf(true) }
+            LaunchedEffect(Unit) {
+                delay(SPLASH_MINIMUM_DISPLAY_MILLIS)
+                isSplashVisible = false
+            }
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                BurpsuiteRemoteNavigationHost(
+                    navigationDependencies = navigationDependencies,
+                    startRoute = startRoute,
+                    pairingTicketText = pairingTicketText,
+                )
+                AnimatedVisibility(
+                    visible = isSplashVisible,
+                    exit =
+                        fadeOut(
+                            tween(
+                                durationMillis = BurpRemoteMotion.DURATION_EMPHASISED,
+                                easing = BurpRemoteMotion.EasingStandard,
+                            ),
+                        ),
+                ) {
+                    BurpRemoteSplashScreen()
+                }
+            }
         }
     }
 }
+
+// 启动屏最短停留：太短像闪了一下，太长就变成等待。这一档够看清标记落下，也不会让人等。
+private const val SPLASH_MINIMUM_DISPLAY_MILLIS = 700L
 
 /**
  * 系统栏图标的明暗随主题切换。
