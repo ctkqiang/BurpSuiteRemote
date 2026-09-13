@@ -81,6 +81,31 @@ ktlint {
     }
 }
 
+// 端到端夹具的源码集。
+//
+// 单独一个源码集而不是塞进 main：夹具带 main()，混进扩展 JAR 会往 Burp 里多塞一个入口类；
+// 它复用 main 的产物与依赖，所以用的仍是真实的传输层与安全层。
+val harnessSourceSet =
+    sourceSets.create("harness") {
+        compileClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.main.get().output
+    }
+
+configurations[harnessSourceSet.implementationConfigurationName].extendsFrom(configurations.implementation.get())
+configurations[harnessSourceSet.runtimeOnlyConfigurationName].extendsFrom(configurations.runtimeOnly.get())
+// Montoya 只参与编译：夹具要在没有 Burp 的 JVM 里跑起来，运行期不能要求它存在。
+configurations[harnessSourceSet.compileOnlyConfigurationName].extendsFrom(configurations.compileOnly.get())
+
+// 在 JVM 里起真实服务端，供移动端跑端到端链路：它不依赖 Burp，因此能独立证明「扫到的票据真能连上」。
+val remoteServerHarness by tasks.registering(JavaExec::class) {
+    group = "verification"
+    description = "启动真实的远程控制服务端夹具，用于移动端端到端联调。"
+
+    dependsOn(tasks.named(harnessSourceSet.classesTaskName))
+    classpath = harnessSourceSet.runtimeClasspath
+    mainClass.set("xin.ctkqiang.burpsuite.remote.harness.RemoteServerHarnessKt")
+}
+
 detekt {
     // 不叠加默认配置：配置以仓库内的 detekt.yml 为唯一事实来源，
     // 避免「默认配置悄悄打开某条规则」这种不可见的行为差异。
