@@ -199,6 +199,9 @@ private fun PairingTicketSection(
             }
         } else {
             SectionNote(text = stringResource(R.string.connection_ticket_absent_headline))
+            // 还没有票据时正是该说清「去哪儿拿、能拿几次」的时刻：票据在插件那侧只认一次，
+            // 配对成功之后同一张二维码就作废了，而用户最容易做错的事就是对着它反复扫。
+            SectionNote(text = stringResource(R.string.connection_scan_detail))
         }
         if (rejection != null) {
             SectionNote(

@@ -13,7 +13,7 @@
     <string name="dashboard_recent_empty_live_headline">まだ何も観測されていません</string>
     <string name="dashboard_recent_empty_live_detail">Burp は接続されていますが、この端末にはまだリクエストが届いていません。プラグインが転送すると、すぐにここへ表示されます。</string>
     <string name="dashboard_recent_empty_offline_headline">Burp に接続されていません</string>
-    <string name="dashboard_recent_empty_offline_detail">Burp Remote タブに表示されるペアリングコードをスキャンすると、ここでライブトラフィックを確認できます。保存済みの履歴はオフラインでも読めます。</string>
+    <string name="dashboard_recent_empty_offline_detail">Burp Remote タブに表示されるペアリングチケットをスキャンすると、ここでライブトラフィックを確認できます。保存済みの履歴はオフラインでも読めます。</string>
 
     <string name="dashboard_error_read_failed">イベントジャーナルまたはその投影を読み取れませんでした</string>
 

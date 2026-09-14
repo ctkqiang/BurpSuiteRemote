@@ -23,9 +23,9 @@
     <string name="connection_state_timed_out">握手超时</string>
     <string name="connection_state_server_unavailable">插件不可达</string>
 
-    <string name="connection_scan_heading">扫码配对</string>
+    <string name="connection_scan_heading">扫描配对票据</string>
     <string name="connection_scan_headline">把二维码对准取景框</string>
-    <string name="connection_scan_detail">在插件的 Burp Remote 标签页里生成二维码，再扫它。地址、端口与一次性配对码都在码里，这是配置本机的唯一途径。</string>
+    <string name="connection_scan_detail">在插件的 Burp Remote 标签页里生成配对票据，再扫它的二维码。地址、端口与一次性配对码都在票据里，这是配置本机的唯一途径。一张票据只可用一次：配对成功后，要为下一台设备配对之前，请先在 Burp Remote 标签页里重新生成一张。</string>
     <string name="connection_scan_action">打开扫码面板</string>
 
     <string name="connection_scanner_status_searching">正在寻找二维码……</string>
@@ -37,9 +37,9 @@
     <string name="connection_scanner_close_action">关闭扫码面板</string>
 
     <string name="connection_scanner_mode_camera">相机</string>
-    <string name="connection_scanner_mode_manual">配对文本</string>
+    <string name="connection_scanner_mode_manual">手工粘贴</string>
     <string name="connection_scanner_manual_headline">扫不出来？</string>
-    <string name="connection_scanner_manual_detail">把插件里二维码旁边那段配对文本粘进来。它会经过与扫码完全相同的本地校验，最后发出的是同一个配对请求。</string>
+    <string name="connection_scanner_manual_detail">把插件里二维码旁边那段配对票据文本粘进来。它会经过与扫码完全相同的本地校验，最后发出的是同一个配对请求。</string>
 
     <string name="connection_scanner_permission_denied_headline">相机权限被拒绝</string>
     <string name="connection_scanner_permission_denied_detail">没有相机就读不出二维码，本机也就没法配置。请授予相机权限后再扫一次；如果系统已经不再弹窗，请到系统设置里为本应用打开相机权限。</string>
@@ -62,10 +62,10 @@
     <string name="connection_ticket_rejection_protocol_headline">协议版本不受支持</string>
     <string name="connection_ticket_rejection_protocol_detail">票据声明的是协议版本 %1$d，本客户端说的是版本 %2$d。请把较旧的一端升级后重新生成一张码。</string>
 
-    <string name="connection_manual_pairing_heading">手输配对文本</string>
+    <string name="connection_manual_pairing_heading">手输配对票据文本</string>
     <string name="connection_manual_pairing_headline">码扫不出来时的兜底</string>
-    <string name="connection_manual_pairing_hint">把插件里二维码旁边那段配对文本粘进来。它和扫到的码走的是同一条链路，两条路最后发出的是同一个配对请求。</string>
-    <string name="connection_manual_pairing_text_label">配对文本</string>
+    <string name="connection_manual_pairing_hint">把插件里二维码旁边那段配对票据文本粘进来。它和扫到的码走的是同一条链路，两条路最后发出的是同一个配对请求。</string>
+    <string name="connection_manual_pairing_text_label">配对票据文本</string>
     <string name="connection_manual_pairing_action">配对</string>
     <string name="connection_pairing_text_required_hint">先粘贴或输入配对文本</string>
 
@@ -84,7 +84,7 @@
 
     <string name="connection_unavailable_headline">这个动作暂时不可用</string>
     <string name="connection_reason_no_transport">这个构建里还没有接上远程传输层</string>
-    <string name="connection_reason_no_ticket">请先扫一张配对票据，或把配对文本粘进上面的输入框</string>
+    <string name="connection_reason_no_ticket">请先扫一张配对票据，或把配对票据文本粘进上面的输入框</string>
     <string name="connection_reason_ticket_unusable">扫到的票据当前用不了，具体原因写在上面的票据一节里</string>
 
     <string name="connection_paired_heading">已配对设备</string>

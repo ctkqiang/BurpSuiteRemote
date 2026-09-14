@@ -13,7 +13,7 @@
     <string name="dashboard_recent_empty_live_headline">Noch nichts beobachtet</string>
     <string name="dashboard_recent_empty_live_detail">Burp ist verbunden, aber es hat noch keine Anfrage dieses Gerät erreicht. Sobald das Plug-in weiterleitet, erscheint sie hier.</string>
     <string name="dashboard_recent_empty_offline_headline">Burp ist nicht verbunden</string>
-    <string name="dashboard_recent_empty_offline_detail">Scannen Sie den Kopplungscode aus dem Burp-Remote-Tab, um hier Live-Verkehr zu sehen. Gespeicherter Verlauf bleibt offline lesbar.</string>
+    <string name="dashboard_recent_empty_offline_detail">Scannen Sie das Kopplungsticket aus dem Burp-Remote-Tab, um hier Live-Verkehr zu sehen. Gespeicherter Verlauf bleibt offline lesbar.</string>
 
     <string name="dashboard_error_read_failed">das Ereignisjournal oder eine seiner Projektionen ließ sich nicht lesen</string>
 

@@ -23,9 +23,9 @@
     <string name="connection_state_timed_out">タイムアウト</string>
     <string name="connection_state_server_unavailable">サーバーに到達できません</string>
 
-    <string name="connection_scan_heading">ペアリングコードをスキャン</string>
+    <string name="connection_scan_heading">ペアリングチケットをスキャン</string>
     <string name="connection_scan_headline">カメラを QR コードに向けてください</string>
-    <string name="connection_scan_detail">拡張機能の Burp Remote タブでコードを生成し、それをスキャンします。コードにはアドレス、ポート、使い捨てのペアリングコードが含まれるため、この端末を設定する唯一の手段です。</string>
+    <string name="connection_scan_detail">拡張機能の Burp Remote タブでチケットを生成し、それをスキャンします。チケットにはアドレス、ポート、使い捨てのペアリングコードが含まれるため、この端末を設定する唯一の手段です。チケットは一度だけ使用でき、ペアリングに成功した後、別の端末をペアリングする前には Burp Remote タブで新しいチケットを生成し直す必要があります。</string>
     <string name="connection_scan_action">スキャナーを開く</string>
 
     <string name="connection_scanner_status_searching">QR コードを探しています…</string>
@@ -37,9 +37,9 @@
     <string name="connection_scanner_close_action">スキャナーを閉じる</string>
 
     <string name="connection_scanner_mode_camera">カメラ</string>
-    <string name="connection_scanner_mode_manual">ペアリングテキスト</string>
+    <string name="connection_scanner_mode_manual">手動で貼り付け</string>
     <string name="connection_scanner_manual_headline">スキャンできない場合</string>
-    <string name="connection_scanner_manual_detail">QR コードの隣に拡張機能が表示するペアリングテキストを貼り付けます。スキャンしたコードとまったく同じ検証、同じペアリングリクエストを通ります。</string>
+    <string name="connection_scanner_manual_detail">QR コードの隣に拡張機能が表示するペアリングチケットのテキストを貼り付けます。スキャンしたコードとまったく同じ検証、同じペアリングリクエストを通ります。</string>
 
     <string name="connection_scanner_permission_denied_headline">カメラへのアクセスが拒否されました</string>
     <string name="connection_scanner_permission_denied_detail">カメラがないと QR コードを読み取れず、この端末を設定できません。スキャンするには権限を許可してください。Android がプロンプトを表示しなくなった場合は、システム設定でこのアプリのカメラ権限を有効にしてください。</string>
@@ -62,10 +62,10 @@
     <string name="connection_ticket_rejection_protocol_headline">プロトコルバージョンがサポートされていません</string>
     <string name="connection_ticket_rejection_protocol_detail">チケットはプロトコルバージョン %1$d を宣言していますが、このクライアントはバージョン %2$d を話します。古い方を更新して、新しいコードを生成してください。</string>
 
-    <string name="connection_manual_pairing_heading">ペアリングテキストを手入力</string>
+    <string name="connection_manual_pairing_heading">ペアリングチケットのテキストを手入力</string>
     <string name="connection_manual_pairing_headline">コードをスキャンできないときの代替手段</string>
-    <string name="connection_manual_pairing_hint">QR コードの隣に拡張機能が表示するペアリングテキストを貼り付けます。スキャンしたコードとまったく同じ経路を通るため、どちらの方法でも同じペアリングリクエストになります。</string>
-    <string name="connection_manual_pairing_text_label">ペアリングテキスト</string>
+    <string name="connection_manual_pairing_hint">QR コードの隣に拡張機能が表示するペアリングチケットのテキストを貼り付けます。スキャンしたコードとまったく同じ経路を通るため、どちらの方法でも同じペアリングリクエストになります。</string>
+    <string name="connection_manual_pairing_text_label">ペアリングチケットのテキスト</string>
     <string name="connection_manual_pairing_action">ペアリング</string>
     <string name="connection_pairing_text_required_hint">まずペアリングテキストを貼り付けるか入力してください</string>
 
@@ -84,7 +84,7 @@
 
     <string name="connection_unavailable_headline">この操作はまだ利用できません</string>
     <string name="connection_reason_no_transport">このビルドではまだリモートトランスポートが接続されていません</string>
-    <string name="connection_reason_no_ticket">先にペアリングチケットをスキャンするか、上のフィールドにペアリングテキストを貼り付けてください</string>
+    <string name="connection_reason_no_ticket">先にペアリングチケットをスキャンするか、上の欄にペアリングチケットのテキストを貼り付けてください</string>
     <string name="connection_reason_ticket_unusable">スキャンしたチケットはそのままでは使えません。理由は上に書かれています</string>
 
     <string name="connection_paired_heading">ペアリング済み端末</string>

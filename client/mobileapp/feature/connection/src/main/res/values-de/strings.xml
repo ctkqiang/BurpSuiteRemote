@@ -23,9 +23,9 @@
     <string name="connection_state_timed_out">Zeitüberschreitung</string>
     <string name="connection_state_server_unavailable">Plug-in nicht erreichbar</string>
 
-    <string name="connection_scan_heading">Kopplungscode scannen</string>
+    <string name="connection_scan_heading">Kopplungsticket scannen</string>
     <string name="connection_scan_headline">QR-Code in den Sucher halten</string>
-    <string name="connection_scan_detail">Erzeugen Sie den Code im Burp-Remote-Tab des Plug-ins und scannen Sie ihn. Der Code enthält Adresse, Port und einen einmaligen Kopplungscode und ist damit der einzige Weg, dieses Gerät zu konfigurieren.</string>
+    <string name="connection_scan_detail">Erzeugen Sie das Ticket im Burp-Remote-Tab des Plug-ins und scannen Sie es. Das Ticket enthält Adresse, Port und einen einmaligen Kopplungscode und ist damit der einzige Weg, dieses Gerät zu konfigurieren. Ein Ticket ist nur einmal verwendbar: Erzeugen Sie nach einer erfolgreichen Kopplung im Burp-Remote-Tab ein neues, bevor Sie ein weiteres Gerät koppeln.</string>
     <string name="connection_scan_action">Scanner öffnen</string>
 
     <string name="connection_scanner_status_searching">QR-Code wird gesucht…</string>
@@ -37,9 +37,9 @@
     <string name="connection_scanner_close_action">Scanner schließen</string>
 
     <string name="connection_scanner_mode_camera">Kamera</string>
-    <string name="connection_scanner_mode_manual">Kopplungstext</string>
+    <string name="connection_scanner_mode_manual">Von Hand einfügen</string>
     <string name="connection_scanner_manual_headline">Scannen nicht möglich?</string>
-    <string name="connection_scanner_manual_detail">Fügen Sie den Kopplungstext ein, den das Plug-in neben dem QR-Code anzeigt. Er durchläuft dieselbe lokale Prüfung und dieselbe Kopplungsanfrage wie ein gescannter Code.</string>
+    <string name="connection_scanner_manual_detail">Fügen Sie den Kopplungsticket-Text ein, den das Plug-in neben dem QR-Code anzeigt. Er durchläuft dieselbe lokale Prüfung und dieselbe Kopplungsanfrage wie ein gescannter Code.</string>
 
     <string name="connection_scanner_permission_denied_headline">Kamerazugriff ist verweigert</string>
     <string name="connection_scanner_permission_denied_detail">Ohne Kamera lässt sich der QR-Code nicht lesen und dieses Gerät nicht konfigurieren. Erteilen Sie die Berechtigung zum Scannen. Zeigt Android die Abfrage nicht mehr, aktivieren Sie die Kameraberechtigung für diese App in den Systemeinstellungen.</string>
@@ -62,10 +62,10 @@
     <string name="connection_ticket_rejection_protocol_headline">Protokollversion nicht unterstützt</string>
     <string name="connection_ticket_rejection_protocol_detail">Das Ticket nennt Protokollversion %1$d, dieser Client spricht Version %2$d. Aktualisieren Sie die ältere Seite und erzeugen Sie einen neuen Code.</string>
 
-    <string name="connection_manual_pairing_heading">Kopplungstext von Hand eingeben</string>
+    <string name="connection_manual_pairing_heading">Kopplungsticket-Text von Hand eingeben</string>
     <string name="connection_manual_pairing_headline">Rückfalloption, wenn der Code nicht scanbar ist</string>
-    <string name="connection_manual_pairing_hint">Fügen Sie den Kopplungstext ein, den das Plug-in neben dem QR-Code anzeigt. Er läuft durch dieselbe Kette wie ein gescannter Code; beide Wege enden in derselben Kopplungsanfrage.</string>
-    <string name="connection_manual_pairing_text_label">Kopplungstext</string>
+    <string name="connection_manual_pairing_hint">Fügen Sie den Kopplungsticket-Text ein, den das Plug-in neben dem QR-Code anzeigt. Er läuft durch dieselbe Kette wie ein gescannter Code; beide Wege enden in derselben Kopplungsanfrage.</string>
+    <string name="connection_manual_pairing_text_label">Kopplungsticket-Text</string>
     <string name="connection_manual_pairing_action">Koppeln</string>
     <string name="connection_pairing_text_required_hint">Fügen Sie zuerst den Kopplungstext ein</string>
 
@@ -84,7 +84,7 @@
 
     <string name="connection_unavailable_headline">Diese Aktion ist noch nicht verfügbar</string>
     <string name="connection_reason_no_transport">die entfernte Übertragungsschicht ist in diesem Build noch nicht verdrahtet</string>
-    <string name="connection_reason_no_ticket">scannen Sie zuerst ein Kopplungsticket oder fügen Sie den Kopplungstext oben ein</string>
+    <string name="connection_reason_no_ticket">scannen Sie zuerst ein Kopplungsticket oder fügen Sie den Kopplungsticket-Text oben ein</string>
     <string name="connection_reason_ticket_unusable">das gescannte Ticket ist so nicht verwendbar; der Grund steht oben im Ticket-Abschnitt</string>
 
     <string name="connection_paired_heading">Gekoppeltes Gerät</string>

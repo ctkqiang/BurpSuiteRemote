@@ -23,9 +23,9 @@
     <string name="connection_state_timed_out">Timed out</string>
     <string name="connection_state_server_unavailable">Server unavailable</string>
 
-    <string name="connection_scan_heading">Scan pairing code</string>
+    <string name="connection_scan_heading">Scan pairing ticket</string>
     <string name="connection_scan_headline">Point the camera at the QR code</string>
-    <string name="connection_scan_detail">Generate the code in the Burp Remote tab of the extension, then scan it. The code carries the address, the port and a one-time pairing code, so it is the only way to configure this device.</string>
+    <string name="connection_scan_detail">Generate the ticket in the Burp Remote tab of the extension, then scan it. The ticket carries the address, the port and a one-time pairing code, so it is the only way to configure this device. A ticket is single-use: after a successful pairing, generate a new one in the Burp Remote tab before pairing another device.</string>
     <string name="connection_scan_action">Open scanner</string>
 
     <string name="connection_scanner_status_searching">Looking for the QR code…</string>
@@ -37,9 +37,9 @@
     <string name="connection_scanner_close_action">Close scanner</string>
 
     <string name="connection_scanner_mode_camera">Camera</string>
-    <string name="connection_scanner_mode_manual">Pairing text</string>
+    <string name="connection_scanner_mode_manual">Paste by hand</string>
     <string name="connection_scanner_manual_headline">Scanning is not an option?</string>
-    <string name="connection_scanner_manual_detail">Paste the pairing text the extension shows next to the QR code. It goes through exactly the same validation and the same pairing request as a scanned code.</string>
+    <string name="connection_scanner_manual_detail">Paste the pairing ticket text the extension shows next to the QR code. It goes through exactly the same validation and the same pairing request as a scanned code.</string>
 
     <string name="connection_scanner_permission_denied_headline">Camera access is denied</string>
     <string name="connection_scanner_permission_denied_detail">Without the camera the QR code cannot be read, and this device cannot be configured. Grant the permission to scan. If Android no longer shows the prompt, enable the camera permission for this app in system settings.</string>
@@ -62,10 +62,10 @@
     <string name="connection_ticket_rejection_protocol_headline">Protocol version not supported</string>
     <string name="connection_ticket_rejection_protocol_detail">The ticket declares protocol version %1$d; this client speaks version %2$d. Update whichever side is older and generate a new code.</string>
 
-    <string name="connection_manual_pairing_heading">Enter the pairing text by hand</string>
+    <string name="connection_manual_pairing_heading">Enter the pairing ticket text by hand</string>
     <string name="connection_manual_pairing_headline">Fallback when the code cannot be scanned</string>
-    <string name="connection_manual_pairing_hint">Paste the pairing text the extension shows next to the QR code. It goes through exactly the same pipeline as a scanned code, so both routes end in the same pairing request.</string>
-    <string name="connection_manual_pairing_text_label">Pairing text</string>
+    <string name="connection_manual_pairing_hint">Paste the pairing ticket text the extension shows next to the QR code. It goes through exactly the same pipeline as a scanned code, so both routes end in the same pairing request.</string>
+    <string name="connection_manual_pairing_text_label">Pairing ticket text</string>
     <string name="connection_manual_pairing_action">Pair</string>
     <string name="connection_pairing_text_required_hint">Paste or type the pairing text first</string>
 
@@ -84,7 +84,7 @@
 
     <string name="connection_unavailable_headline">This action is not available yet</string>
     <string name="connection_reason_no_transport">the remote transport is not wired up yet in this build</string>
-    <string name="connection_reason_no_ticket">scan a pairing ticket first, or paste the pairing text into the field above</string>
+    <string name="connection_reason_no_ticket">scan a pairing ticket first, or paste the pairing ticket text into the field above</string>
     <string name="connection_reason_ticket_unusable">the scanned ticket cannot be used as it stands; the reason is written above</string>
 
     <string name="connection_paired_heading">Paired device</string>

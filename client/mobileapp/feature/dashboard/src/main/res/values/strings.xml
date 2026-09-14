@@ -13,7 +13,7 @@
     <string name="dashboard_recent_empty_live_headline">Nothing observed yet</string>
     <string name="dashboard_recent_empty_live_detail">Burp is connected, but no request has reached this device yet. Traffic shows up here as soon as the plug-in forwards it.</string>
     <string name="dashboard_recent_empty_offline_headline">Burp is not connected</string>
-    <string name="dashboard_recent_empty_offline_detail">Scan the pairing code shown in the Burp Remote tab to see live traffic here. Saved history stays readable offline.</string>
+    <string name="dashboard_recent_empty_offline_detail">Scan the pairing ticket shown in the Burp Remote tab to see live traffic here. Saved history stays readable offline.</string>
 
     <string name="dashboard_error_read_failed">the event journal or one of its projections could not be read</string>
 

@@ -23,9 +23,9 @@
     <string name="connection_state_timed_out">Хугацаа хэтэрсэн</string>
     <string name="connection_state_server_unavailable">Серверт холбогдох боломжгүй</string>
 
-    <string name="connection_scan_heading">Хослолтын кодыг унших</string>
+    <string name="connection_scan_heading">Хослолтын тасалбарыг унших</string>
     <string name="connection_scan_headline">Камерыг QR код руу чиглүүлнэ үү</string>
-    <string name="connection_scan_detail">Өргөтгөлийн Burp Remote таб дээр код үүсгээд уншуулна. Код хаяг, порт, нэг удаагийн хослолтын кодыг агуулдаг тул энэ төхөөрөмжийг тохируулах цорын ганц арга юм.</string>
+    <string name="connection_scan_detail">Өргөтгөлийн Burp Remote таб дээр тасалбар үүсгээд уншуулна. Тасалбар хаяг, порт, нэг удаагийн хослолтын кодыг агуулдаг тул энэ төхөөрөмжийг тохируулах цорын ганц арга юм. Тасалбар нэг л удаа хүчинтэй: амжилттай хослолтын дараа өөр төхөөрөмж хослохын өмнө Burp Remote таб дээр шинэ тасалбар үүсгэнэ үү.</string>
     <string name="connection_scan_action">Уншигчийг нээх</string>
 
     <string name="connection_scanner_status_searching">QR кодыг хайж байна…</string>
@@ -37,9 +37,9 @@
     <string name="connection_scanner_close_action">Уншигчийг хаах</string>
 
     <string name="connection_scanner_mode_camera">Камер</string>
-    <string name="connection_scanner_mode_manual">Хослолтын текст</string>
+    <string name="connection_scanner_mode_manual">Гараар наах</string>
     <string name="connection_scanner_manual_headline">Унших боломжгүй юу?</string>
-    <string name="connection_scanner_manual_detail">QR кодын хажууд өргөтгөл харуулдаг хослолтын текстийг наана. Уншсан кодтой яг ижил баталгаажуулалт, яг ижил хослолтын хүсэлтээр дамжина.</string>
+    <string name="connection_scanner_manual_detail">QR кодын хажууд өргөтгөл харуулдаг хослолтын тасалбарын текстийг наана. Уншсан кодтой яг ижил баталгаажуулалт, яг ижил хослолтын хүсэлтээр дамжина.</string>
 
     <string name="connection_scanner_permission_denied_headline">Камерын хандалт татгалзсан</string>
     <string name="connection_scanner_permission_denied_detail">Камергүйгээр QR кодыг унших боломжгүй бөгөөд энэ төхөөрөмжийг тохируулах боломжгүй. Уншихын тулд зөвшөөрлийг олгоно уу. Android промптыг харуулахаа больсон бол системийн тохиргооноос энэ аппын камерын зөвшөөрлийг идэвхжүүлнэ үү.</string>
@@ -62,10 +62,10 @@
     <string name="connection_ticket_rejection_protocol_headline">Протоколын хувилбарыг дэмжихгүй</string>
     <string name="connection_ticket_rejection_protocol_detail">Тасалбар протоколын %1$d хувилбарыг зарлаж байгаа бол энэ клиент %2$d хувилбараар ярьдаг. Хуучин талыг шинэчлээд шинэ код үүсгэнэ үү.</string>
 
-    <string name="connection_manual_pairing_heading">Хослолтын текстийг гараар оруулах</string>
+    <string name="connection_manual_pairing_heading">Хослолтын тасалбарын текстийг гараар оруулах</string>
     <string name="connection_manual_pairing_headline">Код уншуулж чадахгүй үеийн нөөц</string>
-    <string name="connection_manual_pairing_hint">QR кодын хажууд өргөтгөл харуулдаг хослолтын текстийг наана. Уншсан кодтой яг ижил зам тул аль ч арга ижил хослолтын хүсэлт болно.</string>
-    <string name="connection_manual_pairing_text_label">Хослолтын текст</string>
+    <string name="connection_manual_pairing_hint">QR кодын хажууд өргөтгөл харуулдаг хослолтын тасалбарын текстийг наана. Уншсан кодтой яг ижил зам тул аль ч арга ижил хослолтын хүсэлт болно.</string>
+    <string name="connection_manual_pairing_text_label">Хослолтын тасалбарын текст</string>
     <string name="connection_manual_pairing_action">Хослох</string>
     <string name="connection_pairing_text_required_hint">Эхлээд хослолтын текстийг наагаад эсвэл бичнэ үү</string>
 
@@ -84,7 +84,7 @@
 
     <string name="connection_unavailable_headline">Энэ үйлдэл одоогоор боломжгүй</string>
     <string name="connection_reason_no_transport">энэ бүтцэд алсын тээвэрлэлт хараахан холбогдоогүй</string>
-    <string name="connection_reason_no_ticket">эхлээд хослолтын тасалбар уншуулах эсвэл дээрх талбарт хослолтын текст наана уу</string>
+    <string name="connection_reason_no_ticket">эхлээд хослолтын тасалбар уншуулах эсвэл дээрх талбарт хослолтын тасалбарын текстийг наана уу</string>
     <string name="connection_reason_ticket_unusable">уншуулсан тасалбарыг байгаагаар нь ашиглах боломжгүй; шалтгаан дээр бичигдсэн</string>
 
     <string name="connection_paired_heading">Хослогдсон төхөөрөмж</string>

@@ -13,7 +13,7 @@
     <string name="dashboard_recent_empty_live_headline">还没有观测到请求</string>
     <string name="dashboard_recent_empty_live_detail">Burp 已连接，但还没有任何请求到达本机。插件一旦转发过来，这里会立刻出现。</string>
     <string name="dashboard_recent_empty_offline_headline">Burp 未连接</string>
-    <string name="dashboard_recent_empty_offline_detail">扫一扫 Burp Remote 标签页里的配对码，实时流量就会出现在这里。已保存的历史离线仍然可读。</string>
+    <string name="dashboard_recent_empty_offline_detail">扫一扫 Burp Remote 标签页里的配对票据，实时流量就会出现在这里。已保存的历史离线仍然可读。</string>
 
     <string name="dashboard_error_read_failed">事件日志或其中一个投影读不出来</string>
 

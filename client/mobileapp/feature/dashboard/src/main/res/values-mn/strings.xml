@@ -13,7 +13,7 @@
     <string name="dashboard_recent_empty_live_headline">Одоогоор юу ч ажиглагдаагүй</string>
     <string name="dashboard_recent_empty_live_detail">Burp холбогдсон ч энэ төхөөрөмжид хүсэлт ирээгүй байна. Плагин дамжуулмагц энд харагдана.</string>
     <string name="dashboard_recent_empty_offline_headline">Burp холбогдоогүй байна</string>
-    <string name="dashboard_recent_empty_offline_detail">Burp Remote таб дээрх хослолтын кодыг уншуулаад энд шууд траффик харна. Хадгалсан түүх офлайн ч унших боломжтой.</string>
+    <string name="dashboard_recent_empty_offline_detail">Burp Remote таб дээрх хослолтын тасалбарыг уншуулаад энд шууд траффик харна. Хадгалсан түүх офлайн ч унших боломжтой.</string>
 
     <string name="dashboard_error_read_failed">үйл явдлын журнал эсвэл түүний проекцийг уншиж чадсангүй</string>
 
