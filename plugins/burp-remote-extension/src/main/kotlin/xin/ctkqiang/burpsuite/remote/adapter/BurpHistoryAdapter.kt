@@ -78,7 +78,8 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
     }
 
     // 协议方案由是否经 TLS 推出，两处各写一遍迟早会分叉；线上沿用客户端既有的小写写法。
-    private fun schemeTextOf(entry: BurpProxyHistoryEntry): String =
+    // 作用域适配器也要拼主机地址，因此它对模块内可见：两边用同一份事实，不会各推一遍。
+    internal fun schemeTextOf(entry: BurpProxyHistoryEntry): String =
         if (entry.isSecure) HTTPS_SCHEME_TEXT else HTTP_SCHEME_TEXT
 
     /**
