@@ -2,6 +2,7 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.feature.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -85,12 +87,18 @@ class HistoryViewModel(
     }
 
     private fun observeSources(): Flow<HistoryLoad> {
+        // 每次投影有变化，都要把整张表映射成领域对象、再筛出仍在实时投影里的那部分。
+        // 这是读盘之后的算术，不是界面要做的事：事件持续到来时留着它在主线程上做，
+        // 每一帧都要等这次筛选算完。下游只负责把结果画出来。
         val loaded: Flow<HistoryLoad> =
-            historyRepository.observeHistoryRecords().map { historyRecords ->
-                HistoryLoad.Loaded(
-                    records = historyRecords.filter { record -> record.archiveState == HistoryArchiveState.Live },
-                )
-            }
+            historyRepository
+                .observeHistoryRecords()
+                .map { historyRecords ->
+                    HistoryLoad.Loaded(
+                        records = historyRecords.filter { record -> record.archiveState == HistoryArchiveState.Live },
+                    )
+                }
+                .flowOn(Dispatchers.Default)
         return loaded.catch { throwable -> emit(HistoryLoad.Failed(throwable = throwable)) }
     }
 

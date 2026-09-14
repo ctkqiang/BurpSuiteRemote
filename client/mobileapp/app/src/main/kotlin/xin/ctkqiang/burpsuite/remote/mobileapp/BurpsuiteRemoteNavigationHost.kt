@@ -30,7 +30,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
@@ -410,8 +410,11 @@ fun BurpsuiteRemoteNavigationHost(
 }
 
 // 连接状态在界面上只有一种来源；各屏读的是同一份，不各自去问传输层。
+//
+// 直接读会话本身，不走主面板汇总：汇总要数完两张投影表才能给出状态，而顶栏只要状态。
+// 走汇总的话，任何一屏（连历史、设置都算）都会替主面板做一遍全表统计，白白占着主线程。
 private fun connectionStateOf(navigationDependencies: NavigationDependencies): Flow<ConnectionState> =
-    navigationDependencies.dashboardRepository.observeDashboardSummary().map { summary -> summary.connectionState }
+    navigationDependencies.remoteControlClient?.connectionState ?: emptyFlow()
 
 /** 连的是哪台机器；还没配过端点时这一行留空，不编一个地址出来。 */
 private fun endpointTextOf(endpoint: RemoteServerEndpoint?): String? =
