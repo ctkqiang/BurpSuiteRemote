@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="archive_title">アーカイブ</string>
+    <string name="archive_subtitle">保存したコピーはオフラインでも読めます</string>
+    <string name="archive_absent_value">—</string>
+    <string name="archive_action_refresh">更新</string>
+    <string name="archive_archived_pill">アーカイブ済み</string>
+
+    <string name="archive_tab_saved_history">保存済み</string>
+    <string name="archive_tab_bookmarks">ブックマーク</string>
+    <string name="archive_tab_screenshots">スクリーンショット</string>
+
+    <string name="archive_loading_headline">保存した履歴を読み取り中</string>
+    <string name="archive_loading_detail">履歴プロジェクションのアーカイブ部分をこの端末から読み取っています。</string>
+    <string name="archive_error_headline">保存した履歴を読み取れませんでした</string>
+    <string name="archive_error_read_failed">履歴プロジェクションのアーカイブ部分をこの端末から読み取れませんでした</string>
+    <string name="archive_error_action">再試行</string>
+
+    <string name="archive_saved_history_heading">保存したコピー</string>
+    <string name="archive_saved_history_empty">まだ何も保存されていません</string>
+    <string name="archive_saved_history_empty_detail">保存は制御コマンドなので、実行中の接続が必要です。それまではこのタブは空のままです。端末が実際に持っていないものは一覧に出しません。</string>
+    <string name="archive_saved_at_label">保存 · %1$s</string>
+    <string name="archive_action_share">共有またはエクスポート</string>
+
+    <string name="archive_bookmarks_heading">ブックマークしたリクエスト</string>
+    <string name="archive_bookmarks_empty">この端末に保存されたブックマークはありません</string>
+    <string name="archive_reason_bookmarks">クライアントにはまだブックマークプロジェクションのポートがありません</string>
+
+    <string name="archive_screenshots_heading">スクリーンショット</string>
+    <string name="archive_screenshots_empty">この端末に保存されたスクリーンショットはありません</string>
+    <string name="archive_reason_screenshots">クライアントにはまだスクリーンショットポートがなく、画像パイプラインは今もデータ層にあります</string>
+    <string name="archive_screenshots_open_action">スクリーンショットワークスペースを開く</string>
+
+    <string name="archive_relative_just_now">たった今</string>
+    <plurals name="archive_relative_seconds">
+        <item quantity="other">%1$d 秒前</item>
+    </plurals>
+    <plurals name="archive_relative_minutes">
+        <item quantity="other">%1$d 分前</item>
+    </plurals>
+    <plurals name="archive_relative_hours">
+        <item quantity="other">%1$d 時間前</item>
+    </plurals>
+    <plurals name="archive_relative_days">
+        <item quantity="other">%1$d 日前</item>
+    </plurals>
+</resources>

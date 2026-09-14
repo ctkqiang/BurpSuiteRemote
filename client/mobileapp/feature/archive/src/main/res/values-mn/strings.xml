@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="archive_title">Архив</string>
+    <string name="archive_subtitle">Хадгалсан хуулбарууд офлайн ч уншигдана</string>
+    <string name="archive_absent_value">—</string>
+    <string name="archive_action_refresh">Шинэчлэх</string>
+    <string name="archive_archived_pill">Архивлагдсан</string>
+
+    <string name="archive_tab_saved_history">Хадгалсан</string>
+    <string name="archive_tab_bookmarks">Хавчуурга</string>
+    <string name="archive_tab_screenshots">Дэлгэцийн зураг</string>
+
+    <string name="archive_loading_headline">Хадгалсан түүхийг уншиж байна</string>
+    <string name="archive_loading_detail">Түүхийн проекцын архивлагдсан хэсгийг энэ төхөөрөмжөөс уншиж байна.</string>
+    <string name="archive_error_headline">Хадгалсан түүхийг уншиж чадсангүй</string>
+    <string name="archive_error_read_failed">түүхийн проекцын архивлагдсан хэсгийг энэ төхөөрөмжөөс уншиж чадсангүй</string>
+    <string name="archive_error_action">Дахин оролдох</string>
+
+    <string name="archive_saved_history_heading">Хадгалсан хуулбарууд</string>
+    <string name="archive_saved_history_empty">Одоогоор юу ч хадгалагдаагүй</string>
+    <string name="archive_saved_history_empty_detail">Хадгалах нь удирдлагын команд тул ажиллаж буй холболт шаардана; тэр болтол энэ таб хоосон байна. Төхөөрөмжид үнэхээр байхгүй зүйлийг жагсаахгүй.</string>
+    <string name="archive_saved_at_label">Хадгалсан · %1$s</string>
+    <string name="archive_action_share">Хуваалцах эсвэл экспортлох</string>
+
+    <string name="archive_bookmarks_heading">Хавчуургадсан хүсэлтүүд</string>
+    <string name="archive_bookmarks_empty">Энэ төхөөрөмжид хадгалсан хавчуурга байхгүй</string>
+    <string name="archive_reason_bookmarks">клиентэд хавчуургын проекцын порт хараахан байхгүй</string>
+
+    <string name="archive_screenshots_heading">Дэлгэцийн зураг</string>
+    <string name="archive_screenshots_empty">Энэ төхөөрөмжид хадгалсан дэлгэцийн зураг байхгүй</string>
+    <string name="archive_reason_screenshots">клиентэд дэлгэцийн зургийн порт хараахан байхгүй бөгөөд зургийн дамжуулах шугам өнөөг хүртэл өгөгдлийн давхаргад байна</string>
+    <string name="archive_screenshots_open_action">Дэлгэцийн зургийн ажлын талбарыг нээх</string>
+
+    <string name="archive_relative_just_now">яг одоо</string>
+    <plurals name="archive_relative_seconds">
+        <item quantity="other">%1$d секундын өмнө</item>
+    </plurals>
+    <plurals name="archive_relative_minutes">
+        <item quantity="other">%1$d минутын өмнө</item>
+    </plurals>
+    <plurals name="archive_relative_hours">
+        <item quantity="other">%1$d цагийн өмнө</item>
+    </plurals>
+    <plurals name="archive_relative_days">
+        <item quantity="other">%1$d өдрийн өмнө</item>
+    </plurals>
+</resources>

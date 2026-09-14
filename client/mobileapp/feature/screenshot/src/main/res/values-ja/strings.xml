@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screenshot_title">スクリーンショット</string>
+    <string name="screenshot_subtitle">元の画像と美化したコピーは別々に保持されます</string>
+
+    <string name="screenshot_pipeline_heading">処理パイプライン</string>
+    <string name="screenshot_pipeline_note_headline">インポートした画像が各段階をどう進むか</string>
+    <string name="screenshot_pipeline_note">各段階は前の段階の結果に積み重なり、元の画像は決して上書きされません。美化に失敗しても、インポートした画像はそのまま残ります。</string>
+    <string name="screenshot_stage_imported">インポート済み</string>
+    <string name="screenshot_stage_analyzing">レイアウトを解析中</string>
+    <string name="screenshot_stage_detected">コンテンツ領域を検出</string>
+    <string name="screenshot_stage_beautifying">美化中</string>
+    <string name="screenshot_stage_ready">準備完了</string>
+    <string name="screenshot_stage_failed">失敗 — 元の画像はそのまま残っています</string>
+
+    <string name="screenshot_stored_heading">保存済みのスクリーンショット</string>
+    <string name="screenshot_stored_empty_headline">この端末には何も保存されていません</string>
+    <string name="screenshot_stored_empty">ここにはまだスクリーンショットがインポートも生成もされておらず、端末が持っていないものは一覧に出しません。</string>
+    <string name="screenshot_reason_headline">不足しているもの</string>
+    <string name="screenshot_reason_import">クライアントにはまだスクリーンショットポートがないため、何もインポートできません</string>
+    <string name="screenshot_action_import">スクリーンショットをインポート</string>
+</resources>

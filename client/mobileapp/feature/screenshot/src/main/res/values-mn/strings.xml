@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screenshot_title">Дэлгэцийн зураг</string>
+    <string name="screenshot_subtitle">Эх зураг болон гоёосон хуулбар тусдаа хадгалагдана</string>
+
+    <string name="screenshot_pipeline_heading">Боловсруулах шугам</string>
+    <string name="screenshot_pipeline_note_headline">Импортолсон зураг үе шатуудаар хэрхэн явдаг</string>
+    <string name="screenshot_pipeline_note">Үе шат бүр өмнөхийн дээр нэмэгдэж, эх зураг хэзээ ч дахин бичигдэхгүй тул гоёолт амжилтгүй болсон ч импорт бүрэн бүтэн үлдэнэ.</string>
+    <string name="screenshot_stage_imported">Импортолсон</string>
+    <string name="screenshot_stage_analyzing">Байршлыг шинжилж байна</string>
+    <string name="screenshot_stage_detected">Агуулгын хэсэг илэрлээ</string>
+    <string name="screenshot_stage_beautifying">Гоёож байна</string>
+    <string name="screenshot_stage_ready">Бэлэн</string>
+    <string name="screenshot_stage_failed">Амжилтгүй — эх зураг бүрэн бүтэн хэвээр</string>
+
+    <string name="screenshot_stored_heading">Хадгалсан дэлгэцийн зургууд</string>
+    <string name="screenshot_stored_empty_headline">Энэ төхөөрөмжид юу ч хадгалагдаагүй</string>
+    <string name="screenshot_stored_empty">Энд дэлгэцийн зураг импортлогдоогүй, үүсгэгдээгүй байгаа бөгөөд төхөөрөмжид байхгүй зүйлийг жагсаахгүй.</string>
+    <string name="screenshot_reason_headline">Юу дутагдаж байна</string>
+    <string name="screenshot_reason_import">клиентэд дэлгэцийн зургийн порт хараахан байхгүй тул юу ч импортолж болохгүй</string>
+    <string name="screenshot_action_import">Дэлгэцийн зураг импортлох</string>
+</resources>
