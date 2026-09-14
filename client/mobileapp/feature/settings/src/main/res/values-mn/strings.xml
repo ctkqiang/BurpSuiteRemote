@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_appearance_title">Гадаад байдал</string>
+    <string name="settings_appearance_subtitle">Бүх аппын өнгөний схем</string>
+
+    <string name="settings_theme_heading">Сэдэв</string>
+    <string name="settings_theme_headline">Энэ сонголт хаа сайгүй хамаарна</string>
+    <string name="settings_theme_detail">Дэлгэц, жагсаалт, тэмдэг бүр сэдвээс өнгөө авдаг тул энд шилжүүлэхэд апп бүхэлдээ нэг дор дахин өнгөждөг. Сонголт энэ төхөөрөмжид хадгалагдана.</string>
+    <string name="settings_theme_selected">Сонгогдсон</string>
+
+    <string name="settings_theme_automatic">Системийг дагах</string>
+    <string name="settings_theme_automatic_detail">Систем цайвар үед цайвар, бараан үед бараан. Систем өөрийн хуваариар шилжихэд ч дагана.</string>
+    <string name="settings_theme_light">Цайвар</string>
+    <string name="settings_theme_light_detail">Систем бараан ч цайвар өнгийг хадгална. Гадаа ашиглахад тохиромжтой.</string>
+    <string name="settings_theme_dark">Бараан</string>
+    <string name="settings_theme_dark_detail">Систем цайвар ч бараан өнгийг хадгална. Шөнө нүдэнд зөөлөн.</string>
+
+    <string name="settings_language_title">Хэл</string>
+    <string name="settings_language_subtitle">Дэлгэц болон мессеж бүрийн хэл</string>
+    <string name="settings_language_heading">Интерфейсийн хэл</string>
+    <string name="settings_language_headline">Үүнийг өөрчлөхөд интерфейс дахин асна</string>
+    <string name="settings_language_detail">Харагдах мөр бүр сонгосон хэлний нөөцөөс авдаг тул шилжүүлэхэд интерфейс нэг удаа дахин бүтээгдэнэ. Хадгалсан өгөгдөлд нөлөөлөхгүй.</string>
+    <string name="settings_language_selected">Сонгогдсон</string>
+    <!-- 语言名按各自的语言书写，三种语言里都一样。 -->
+    <string name="settings_language_automatic">Системийг дагах</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_chinese">简体中文</string>
+    <string name="settings_language_german">Deutsch</string>
+    <string name="settings_language_japanese">日本語</string>
+    <string name="settings_language_korean">한국어</string>
+    <string name="settings_language_thai">ไทย</string>
+    <string name="settings_language_malay">Bahasa Melayu</string>
+    <string name="settings_language_tibetan">བོད་ཡིག</string>
+    <string name="settings_language_uyghur">ئۇيغۇرچە</string>
+    <string name="settings_language_russian">Русский</string>
+    <string name="settings_language_french">Français</string>
+    <string name="settings_language_mongolian">Монгол</string>
+
+    <string name="settings_security_title">Аюулгүй байдал</string>
+    <string name="settings_security_subtitle">Энэ клиент юуг хийхээс татгалздаг</string>
+    <string name="settings_security_redaction_heading">Дархлал</string>
+    <string name="settings_security_redaction_headline">Зөвхөн экспортод масклана</string>
+    <string name="settings_security_redaction_body">Эмзэг утгууд зөвхөн экспортлогдсон хуулбарт масклагдана. Хадгалагдсан эх хувилбар дахин бичигдэхгүй.</string>
+    <string name="settings_security_logging_heading">Бүртгэл</string>
+    <string name="settings_security_logging_headline">Бие болон эрх олголт логт ордоггүй</string>
+    <string name="settings_security_logging_body">Хүсэлт ба хариуны бие, Cookie, Authorization толгой, токен хэзээ ч логт бичигдэхгүй. Техникийн логт зөвхөн тодорхойлогч, тоо, алдааны нэр орно.</string>
+    <string name="settings_security_pairing_heading">Хослолт</string>
+    <string name="settings_security_pairing_headline">Хослогдсон төхөөрөмжгүйгээр удирдлага байхгүй</string>
+    <string name="settings_security_pairing_body">Удирдлагын команд хүлээн авахад төхөөрөмж хослогдсон байх ёстой. Локал сүлжээг итгэж болохгүй гэж үзнэ.</string>
+    <string name="settings_security_reason_heading">Одоогоор тохируулж болохгүй зүйл</string>
+    <string name="settings_security_reason">тохируулж болох дархлалын анхдагч утгад хараахан байхгүй тохиргооны порт хэрэгтэй</string>
+
+    <string name="settings_storage_title">Хадгалах сан</string>
+    <string name="settings_storage_subtitle">Локал өгөгдөл хаана байдаг, түүнээс юу гардаг</string>
+    <string name="settings_storage_database_heading">Локал өгөгдлийн сан</string>
+    <string name="settings_storage_database_headline">Энэ аппад хувийн</string>
+    <string name="settings_storage_database_body">Үйл явдлын журнал болон түүний проекц энэ аппын хувийн хадгалах санд хадгалагдана. Нийтлэг хадгалах санд юу ч бичигдэхгүй.</string>
+    <string name="settings_storage_export_heading">Экспортууд</string>
+    <string name="settings_storage_export_headline">Зөвхөн файл сонгогчоор заасан газар</string>
+    <string name="settings_storage_export_body">Экспортын багц зөвхөн системийн файл сонгогчоор сонгосон байршилд бичигдэнэ; энэ апп хоёр дахь хуулбарыг хадгалахгүй.</string>
+    <string name="settings_storage_maintenance_heading">Засвар үйлчилгээ</string>
+    <string name="settings_storage_reason_heading">Одоогоор хийж болохгүй зүйл</string>
+    <string name="settings_storage_reason">локал өгөгдлийг устгах, шилжүүлэхэд хараахан байхгүй хадгалах сангийн портууд хэрэгтэй</string>
+
+    <!-- 关于与开发者信息。名字、邮箱与仓库地址是事实，交给翻译既没意义还会被拼错，因此不进翻译条目。 -->
+    <string name="about_application_name" translatable="false">Burpsuite Remote</string>
+    <string name="about_author_value" translatable="false">ctkqiang 钟智强</string>
+    <string name="about_email_value" translatable="false">johnmelodymel@qq.com</string>
+    <string name="about_source_value" translatable="false">https://github.com/ctkqiang/BurpSuiteRemote.git</string>
+
+    <string name="about_tagline">Burp Remote өргөтгөлийн гар утасны клиент</string>
+    <string name="about_developer_heading">Хөгжүүлэгч</string>
+    <string name="about_author_label">Зохиогч</string>
+    <string name="about_email_label">Имэйл</string>
+    <string name="about_source_heading">Эх код</string>
+    <string name="about_source_label">Репозитор</string>
+    <string name="about_open_source_heading">Нээлттэй эх</string>
+    <string name="about_open_source_headline">Энэ аппын мэдэгдэл бүр кодоор шалгагдаж болно</string>
+    <string name="about_open_source_body">Эх код нийтэд нээлттэй тул энэ интерфейс дээр тайлбарлагдсан үйлдэл бүрийн ард код байдаг. Техникийн лог зөвхөн энэ төхөөрөмжид бичигдэж, хаана ч байршуулагддаггүй.</string>
+</resources>

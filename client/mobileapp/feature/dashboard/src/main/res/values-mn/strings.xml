@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard_target_host_label">Зорилтот хост</string>
+    <string name="dashboard_absent_value">—</string>
+
+    <string name="dashboard_live_request_label">Шууд хүсэлт</string>
+    <string name="dashboard_intercepted_label">Саатуулсан</string>
+    <string name="dashboard_saved_label">Хадгалсан</string>
+
+    <string name="dashboard_recent_heading">Сүүлийн хүсэлтүүд</string>
+    <string name="dashboard_last_observed_label">Сүүлд ажиглагдсан · %1$s</string>
+
+    <string name="dashboard_recent_empty_live_headline">Одоогоор юу ч ажиглагдаагүй</string>
+    <string name="dashboard_recent_empty_live_detail">Burp холбогдсон ч энэ төхөөрөмжид хүсэлт ирээгүй байна. Плагин дамжуулмагц энд харагдана.</string>
+    <string name="dashboard_recent_empty_offline_headline">Burp холбогдоогүй байна</string>
+    <string name="dashboard_recent_empty_offline_detail">Burp Remote таб дээрх хослолтын кодыг уншуулаад энд шууд траффик харна. Хадгалсан түүх офлайн ч унших боломжтой.</string>
+
+    <string name="dashboard_error_read_failed">үйл явдлын журнал эсвэл түүний проекцийг уншиж чадсангүй</string>
+
+    <string name="dashboard_relative_just_now">саяхан</string>
+    <plurals name="dashboard_relative_seconds">
+        <item quantity="other">%1$d секундын өмнө</item>
+    </plurals>
+    <plurals name="dashboard_relative_minutes">
+        <item quantity="other">%1$d минутын өмнө</item>
+    </plurals>
+    <plurals name="dashboard_relative_hours">
+        <item quantity="other">%1$d цагийн өмнө</item>
+    </plurals>
+    <plurals name="dashboard_relative_days">
+        <item quantity="other">%1$d өдрийн өмнө</item>
+    </plurals>
+</resources>

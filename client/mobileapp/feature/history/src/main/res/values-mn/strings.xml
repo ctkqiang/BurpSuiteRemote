@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">Шууд түүх</string>
+    <string name="history_subtitle">Зөвхөн мета өгөгдөл — бие нь хүсэлтээр авагдана</string>
+    <string name="history_absent_value">—</string>
+    <string name="history_action_refresh">Сэргээх</string>
+
+    <string name="history_response_length_label">Хэмжээ</string>
+    <string name="history_response_length_value">%1$d B</string>
+    <string name="history_duration_label">Хугацаа</string>
+    <string name="history_duration_value">%1$d мс</string>
+
+    <string name="history_loading_headline">Локал проекцийг уншиж байна</string>
+    <string name="history_loading_detail">Түүхийн проекцийг энэ төхөөрөмжөөс уншиж байна.</string>
+    <string name="history_empty_headline">Юу ч урсаж ороогүй</string>
+    <string name="history_empty_detail">Шууд түүх хоосон байна. Burp-г холбож, проксигоор траффик явуулаарай; плагин дамжуулмагц энд бичлэгүүд гарна. «Харуулах зүйлгүй» гэдэг нь «юу ч болоогүй» гэсэн үг биш — «энэ төхөөрөмжид юу ч хүрээгүй» гэсэн үг юм.</string>
+
+    <string name="history_error_headline">Түүхийн проекцийг уншиж чадсангүй</string>
+    <string name="history_error_read_failed">түүхийн проекцийг энэ төхөөрөмжөөс уншиж чадсангүй</string>
+    <string name="history_error_action">Дахин оролдох</string>
+
+    <string name="history_detail_title">Хүсэлтийн дэлгэрэнгүй</string>
+    <string name="history_detail_loading_headline">Энэ бичлэгийг ачаалж байна…</string>
+    <string name="history_detail_loading">Бичлэгийг локал проекцоос уншиж байна.</string>
+    <string name="history_detail_not_found_headline">Энэ бичлэг алга болсон</string>
+    <string name="history_detail_not_found">Бичлэг локал проекцэд байхгүй болсон. Снапшотоор солигдсон байж магадгүй.</string>
+    <string name="history_detail_value_yes">Тийм</string>
+    <string name="history_detail_value_no">Үгүй</string>
+
+    <string name="history_detail_summary_heading">Дүгнэлт</string>
+    <string name="history_detail_request_heading">Хүсэлт</string>
+    <string name="history_detail_request_line_label">Хүсэлтийн мөр</string>
+    <string name="history_detail_host_label">Хост</string>
+    <string name="history_detail_scheme_label">Схем</string>
+    <string name="history_detail_tls_label">TLS</string>
+    <string name="history_detail_destination_address_label">Очих хаяг</string>
+    <string name="history_detail_listener_port_label">Сонсогчийн порт</string>
+
+    <string name="history_detail_response_heading">Хариу</string>
+    <string name="history_detail_status_code_label">Статус код</string>
+    <string name="history_detail_mime_type_label">MIME төрөл</string>
+    <string name="history_detail_response_length_label">Хариуны урт</string>
+    <string name="history_detail_duration_label">Хугацаа</string>
+
+    <string name="history_detail_record_heading">Локал бичлэг</string>
+    <string name="history_detail_saved_at_label">Хадгалсан цаг</string>
+    <string name="history_detail_annotation_count_label">Тайлбар</string>
+    <string name="history_detail_last_annotated_at_label">Сүүлчийн тайлбар</string>
+    <string name="history_detail_title_label">Гарчиг</string>
+    <string name="history_detail_edited_label">Засварлагдсан</string>
+
+    <string name="history_detail_timeline_heading">Цагийн хуваарь</string>
+    <string name="history_detail_sequence_number_label">Үйл явдлын дарааллын дугаар</string>
+    <string name="history_detail_occurred_at_label">Ажиглагдсан цаг</string>
+
+    <string name="history_detail_message_heading">Мессеж</string>
+    <string name="history_detail_request_headers_label">Хүсэлтийн толгойнууд</string>
+    <string name="history_detail_request_body_label">Хүсэлтийн бие</string>
+    <string name="history_detail_response_headers_label">Хариуны толгойнууд</string>
+    <string name="history_detail_response_body_label">Хариуны бие</string>
+    <string name="history_detail_message_absent">Burp энэ хэсгийг аваагүй</string>
+    <string name="history_detail_message_retry">Дахин авах</string>
+
+    <string name="history_detail_message_failure_not_paired">Энэ төхөөрөмж Burp-тай хослогдоогүй</string>
+    <string name="history_detail_message_failure_unreachable">Яг одоо Burp-д хүрэх боломжгүй</string>
+    <string name="history_detail_message_failure_not_supported">Энэ плагины бүтэц мессежийн биеийг буцааж чадахгүй</string>
+    <string name="history_detail_message_failure_record_missing">Burp энэ бичлэгийг хадгалахаа больсон</string>
+    <string name="history_detail_message_failure_malformed">Burp буцаасан байтыг энэ клиент уншиж чадахгүй</string>
+    <string name="history_detail_message_failure_refused">Burp энэ уншилтыг татгалзсан</string>
+
+    <string name="history_detail_actions_heading">Үйлдлүүд</string>
+    <string name="history_detail_reason_headline">Яагаад энэ дутагдаж байна</string>
+    <string name="history_detail_action_share">Хуваалцах / экспортлох</string>
+    <string name="history_detail_action_send_to_repeater">Рипитер рүү илгээх</string>
+    <string name="history_detail_reason_send_to_repeater">клиентэд рипитер-командын порт хараахан байхгүй</string>
+
+    <string name="history_relative_just_now">саяхан</string>
+    <plurals name="history_relative_seconds">
+        <item quantity="other">%1$d секундын өмнө</item>
+    </plurals>
+    <plurals name="history_relative_minutes">
+        <item quantity="other">%1$d минутын өмнө</item>
+    </plurals>
+    <plurals name="history_relative_hours">
+        <item quantity="other">%1$d цагийн өмнө</item>
+    </plurals>
+    <plurals name="history_relative_days">
+        <item quantity="other">%1$d өдрийн өмнө</item>
+    </plurals>
+</resources>

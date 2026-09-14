@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="components_not_implemented_reason">Хэрэгжээгүй: %1$s</string>
+    <string name="components_unavailable_reason">Боломжгүй: %1$s</string>
+    <string name="components_absent_value">—</string>
+    <string name="components_navigate_back">Буцах</string>
+    <string name="components_scanner_toggle_torch">Гар чийдэнг солих</string>
+    <string name="components_retry">Дахин оролдох</string>
+
+    <!-- 实时与离线是全局口径（plan §59），因此写作固定词形，三种语言都不翻译。 -->
+    <string name="components_mode_live">LIVE</string>
+    <string name="components_mode_offline">OFFLINE</string>
+
+    <string name="navigation_section_dashboard">Самбар</string>
+    <string name="navigation_section_live">Шууд</string>
+    <string name="navigation_section_settings">Тохиргоо</string>
+
+    <!-- 分区索引按组排列：每组一个标题，组内几行共用一个描边容器。 -->
+    <string name="navigation_group_connection">Холболт</string>
+    <string name="navigation_group_interface">Интерфейс</string>
+    <string name="navigation_group_data">Өгөгдөл ба аюулгүй байдал</string>
+    <string name="navigation_group_about">Тухай</string>
+
+    <string name="navigation_entry_live_history">Түүх</string>
+    <string name="navigation_entry_live_intercept">Саатуулалт</string>
+    <string name="navigation_entry_live_repeater">Рипитер</string>
+    <string name="navigation_entry_settings_burp_connection">Burp холболт</string>
+    <string name="navigation_entry_settings_appearance">Гадаад байдал</string>
+    <string name="navigation_entry_settings_language">Хэл</string>
+    <string name="navigation_entry_settings_security">Аюулгүй байдал</string>
+    <string name="navigation_entry_settings_storage">Хадгалах сан</string>
+    <string name="navigation_entry_settings_about">Тухай</string>
+
+    <!-- 每一行补一句它通向什么：索引页的价值在于点之前就知道会去哪，而不是点进去再退回来。 -->
+    <string name="navigation_entry_live_history_detail">Плагин дамжуулсан бүх хүсэлт, шинэ нь эхэнд.</string>
+    <string name="navigation_entry_live_intercept_detail">Та шийдэх хүртэл плагин түр зогсоосон хүсэлтүүд.</string>
+    <string name="navigation_entry_live_repeater_detail">Хадгалсан хүсэлтийг дахин илгээж, хариуг харьцуул.</string>
+    <string name="navigation_entry_settings_burp_connection_detail">Хаяг, порт, хослолтын тасалбар, шууд холболтын төлөв.</string>
+    <string name="navigation_entry_settings_appearance_detail">Цайвар эсвэл бараан, мөн системийг дагах эсэх.</string>
+    <string name="navigation_entry_settings_language_detail">Бүх мөр таарахын тулд интерфейсийг нэг удаа дахин бүтээдэг.</string>
+    <string name="navigation_entry_settings_security_detail">Энэ төхөөрөмжид юу хадгалагдаж, хэрхэн хамгаалагдаж байгаа.</string>
+    <string name="navigation_entry_settings_storage_detail">Локал өгөгдлийн сангийн хэмжээ болон авагдсан өгөгдлийг хэрхэн устгах.</string>
+    <string name="navigation_entry_settings_about_detail">Зохиогч, холбоо барих хаяг, эх кодын байршил.</string>
+
+    <string name="connection_state_disconnected">Салгагдсан</string>
+    <string name="connection_state_discovering">Хайж байна</string>
+    <string name="connection_state_connecting">Холбогдож байна</string>
+    <string name="connection_state_authenticating">Баталгаажуулж байна</string>
+    <string name="connection_state_synchronising">Синхрончилж байна</string>
+    <string name="connection_state_connected">Холбогдсон</string>
+    <string name="connection_state_reconnecting">Дахин холбогдож байна</string>
+    <string name="connection_state_resynchronisation_required">Дахин синхрончлол шаардлагатай</string>
+    <string name="connection_state_authentication_failed">Баталгаажуулалт амжилтгүй</string>
+    <string name="connection_state_protocol_error">Протоколын алдаа</string>
+    <string name="connection_state_timed_out">Хугацаа хэтэрсэн</string>
+    <string name="connection_state_server_unavailable">Серверт холбогдох боломжгүй</string>
+
+    <!-- 配对结论逐条分开写：每一种都对应不同的下一步，合并成一句等于让用户自己猜。 -->
+    <string name="pairing_conclusion_succeeded">Хослогдсон. Burp-д холбогдож байна…</string>
+    <string name="pairing_conclusion_malformed_ticket">Энэ код Burpsuite Remote-ийн хослолтын тасалбар биш.</string>
+    <string name="pairing_conclusion_ticket_expired">Энэ хослолтын тасалбарын хугацаа дууссан. Шинээр уншуулна уу.</string>
+    <string name="pairing_conclusion_protocol_version_unsupported">Протоколын хувилбар таарахгүй. Burpsuite Remote эсвэл өргөтгөлийг шинэчилнэ үү.</string>
+    <string name="pairing_conclusion_device_not_paired">Burp энэ төхөөрөмжийг хүлээн авахгүй. Өргөтгөлөөс хослолтыг эхлүүлнэ үү.</string>
+    <string name="pairing_conclusion_pairing_code_mismatch">Хослолтын код таарахгүй. Шалгаад дахин оролдоно уу.</string>
+    <string name="pairing_conclusion_pairing_session_expired">Burp дээрх хослолтын сессийн хугацаа дууссан. Шинэ тасалбар уншуулна уу.</string>
+    <string name="pairing_conclusion_unreachable">Burp-д хүрэх боломжгүй. Хаяг, порт, сүлжээгээ шалгана уу.</string>
+    <string name="pairing_conclusion_failed">Хослолт амжилтгүй. Яг шалтгааныг техникийн логоос харна уу.</string>
+
+    <!-- 日志面板的级别标签。级别同时用颜色与文字表达，不以颜色作为唯一线索。 -->
+    <string name="components_severity_debug">Дибаг</string>
+    <string name="components_severity_information">Мэдээлэл</string>
+    <string name="components_severity_warning">Анхааруулга</string>
+    <string name="components_severity_error">Алдаа</string>
+
+    <!-- 日志分类标签。 -->
+    <string name="components_category_pairing">Хослолт</string>
+    <string name="components_category_transport">Тээвэрлэлт</string>
+    <string name="components_category_event_stream">Үйл явдлын урсгал</string>
+    <string name="components_category_event_ingestion">Шингээлт</string>
+    <string name="components_category_navigation">Навигаци</string>
+    <string name="components_category_user_interface">Интерфейс</string>
+    <string name="components_category_failure">Алдаа</string>
+
+    <!-- 相对时间：全应用共用一套，各屏不再各写一份。 -->
+    <string name="components_relative_just_now">саяхан</string>
+    <plurals name="components_relative_seconds">
+        <item quantity="other">%d секундын өмнө</item>
+    </plurals>
+    <plurals name="components_relative_minutes">
+        <item quantity="other">%d минутын өмнө</item>
+    </plurals>
+    <plurals name="components_relative_hours">
+        <item quantity="other">%d цагийн өмнө</item>
+    </plurals>
+    <plurals name="components_relative_days">
+        <item quantity="other">%d өдрийн өмнө</item>
+    </plurals>
+</resources>

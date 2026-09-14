@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intercept_title">Саатуулалтын дараалал</string>
+    <string name="intercept_subtitle">Зөвхөн плагин мета өгөгдөл болгон дамжуулсан зүйл</string>
+    <string name="intercept_absent_value">—</string>
+    <string name="intercept_action_refresh">Сэргээх</string>
+
+    <string name="intercept_state_pending">Хүлээгдэж байгаа</string>
+    <string name="intercept_state_modified">Өөрчлөгдсөн</string>
+    <string name="intercept_state_forwarded">Дамжуулагдсан</string>
+    <string name="intercept_state_dropped">Хаягдсан</string>
+
+    <string name="intercept_loading_headline">Саатуулалтын дарааллыг уншиж байна</string>
+    <string name="intercept_loading_detail">Саатуулалтын проекцийг энэ төхөөрөмжөөс уншиж байна.</string>
+    <string name="intercept_empty_headline">Хүлээгдэж буй зүйл алга</string>
+    <string name="intercept_empty_detail">Одоогоор түр зогсоосон хүсэлт байхгүй. Плагин саатуулж байгаа бөгөөд дамжуулаагүй, хаяагүй хүсэлт байх үед л энд зүйлс гарна.</string>
+
+    <string name="intercept_error_headline">Саатуулалтын дарааллыг уншиж чадсангүй</string>
+    <string name="intercept_error_read_failed">саатуулалтын проекцийг энэ төхөөрөмжөөс уншиж чадсангүй</string>
+    <string name="intercept_error_action">Дахин оролдох</string>
+
+    <string name="intercept_detail_title">Саатуулалтын зүйл</string>
+    <string name="intercept_detail_loading_headline">Энэ саатуулалтын зүйлийг ачаалж байна…</string>
+    <string name="intercept_detail_loading">Зүйлийг локал проекцоос уншиж байна.</string>
+    <string name="intercept_detail_not_found_headline">Энэ зүйл алга болсон</string>
+    <string name="intercept_detail_not_found">Саатуулалтын зүйл локал проекцэд байхгүй болсон.</string>
+
+    <string name="intercept_detail_summary_heading">Дүгнэлт</string>
+    <string name="intercept_detail_request_heading">Хүсэлт</string>
+    <string name="intercept_detail_request_line_label">Хүсэлтийн мөр</string>
+    <string name="intercept_detail_host_label">Хост</string>
+    <string name="intercept_detail_sequence_number_label">Үйл явдлын дарааллын дугаар</string>
+    <string name="intercept_detail_created_at_label">Үүсгэсэн цаг</string>
+    <string name="intercept_detail_updated_at_label">Сүүлд өөрчилсөн цаг</string>
+
+    <string name="intercept_detail_editor_heading">Өөрчлөх</string>
+    <string name="intercept_detail_editor_headline">Зөвхөн энэ төхөөрөмж дээрх ноорог</string>
+    <string name="intercept_detail_editor_local_only">Эдгээр засвар энэ төхөөрөмж дээр л үлдэнэ: плагин саатуулалтын эцсийн цэггүй тул юу ч илгээгдэхгүй бөгөөд Burp-д баригдсан хүсэлт өөрчлөгдөхгүй.</string>
+    <string name="intercept_detail_request_headers_label">Хүсэлтийн толгойнууд</string>
+
+    <string name="intercept_detail_actions_heading">Үйлдлүүд</string>
+    <string name="intercept_detail_action_submit">Өөрчлөлтийг хэрэглэх</string>
+    <string name="intercept_detail_action_forward">Дамжуулах</string>
+    <string name="intercept_detail_action_drop">Хаях</string>
+    <string name="intercept_detail_reason_headline">Яагаад идэвхгүй байна</string>
+    <string name="intercept_detail_reason_command">плагин саатуулалтын эцсийн цэгт not_implemented гэж хариулж, клиентэд түүний командын порт байхгүй</string>
+
+    <string name="intercept_relative_just_now">саяхан</string>
+    <plurals name="intercept_relative_seconds">
+        <item quantity="other">%1$d секундын өмнө</item>
+    </plurals>
+    <plurals name="intercept_relative_minutes">
+        <item quantity="other">%1$d минутын өмнө</item>
+    </plurals>
+    <plurals name="intercept_relative_hours">
+        <item quantity="other">%1$d цагийн өмнө</item>
+    </plurals>
+    <plurals name="intercept_relative_days">
+        <item quantity="other">%1$d өдрийн өмнө</item>
+    </plurals>
+</resources>

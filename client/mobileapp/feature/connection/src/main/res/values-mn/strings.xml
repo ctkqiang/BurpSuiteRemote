@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connection_title">Burp холболт</string>
+    <string name="connection_absent_value">—</string>
+    <string name="connection_mode_live">LIVE</string>
+    <string name="connection_mode_offline">OFFLINE</string>
+
+    <string name="connection_status_heading">Холболтын төлөв</string>
+    <string name="connection_server_address_label">Серверийн хаяг</string>
+    <string name="connection_server_address_absent">Тохируулаагүй</string>
+    <string name="connection_server_port_label">Порт</string>
+
+    <string name="connection_state_disconnected">Салгагдсан</string>
+    <string name="connection_state_discovering">Хайж байна</string>
+    <string name="connection_state_connecting">Холбогдож байна</string>
+    <string name="connection_state_authenticating">Баталгаажуулж байна</string>
+    <string name="connection_state_synchronising">Синхрончилж байна</string>
+    <string name="connection_state_connected">Холбогдсон</string>
+    <string name="connection_state_reconnecting">Дахин холбогдож байна</string>
+    <string name="connection_state_resynchronisation_required">Дахин синхрончлол шаардлагатай</string>
+    <string name="connection_state_authentication_failed">Баталгаажуулалт амжилтгүй</string>
+    <string name="connection_state_protocol_error">Протоколын алдаа</string>
+    <string name="connection_state_timed_out">Хугацаа хэтэрсэн</string>
+    <string name="connection_state_server_unavailable">Серверт холбогдох боломжгүй</string>
+
+    <string name="connection_scan_heading">Хослолтын кодыг унших</string>
+    <string name="connection_scan_headline">Камерыг QR код руу чиглүүлнэ үү</string>
+    <string name="connection_scan_detail">Өргөтгөлийн Burp Remote таб дээр код үүсгээд уншуулна. Код хаяг, порт, нэг удаагийн хослолтын кодыг агуулдаг тул энэ төхөөрөмжийг тохируулах цорын ганц арга юм.</string>
+    <string name="connection_scan_action">Уншигчийг нээх</string>
+
+    <string name="connection_scanner_status_searching">QR кодыг хайж байна…</string>
+    <string name="connection_scanner_status_pending">Камерын зөвшөөрлийг хүлээж байна…</string>
+    <string name="connection_scanner_status_permission_denied">Камерын хандалт татгалзсан</string>
+    <string name="connection_scanner_status_undecodable">Тэр код хослолтын тасалбар биш</string>
+    <string name="connection_scanner_status_expired">Тэр тасалбарын хугацаа дууссан</string>
+    <string name="connection_scanner_status_protocol">Протоколын хувилбар таарахгүй</string>
+    <string name="connection_scanner_close_action">Уншигчийг хаах</string>
+
+    <string name="connection_scanner_mode_camera">Камер</string>
+    <string name="connection_scanner_mode_manual">Хослолтын текст</string>
+    <string name="connection_scanner_manual_headline">Унших боломжгүй юу?</string>
+    <string name="connection_scanner_manual_detail">QR кодын хажууд өргөтгөл харуулдаг хослолтын текстийг наана. Уншсан кодтой яг ижил баталгаажуулалт, яг ижил хослолтын хүсэлтээр дамжина.</string>
+
+    <string name="connection_scanner_permission_denied_headline">Камерын хандалт татгалзсан</string>
+    <string name="connection_scanner_permission_denied_detail">Камергүйгээр QR кодыг унших боломжгүй бөгөөд энэ төхөөрөмжийг тохируулах боломжгүй. Уншихын тулд зөвшөөрлийг олгоно уу. Android промптыг харуулахаа больсон бол системийн тохиргооноос энэ аппын камерын зөвшөөрлийг идэвхжүүлнэ үү.</string>
+    <string name="connection_scanner_permission_request_action">Камерын хандалтыг олгох</string>
+    <string name="connection_scanner_permission_pending_headline">Камерын зөвшөөрлийг хүлээж байна</string>
+    <string name="connection_scanner_permission_pending_detail">Android камерын зөвшөөрлийг асууж байна. Олгогдсоны дараа энд харагч нээгдэнэ.</string>
+
+    <string name="connection_ticket_heading">Хослолтын тасалбар</string>
+    <string name="connection_ticket_host_label">Хост</string>
+    <string name="connection_ticket_port_label">Порт</string>
+    <string name="connection_ticket_protocol_version_label">Тасалбарын протоколын хувилбар</string>
+    <string name="connection_ticket_expires_at_label">Хүчинтэй хугацаа</string>
+    <string name="connection_ticket_absent_headline">Одоогоор тасалбар уншуулаагүй</string>
+    <string name="connection_ticket_absent_detail">Энэ төхөөрөмжид юу ч уншуулаагүй тул хослох хаяг, порт, нэг удаагийн код байхгүй байна.</string>
+
+    <string name="connection_ticket_rejection_undecodable_headline">Тэр QR код хослолтын тасалбар биш</string>
+    <string name="connection_ticket_rejection_undecodable_detail">Код уншигдсан ч агуулга нь хослолтын тасалбарын гэрээтэй таарахгүй. Өргөтгөлийн Burp Remote таб дээрх кодыг уншуулна уу.</string>
+    <string name="connection_ticket_rejection_expired_headline">Энэ тасалбар аль хэдийн хугацаа дууссан</string>
+    <string name="connection_ticket_rejection_expired_detail">%1$s хүртэл хүчинтэй байсан. Өргөтгөл дээр шинэ код үүсгээд уншуулна уу.</string>
+    <string name="connection_ticket_rejection_protocol_headline">Протоколын хувилбарыг дэмжихгүй</string>
+    <string name="connection_ticket_rejection_protocol_detail">Тасалбар протоколын %1$d хувилбарыг зарлаж байгаа бол энэ клиент %2$d хувилбараар ярьдаг. Хуучин талыг шинэчлээд шинэ код үүсгэнэ үү.</string>
+
+    <string name="connection_manual_pairing_heading">Хослолтын текстийг гараар оруулах</string>
+    <string name="connection_manual_pairing_headline">Код уншуулж чадахгүй үеийн нөөц</string>
+    <string name="connection_manual_pairing_hint">QR кодын хажууд өргөтгөл харуулдаг хослолтын текстийг наана. Уншсан кодтой яг ижил зам тул аль ч арга ижил хослолтын хүсэлт болно.</string>
+    <string name="connection_manual_pairing_text_label">Хослолтын текст</string>
+    <string name="connection_manual_pairing_action">Хослох</string>
+    <string name="connection_pairing_text_required_hint">Эхлээд хослолтын текстийг наагаад эсвэл бичнэ үү</string>
+
+    <string name="connection_pairing_result_heading">Хослолтын үр дүн</string>
+    <string name="connection_pairing_succeeded_headline">Плагин энэ төхөөрөмжийг хүлээн авсан</string>
+    <string name="connection_pairing_succeeded_detail">Эрх олголт энэ төхөөрөмжид хадгалагдана. Холболт арын горимд үргэлжилж болно.</string>
+    <string name="connection_pairing_rejection_code">хослолтын код плагины олгосонтой таараагүй</string>
+    <string name="connection_pairing_rejection_session_expired">хослолтын сессийн хугацаа аль хэдийн дууссан; шинэ код үүсгэнэ үү</string>
+    <string name="connection_pairing_rejection_session_unavailable">плагин энэ хослолтын сессийг мэдэхээ больсон; шинэ код уншуулна уу</string>
+    <string name="connection_pairing_rejection_protocol">хоёр тал протоколын хувилбар дээр санал нийлэхгүй байна</string>
+    <string name="connection_pairing_rejection_authentication">энэ төхөөрөмжийн таних мэдээлэл татгалзсан</string>
+    <string name="connection_pairing_rejection_unreachable">плагинтай холбогдох боломжгүй; хаяг, порт, Burp ажиллаж байгаа эсэхийг шалгана уу</string>
+    <string name="connection_pairing_rejection_not_supported">плагин энэ эцсийн цэгийг хараахан хэрэгжүүлээгүй</string>
+    <string name="connection_pairing_rejection_unknown">плагин энэ клиентийн танихгүй алдааг буцаасан</string>
+    <string name="connection_pairing_in_flight">Хослож байна…</string>
+
+    <string name="connection_unavailable_headline">Энэ үйлдэл одоогоор боломжгүй</string>
+    <string name="connection_reason_no_transport">энэ бүтцэд алсын тээвэрлэлт хараахан холбогдоогүй</string>
+    <string name="connection_reason_no_ticket">эхлээд хослолтын тасалбар уншуулах эсвэл дээрх талбарт хослолтын текст наана уу</string>
+    <string name="connection_reason_ticket_unusable">уншуулсан тасалбарыг байгаагаар нь ашиглах боломжгүй; шалтгаан дээр бичигдсэн</string>
+
+    <string name="connection_paired_heading">Хослогдсон төхөөрөмж</string>
+    <string name="connection_paired_state_paired">Хослогдсон</string>
+    <string name="connection_paired_state_unpaired">Хослогдоогүй</string>
+    <string name="connection_paired_headline">Хослолт энэ төхөөрөмжид хадгалагдсан</string>
+    <string name="connection_paired_detail_paired">Доорх хаяг, порт нь уншуулсан тасалбараас авсан. Дахин хослоход эрх олголтыг солино, хослолтыг арилгахад хоёр талд энэ төхөөрөмжийг мартна.</string>
+    <string name="connection_paired_detail_unpaired">Одоогоор эрх олголт хадгалагдаагүй. Тасалбар уншуулж хослоход хаяг, порт түүнээс бичигдэнэ.</string>
+    <string name="connection_paired_host_label">Хослогдсон хост</string>
+    <string name="connection_paired_port_label">Хослогдсон порт</string>
+    <string name="connection_paired_re_pair_action">Дахин хослох</string>
+    <string name="connection_paired_clear_action">Хослолтыг арилгах</string>
+
+    <string name="connection_endpoint_heading">Серверийн хаяг ба порт</string>
+    <string name="connection_endpoint_headline">Плагин сонсож буй газар</string>
+    <string name="connection_endpoint_detail">Анхдагч порт нь %1$d. Хослоход энэ хоёр утга тасалбараас бичигдэнэ; өөр хост руу чиглүүлэхийн тулд энд засварлаад хадгална.</string>
+    <string name="connection_endpoint_host_label">Хост</string>
+    <string name="connection_endpoint_port_label">Порт</string>
+    <string name="connection_endpoint_default_port_hint">Анхдагч порт %1$d</string>
+    <string name="connection_endpoint_invalid_port_hint">Порт 1-ээс 65535 хүртэлх бүхэл тоо байх ёстой</string>
+    <string name="connection_endpoint_save_action">Хадгалах</string>
+
+    <string name="connection_retry_heading">Холбогдох</string>
+    <string name="connection_retry_headline">Burp руу сесс нээх</string>
+    <string name="connection_retry_detail">Холболт сессийг нээлттэй байлгаж, үйл явдлыг локал журнал руу урсгана. Самбар дээр доош татах эсвэл алдааны дараа энд дахин оролдоно уу.</string>
+    <string name="connection_retry_action">Холболтыг дахин оролдох</string>
+    <string name="connection_retry_disabled_hint">Эхлээд хаяг, портоо хадгална уу</string>
+</resources>

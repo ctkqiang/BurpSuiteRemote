@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="repeater_title">Рипитер</string>
+    <string name="repeater_subtitle">Шууд сесс болон гүйцэтгэх порт шаардлагатай</string>
+    <string name="repeater_mode_live">LIVE</string>
+    <string name="repeater_mode_offline">OFFLINE</string>
+
+    <string name="repeater_connection_heading">Холболт</string>
+    <string name="repeater_connection_state_label">Сессийн төлөв</string>
+    <string name="repeater_connection_state_disconnected">Салгагдсан</string>
+    <string name="repeater_connection_state_discovering">Хайж байна</string>
+    <string name="repeater_connection_state_connecting">Холбогдож байна</string>
+    <string name="repeater_connection_state_authenticating">Баталгаажуулж байна</string>
+    <string name="repeater_connection_state_synchronising">Синхрончилж байна</string>
+    <string name="repeater_connection_state_connected">Холбогдсон</string>
+    <string name="repeater_connection_state_reconnecting">Дахин холбогдож байна</string>
+    <string name="repeater_connection_state_resynchronisation_required">Дахин синхрончлол шаардлагатай</string>
+    <string name="repeater_connection_state_authentication_failed">Баталгаажуулалт амжилтгүй</string>
+    <string name="repeater_connection_state_protocol_error">Протоколын алдаа</string>
+    <string name="repeater_connection_state_timed_out">Хугацаа хэтэрсэн</string>
+    <string name="repeater_connection_state_server_unavailable">Серверт холбогдох боломжгүй</string>
+
+    <string name="repeater_loading_headline">Сессийн төлвийг уншиж байна</string>
+    <string name="repeater_loading_detail">Сессийн төлвийг локал проекцоос уншиж байна.</string>
+    <string name="repeater_error_headline">Сессийн төлвийг уншиж чадсангүй</string>
+    <string name="repeater_error_read_failed">сессийн төлвийг энэ төхөөрөмжөөс уншиж чадсангүй</string>
+    <string name="repeater_error_action">Дахин оролдох</string>
+
+    <string name="repeater_request_list_heading">Хадгалсан хүсэлтүүд</string>
+    <string name="repeater_request_list_empty_headline">Рипитер хүсэлт байхгүй</string>
+    <string name="repeater_request_list_empty_detail">Рипитер хүсэлт энэ төхөөрөмжид хадгалагдаагүй байгаа бөгөөд хоосон зайг нөхөх гэж юу ч зохиогоогүй.</string>
+
+    <string name="repeater_execution_heading">Гүйцэтгэл</string>
+    <string name="repeater_execution_empty_headline">Юу ч гүйцэтгэгдээгүй</string>
+    <string name="repeater_execution_empty_detail">Гүйцэтгэлийн үр дүн плагинаас ирнэ. Тэр зам бий болтол энэ дэлгэц зөвхөн сессийн төлвийг харуулна.</string>
+
+    <string name="repeater_reason_headline">Юу дутагдаж байна</string>
+    <string name="repeater_reason_request_list">клиентэд рипитер-проекцийн порт хараахан байхгүй</string>
+    <string name="repeater_reason_execute">клиентэд рипитер-командын порт хараахан байхгүй</string>
+    <string name="repeater_action_create">Шинэ рипитер хүсэлт</string>
+    <string name="repeater_action_execute">Гүйцэтгэх</string>
+</resources>

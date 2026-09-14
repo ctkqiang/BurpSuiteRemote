@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Burpsuite Remote</string>
+
+    <!-- 主面板顶栏的扫码动作：图标没有文字，因此这句同时是它的无障碍说明。 -->
+    <string name="navigation_action_scan_pairing">Хослолтын QR кодыг унших</string>
+
+    <!-- 分享与导出屏的标题；这一屏只有参数路由，标题归外壳那块唯一的顶栏。 -->
+    <string name="navigation_title_sharing">Хуваалцах ба экспортлох</string>
+
+    <!-- 弹窗容器在配对请求飞行期间说的话：那一段时间里界面必须有东西动，否则用户以为卡住了。 -->
+    <string name="pairing_scanner_status_in_flight">Хослож байна…</string>
+
+    <!-- 会话前台服务的常驻通知；文案要能解释「为什么这里一直挂着一条通知」。 -->
+    <string name="connection_session_channel_name">Холболтын сесс</string>
+    <string name="connection_session_channel_description">Burp-тай сесс хадгалагдаж байх үед л харагдана.</string>
+    <string name="connection_session_title">Burp-тай сесс хадгалж байна</string>
+    <string name="connection_session_disconnect_action">Салгах</string>
+</resources>

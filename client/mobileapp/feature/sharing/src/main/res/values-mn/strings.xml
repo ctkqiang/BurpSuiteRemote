@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sharing_title">Хуваалцах / экспортлох</string>
+    <string name="sharing_absent_value">—</string>
+    <string name="sharing_loading_headline">Энэ бичлэгийг ачаалж байна…</string>
+    <string name="sharing_loading">Бичлэгийг локал проекцоос уншиж байна.</string>
+    <string name="sharing_not_found_headline">Энэ бичлэг алга болсон</string>
+    <string name="sharing_not_found">Бичлэг локал проекцэд байхгүй тул экспортлох зүйл алга.</string>
+
+    <string name="sharing_subject_heading">Экспортлогдох зүйл</string>
+    <string name="sharing_request_line_label">Хүсэлтийн мөр</string>
+    <string name="sharing_host_label">Хост</string>
+    <string name="sharing_identifier_label">Түүхийн тодорхойлогч</string>
+
+    <string name="sharing_scope_heading">Экспортын хамрах хүрээ</string>
+    <string name="sharing_scope_headline">Зөвхөн энэ төхөөрөмжид байгаа зүйл</string>
+    <string name="sharing_scope_note">Экспортод манифест, дархлалын тайлан болон энэ төхөөрөмжид хадгалагдсан талбарууд орно. Хүсэлт болон хариуны байт хараахан авагдаагүй тул ордоггүй. Багц үүнийг өөрөө тодорхойлдог бөгөөд хуурамчаар дүүргэдэггүй.</string>
+
+    <string name="sharing_scan_heading">Эмзэг өгөгдлийн шалгалт</string>
+    <string name="sharing_scan_count_label">Шалгасан мөрүүд</string>
+    <string name="sharing_scan_empty_headline">Эмзэг зүйл олдсонгүй</string>
+    <string name="sharing_scan_empty">Экспортлогдож буй талбарт эрх олголтын толгой, Bearer токен, JSON Web Token эсвэл имэйл хаяг олдсонгүй.</string>
+
+    <string name="sharing_kind_authorization_header">Authorization толгой</string>
+    <string name="sharing_kind_cookie_header">Cookie толгой</string>
+    <string name="sharing_kind_set_cookie_header">Set-Cookie толгой</string>
+    <string name="sharing_kind_api_key_header">API түлхүүрийн толгой</string>
+    <string name="sharing_kind_bearer_token">Bearer токен</string>
+    <string name="sharing_kind_json_web_token">JSON Web Token</string>
+    <string name="sharing_kind_email_address">Имэйл хаяг</string>
+
+    <string name="sharing_preview_heading">Дархлагдсан урьдчилсан харагдац</string>
+    <string name="sharing_preview_headline">Төхөөрөмжөөс гарч буй зүйл нь энэ</string>
+    <string name="sharing_preview_note">Дархлал нь зөвхөн энэ экспортлогдсон хуулбарт хамаарна. Хадгалагдсан эх хувилбар байтаар нарийвчлалтай хэвээр үлдэж, хэзээ ч дахин бичигдэхгүй.</string>
+
+    <string name="sharing_confirm_heading">Баталгаажуулах</string>
+    <string name="sharing_confirm_action">Баталгаажуулаад экспортлох</string>
+    <string name="sharing_state_exported">Экспортлогдсон</string>
+    <string name="sharing_exported">Экспортын багцыг таны сонгосон байршилд бичлээ.</string>
+    <string name="sharing_state_failed">Экспорт амжилтгүй</string>
+    <string name="sharing_export_failed">Экспортыг бичиж чадсангүй. Өөр байршилд дахин оролдоно уу.</string>
+
+    <!-- 写进导出包 notice.txt 的说明；导出文件是给用户看的，因此文案同样走资源。 -->
+    <string name="sharing_export_notice">Burpsuite Remote экспортын багц\n\nЭнэ архив Burpsuite Remote гар утасны клиентээр үүсгэгдсэн.\nmanifest.json, redaction-report.json болон энэ мэдэгдэл орно.\n\nХамрах хүрээ: зөвхөн төхөөрөмжид хадгалагдсан талбарууд орно. Хүсэлт ба хариуны\nбайт энэ клиентэд хараахан авагдаагүй тул экспортод ордоггүй.\n\nДархлал: эмзэг утгууд зөвхөн энэ экспортлогдсон хуулбарт масклагдсан.\nХадгалагдсан эх хувилбар өөрчлөгдөөгүй.</string>
+</resources>
