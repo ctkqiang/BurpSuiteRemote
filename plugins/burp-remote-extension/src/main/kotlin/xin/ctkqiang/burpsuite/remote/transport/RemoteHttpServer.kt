@@ -65,7 +65,8 @@ class RemoteHttpServer(
 ) {
     private val lifecycleLock = Any()
 
-    private val webSocketServer = RemoteWebSocketServer(controlGate, connectionRegistry, eventStream)
+    // 事件通道与 REST 共用同一个日志出口：手机连不上时，两边的痕迹必须落在同一处才拼得出因果。
+    private val webSocketServer = RemoteWebSocketServer(controlGate, connectionRegistry, eventStream, logSink)
 
     private var runningServer: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
 

@@ -12,6 +12,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import xin.ctkqiang.burpsuite.remote.protocol.AggregateIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.AggregateType
@@ -32,6 +33,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.util.concurrent.CompletionException
 import java.util.concurrent.CompletionStage
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
@@ -81,7 +83,8 @@ class RemoteWebSocketServerTest {
 
     @Test
     fun `an unpaired device is told that authentication failed`() {
-        withRunningEventServer(InMemoryRemoteEventStream()) { port ->
+        val loggedLines = CopyOnWriteArrayList<String>()
+        withRunningEventServer(InMemoryRemoteEventStream(), logSink = loggedLines::add) { port ->
             val probe = JdkWebSocketProbe.connect(port)
             try {
                 probe.sendText(connectRequestText())
@@ -92,6 +95,9 @@ class RemoteWebSocketServerTest {
                 probe.close()
             }
         }
+
+        // 被拒这件事必须留下设备身份：此前这条通道在两端都不出声，连不上只能靠猜。
+        assertTrue(loggedLines.any { line -> line.contains(UNPAIRED_DEVICE_IDENTIFIER) })
     }
 
     @Test
@@ -121,6 +127,7 @@ class RemoteWebSocketServerTest {
 
     private fun withRunningEventServer(
         eventStream: RemoteEventStream,
+        logSink: (String) -> Unit = {},
         verification: (Int) -> Unit,
     ) {
         val webSocketServer =
@@ -128,6 +135,7 @@ class RemoteWebSocketServerTest {
                 controlGate = createControlGate(),
                 connectionRegistry = RemoteConnectionRegistry(),
                 eventStream = eventStream,
+                logSink = logSink,
             )
         val server =
             embeddedServer(
