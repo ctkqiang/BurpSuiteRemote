@@ -2,13 +2,15 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.data.remote
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.request.url
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withTimeout
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
@@ -73,30 +75,38 @@ internal class RemoteEventStreamSession(
         deviceIdentifier: DeviceIdentifier,
     ): RemoteSessionEnd {
         var sessionEnd = RemoteSessionEnd.PeerClosed
+        var openedSession: DefaultClientWebSocketSession? = null
         try {
-            httpClient.webSocket(eventsUrl(configuration)) {
-                val handshakeConclusion =
-                    withTimeout(timeouts.handshakeMilliseconds) { performHandshake(deviceIdentifier) }
-                sessionEnd =
-                    when (handshakeConclusion) {
-                        RemoteHandshakeConclusion.Authenticated -> {
-                            sendResume()
-                            streamEvents(configuration)
-                        }
-
-                        RemoteHandshakeConclusion.AuthenticationRejected -> {
-                            close(CloseReason(CloseReason.Codes.NORMAL, CLOSE_REASON_AUTHENTICATION_REJECTED))
-                            RemoteSessionEnd.AuthenticationRejected
-                        }
-
-                        RemoteHandshakeConclusion.ProtocolMismatch -> {
-                            close(CloseReason(CloseReason.Codes.NORMAL, CLOSE_REASON_PROTOCOL_MISMATCH))
-                            RemoteSessionEnd.ProtocolMismatch
-                        }
-
-                        RemoteHandshakeConclusion.PeerClosed -> RemoteSessionEnd.PeerClosed
+            // 上限必须盖住「建立连接、升级、应用层握手」整段。此前只包住最后一步，于是连接卡在建连或升级
+            // 上就永远没有结局：界面停在「正在建立连接」，既不重试也不给出任何原因（rules.md §11 的会话可诊断性）。
+            val handshakeConclusion =
+                withTimeout(timeouts.handshakeMilliseconds) {
+                    httpClient
+                        .webSocketSession { url(eventsUrl(configuration)) }
+                        .also { session -> openedSession = session }
+                        .performHandshake(deviceIdentifier)
+                }
+            // 走到这里升级一定已成功，会话一定在手上；取成局部值，后续用法就不必再面对可空类型。
+            val session = openedSession ?: return RemoteSessionEnd.PeerClosed
+            sessionEnd =
+                when (handshakeConclusion) {
+                    RemoteHandshakeConclusion.Authenticated -> {
+                        session.sendResume()
+                        session.streamEvents(configuration)
                     }
-            }
+
+                    RemoteHandshakeConclusion.AuthenticationRejected -> {
+                        session.close(CloseReason(CloseReason.Codes.NORMAL, CLOSE_REASON_AUTHENTICATION_REJECTED))
+                        RemoteSessionEnd.AuthenticationRejected
+                    }
+
+                    RemoteHandshakeConclusion.ProtocolMismatch -> {
+                        session.close(CloseReason(CloseReason.Codes.NORMAL, CLOSE_REASON_PROTOCOL_MISMATCH))
+                        RemoteSessionEnd.ProtocolMismatch
+                    }
+
+                    RemoteHandshakeConclusion.PeerClosed -> RemoteSessionEnd.PeerClosed
+                }
         } catch (handshakeTimeout: TimeoutCancellationException) {
             return RemoteSessionEnd.HandshakeTimedOut
         } catch (cancellation: CancellationException) {
@@ -109,8 +119,20 @@ internal class RemoteEventStreamSession(
             return RemoteSessionEnd.TransportFailure
         } catch (unexpectedFailure: Exception) {
             return RemoteSessionEnd.TransportFailure
+        } finally {
+            // 升级成功而握手失败时会话仍握在手里，必须显式收掉，否则对端会一直等这条没人用的连接。
+            openedSession?.let { session -> closeOrTerminate(session) }
         }
         return sessionEnd
+    }
+
+    // 关闭帧只是礼节：协程已被取消时 close 会立刻抛，那就直接取消这条会话，别让收尾本身变成新的失败。
+    private suspend fun closeOrTerminate(session: DefaultClientWebSocketSession) {
+        try {
+            session.close()
+        } catch (cancellation: CancellationException) {
+            session.cancel()
+        }
     }
 
     // 收到达成结论的报文就收场；其余报文（认证前的事件、与握手无关的信号）按噪声跳过。
