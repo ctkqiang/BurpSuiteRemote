@@ -52,6 +52,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.sync.EventSynchronisationC
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.time.TimeProvider
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.NavigationDependencies
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryMessageReader
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryScopeWriter
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemotePairingCoordinator
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
@@ -220,6 +221,19 @@ class AppContainer(context: Context) {
             technicalLog = technicalLog,
         )
 
+    /**
+     * 作用域写入端口。
+     *
+     * 同 [remoteHistoryMessageReader]：地址端口就在 [connectionSettingsStore] 里，它对本模块之外不可见，
+     * 因此「把主机加到哪台机器的作用域」只能在这里定。
+     */
+    val remoteHistoryScopeWriter: RemoteHistoryScopeWriter =
+        RestRemoteHistoryScopeWriter(
+            remoteControlClient = remoteControlClient,
+            connectionSettingsStore = connectionSettingsStore,
+            technicalLog = technicalLog,
+        )
+
     private val hasStarted = AtomicBoolean(false)
 
     /** 启动后台链路：按本地日志校准续传基准，若已配对则直接建连。进程启动时调用一次。 */
@@ -256,6 +270,7 @@ class AppContainer(context: Context) {
             remoteControlClient = remoteControlClient,
             remotePairingCoordinator = remotePairingCoordinator,
             remoteHistoryMessageReader = remoteHistoryMessageReader,
+            remoteHistoryScopeWriter = remoteHistoryScopeWriter,
             // 日志端口由壳分给各屏，各屏不再各自去拿全局日志。
             technicalLog = technicalLog,
         )

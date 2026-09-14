@@ -73,6 +73,17 @@
     <string name="history_detail_action_share">共有 / エクスポート</string>
     <string name="history_detail_action_send_to_repeater">リピーターへ送る</string>
     <string name="history_detail_reason_send_to_repeater">クライアントにはまだリピーターコマンドポートがありません</string>
+    <string name="history_detail_action_add_to_scope">ホストをスコープに追加</string>
+    <string name="history_detail_reason_add_to_scope">クライアントにはまだスコープ書き込みポートがありません</string>
+
+    <string name="history_detail_scope_conclusion_added">ホストをスコープに追加しました</string>
+    <string name="history_detail_scope_conclusion_not_paired">この端末は Burp とペアリングされていません</string>
+    <string name="history_detail_scope_conclusion_unreachable">今 Burp に到達できません</string>
+    <string name="history_detail_scope_conclusion_not_supported">このプラグインのビルドにスコープ端点がありません</string>
+    <string name="history_detail_scope_conclusion_writer_unavailable">このクライアントにスコープ書き込みポートがありません</string>
+    <string name="history_detail_scope_conclusion_record_missing">Burp はもうこのレコードを保持していません</string>
+    <string name="history_detail_scope_conclusion_malformed">Burp が返したバイトをこのクライアントは読み取れません</string>
+    <string name="history_detail_scope_conclusion_refused">Burp がこのスコープ書き込みを拒否しました</string>
 
     <string name="history_relative_just_now">たった今</string>
     <plurals name="history_relative_seconds">

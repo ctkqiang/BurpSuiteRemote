@@ -52,6 +52,10 @@ import java.time.format.FormatStyle
  * 不填占位内容冒充正文（rules.md §5.1）。所有技术值等宽显示，长按可整条复制，
  * 排版上不为了好看截断任何一项——赏金猎人的证据链不能被省略号吃掉。
  *
+ * 动作区里每一条控制都自带它的处境：能做的按钮就能按；做不了的按钮停用，并在下面一行写明差在
+ * 哪里。加入作用域那条更细一层——按下之后的结论（已加入、没配对、连不上……）就地摆一句，
+ * 因为这些结论的下一步动作各不相同，统一成一句「失败了」等于把排查全丢回给用户。
+ *
  * 标题与返回都归装配层的壳；这一屏只负责内容。
  */
 @Composable
@@ -81,9 +85,14 @@ fun HistoryDetailScreen(
                         record = record,
                         message = uiState.message,
                         messageFailure = uiState.messageFailure,
+                        scopeConclusion = uiState.scopeConclusion,
+                        isScopeWriteAvailable = uiState.isScopeWriteAvailable,
                         onReloadMessage = {
                             haptics.tap()
                             onIntent(HistoryDetailUserInterfaceIntent.ReloadHistoryMessage)
+                        },
+                        onAddToScope = {
+                            onIntent(HistoryDetailUserInterfaceIntent.AddHistoryHostToScope)
                         },
                         onShare = {
                             haptics.tap()
@@ -112,9 +121,13 @@ private fun RecordDetail(
     record: HistoryRecord,
     message: RemoteHistoryMessage?,
     messageFailure: HistoryMessageReadFailure?,
+    scopeConclusion: HistoryScopeWriteConclusion?,
+    isScopeWriteAvailable: Boolean,
     onReloadMessage: () -> Unit,
+    onAddToScope: () -> Unit,
     onShare: () -> Unit,
 ) {
+    val tokens = LocalBurpRemoteDesignTokens.current
     val absentValue = stringResource(R.string.history_absent_value)
 
     // 第一行先给判读结果：方法与状态码，往下才是逐项明细。
@@ -224,22 +237,46 @@ private fun RecordDetail(
     )
 
     Section(titleResource = R.string.history_detail_actions_heading) {
-        BurpRemoteButton(
-            text = stringResource(R.string.history_detail_action_share),
-            onClick = onShare,
-            style = BurpRemoteButtonStyle.Primary,
-        )
-        // 送往重放要发控制命令，客户端还没有那条通路；按钮保持禁用并写明原因。
-        BurpRemoteButton(
-            text = stringResource(R.string.history_detail_action_send_to_repeater),
-            onClick = {},
-            style = BurpRemoteButtonStyle.Secondary,
-            isEnabled = false,
-        )
-        BurpRemoteEmptyState(
-            headline = stringResource(R.string.history_detail_reason_headline),
-            detail = stringResource(R.string.history_detail_reason_send_to_repeater),
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small)) {
+            BurpRemoteButton(
+                text = stringResource(R.string.history_detail_action_share),
+                onClick = onShare,
+                style = BurpRemoteButtonStyle.Primary,
+            )
+            // 加入作用域加到这条记录的主机，整台主机下的所有路径一并覆盖；按键自带触感，这里不再叠一次。
+            BurpRemoteButton(
+                text = stringResource(R.string.history_detail_action_add_to_scope),
+                onClick = onAddToScope,
+                style = BurpRemoteButtonStyle.Secondary,
+                isEnabled = isScopeWriteAvailable,
+            )
+            // 停用的按钮要说明差在哪里：这是装配缺口（客户端没接上写入端口），不是插件版本的问题。
+            if (!isScopeWriteAvailable) {
+                BurpRemoteText(
+                    text = stringResource(R.string.history_detail_reason_add_to_scope),
+                    style = tokens.typography.label,
+                    colour = tokens.colourScheme.contentSecondary,
+                )
+            }
+            // 按下的结论就地摆一句并按类着色——每种结论的下一步都不同，合并成一句「失败了」等于把排查丢回给用户。
+            scopeConclusion?.let { conclusion ->
+                BurpRemoteStatusPill(
+                    text = stringResource(conclusion.messageResource),
+                    tone = toneOf(conclusion),
+                )
+            }
+            // 送往重放要发控制命令，客户端还没有那条通路；按钮保持禁用并写明原因。
+            BurpRemoteButton(
+                text = stringResource(R.string.history_detail_action_send_to_repeater),
+                onClick = {},
+                style = BurpRemoteButtonStyle.Secondary,
+                isEnabled = false,
+            )
+            BurpRemoteEmptyState(
+                headline = stringResource(R.string.history_detail_reason_headline),
+                detail = stringResource(R.string.history_detail_reason_send_to_repeater),
+            )
+        }
     }
 }
 
@@ -420,6 +457,28 @@ private fun toneOf(failure: HistoryMessageReadFailure): BurpRemoteStatusTone =
     }
 
 /**
+ * 加入作用域的结论色标：写进去了算在线；学不会契约内容的应答危险；确定重试无用的中性；
+ * 其余（没配对、连不上、被拒）警告。
+ *
+ * 与上面那条失败色标同一套分档逻辑，只是成员不同——同一种颜色在两条通路里表示同一件事，
+ * 用户不用重新学一套图例。
+ */
+private fun toneOf(conclusion: HistoryScopeWriteConclusion): BurpRemoteStatusTone =
+    when (conclusion) {
+        HistoryScopeWriteConclusion.Added -> BurpRemoteStatusTone.Live
+        HistoryScopeWriteConclusion.MalformedResponse -> BurpRemoteStatusTone.Danger
+        HistoryScopeWriteConclusion.NotSupported,
+        HistoryScopeWriteConclusion.WriterUnavailable,
+        HistoryScopeWriteConclusion.RecordMissing,
+        -> BurpRemoteStatusTone.Neutral
+
+        HistoryScopeWriteConclusion.NotPaired,
+        HistoryScopeWriteConclusion.Unreachable,
+        HistoryScopeWriteConclusion.Refused,
+        -> BurpRemoteStatusTone.Warning
+    }
+
+/**
  * 挑语法着色：正文以 `{` 或 `[` 开头就按 JSON 上色。
  *
  * 请求头与响应头是 HTTP 文本，走纯文本；这一条判断只为了让响应体的 JSON 有字段名、字符串、
@@ -507,6 +566,28 @@ private fun HistoryDetailScreenFailedMessageDarkPreview() {
                     message = null,
                     messageFailure = HistoryMessageReadFailure.Unreachable,
                 ),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview(name = "已加入作用域浅色", showBackground = true)
+@Composable
+private fun HistoryDetailScreenScopeAddedLightPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Light) {
+        HistoryDetailScreen(
+            uiState = previewState().copy(scopeConclusion = HistoryScopeWriteConclusion.Added),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview(name = "无作用域通路深色", showBackground = true)
+@Composable
+private fun HistoryDetailScreenScopeUnavailableDarkPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
+        HistoryDetailScreen(
+            uiState = previewState().copy(isScopeWriteAvailable = false),
             onIntent = {},
         )
     }

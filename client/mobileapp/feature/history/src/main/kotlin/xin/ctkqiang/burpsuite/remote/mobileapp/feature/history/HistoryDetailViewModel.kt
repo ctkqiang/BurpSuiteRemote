@@ -23,18 +23,25 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteHistoryMessag
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteResult
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.HistoryRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryMessageReader
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryScopeWriter
 
 /**
  * 历史详情的状态持有者。
  *
- * 两条数据路各自独立：元数据来自本机投影，订阅即得；报文本体要向插件按标识取回，所以它在
- * 进入这一屏时发起一次，失败后由用户按重试再发起一次。之所以不把本体也塞进投影仓库，
- * 是因为仓库读的是本机已有的事实，而本体本来就还没到本机（plan §20）。
+ * 三条数据路各自独立：元数据来自本机投影，订阅即得；报文本体要向插件按标识取回，所以它在
+ * 进入这一屏时发起一次，失败后由用户按重试再发起一次；加入作用域是一条写命令，只在用户按下
+ * 按钮时发一次。之所以不把本体也塞进投影仓库，是因为仓库读的是本机已有的事实，而本体本来
+ * 就还没到本机（plan §20）。
+ *
+ * 写入端口为空是装配缺口，不是插件缺陷：此时按钮会自报
+ * [HistoryScopeWriteConclusion.WriterUnavailable] 并停用——说清「这一版客户端没接上」，
+ * 比让用户去升级一个本来就够新的插件有用。
  */
 class HistoryDetailViewModel(
     private val historyIdentifier: String,
     historyRepository: HistoryRepository,
     private val remoteHistoryMessageReader: RemoteHistoryMessageReader? = null,
+    private val remoteHistoryScopeWriter: RemoteHistoryScopeWriter? = null,
     private val technicalLog: TechnicalLog = SilentTechnicalLog,
 ) : ViewModel() {
     private val effectChannel = Channel<HistoryDetailUserInterfaceEffect>(Channel.BUFFERED)
@@ -44,13 +51,30 @@ class HistoryDetailViewModel(
 
     private val messageReadState: MutableStateFlow<MessageReadState> = MutableStateFlow(MessageReadState())
 
+    /**
+     * 最近一次「加入作用域」的结论；为空就是还没点过。
+     *
+     * 只放一个可空的结果值，而不是「正在写」「写完了」两个布尔量：这一屏不给这条写命令准备骨架态，
+     * 一次本机 REST 写入短到来不及画任何中间态，多出来的布尔量只会多一处需要跟着同步的真相。
+     */
+    private val scopeWriteConclusionState: MutableStateFlow<HistoryScopeWriteConclusion?> =
+        MutableStateFlow(null)
+
     val uiState: StateFlow<HistoryDetailUserInterfaceState> =
         combine(
             historyRepository
                 .observeHistoryRecord(HistoryIdentifier(value = historyIdentifier))
                 .onEach { record -> reportRecord(observedRecord = record) },
             messageReadState,
-        ) { record, messageRead -> mergeState(observedRecord = record, observedMessageRead = messageRead) }
+            scopeWriteConclusionState,
+        ) { record, messageRead, scopeWriteConclusion ->
+            mergeState(
+                observedRecord = record,
+                observedMessageRead = messageRead,
+                observedScopeConclusion = scopeWriteConclusion,
+                isScopeWriteAvailable = remoteHistoryScopeWriter != null,
+            )
+        }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLISECONDS),
@@ -69,6 +93,8 @@ class HistoryDetailViewModel(
             }
 
             is HistoryDetailUserInterfaceIntent.ReloadHistoryMessage -> loadMessage()
+
+            is HistoryDetailUserInterfaceIntent.AddHistoryHostToScope -> addHostToScope()
         }
     }
 
@@ -120,15 +146,62 @@ class HistoryDetailViewModel(
         }
     }
 
+    /**
+     * 把这条记录的主机写进 Burp 作用域。
+     *
+     * 不像取报文本体那样先把上一轮结果清空：这一屏没有为这条写命令准备骨架态，清空只会让刚才那句
+     * 结论闪一下白，而一次本机 REST 写入短到来不及画任何中间态。用户重复点也写不坏——插件的写入
+     * 本身是幂等的（rules.md §5.5）。
+     */
+    private fun addHostToScope() {
+        viewModelScope.launch {
+            val writer = remoteHistoryScopeWriter
+            if (writer == null) {
+                record(
+                    category = TechnicalLogCategory.Failure,
+                    message = "客户端没有接上作用域写入端口，无法把主机加入作用域",
+                )
+                scopeWriteConclusionState.value = HistoryScopeWriteConclusion.WriterUnavailable
+                return@launch
+            }
+
+            scopeWriteConclusionState.value =
+                when (val result = writer.addHistoryHostToScope(historyIdentifier)) {
+                    is RemoteResult.Succeeded -> {
+                        record(
+                            category = TechnicalLogCategory.UserInterface,
+                            message = "主机已加入作用域",
+                            attributes = mapOf("historyIdentifier" to historyIdentifier),
+                        )
+                        HistoryScopeWriteConclusion.Added
+                    }
+
+                    is RemoteResult.Failed -> {
+                        record(
+                            category = TechnicalLogCategory.Failure,
+                            message = "主机加入作用域失败",
+                            severity = TechnicalLogSeverity.Warning,
+                            attributes = mapOf("failure" to result.failure.toString()),
+                        )
+                        HistoryScopeWriteConclusion.of(result.failure)
+                    }
+                }
+        }
+    }
+
     private fun mergeState(
         observedRecord: HistoryRecord?,
         observedMessageRead: MessageReadState,
+        observedScopeConclusion: HistoryScopeWriteConclusion?,
+        isScopeWriteAvailable: Boolean,
     ): HistoryDetailUserInterfaceState =
         HistoryDetailUserInterfaceState(
             record = observedRecord,
             hasLoaded = true,
             message = observedMessageRead.message,
             messageFailure = observedMessageRead.failure,
+            scopeConclusion = observedScopeConclusion,
+            isScopeWriteAvailable = isScopeWriteAvailable,
         )
 
     private fun reportRecord(observedRecord: HistoryRecord?) {

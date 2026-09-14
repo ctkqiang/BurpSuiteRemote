@@ -10,12 +10,15 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.HistoryRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryMessageReader
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryScopeWriter
 
 /**
- * 装配层：把标识、投影仓库、本体读取端口与日志端口交给 ViewModel，把状态与意图处理交给无状态的界面。
+ * 装配层：把标识、投影仓库、本体读取端口、作用域写入端口与日志端口交给 ViewModel，
+ * 把状态与意图处理交给无状态的界面。
  *
- * 本体读取端口可能为空（例如预览或裁剪过的装配），此时详情屏照实说明这条通路没接上，
- * 而不是假装取过了（rules.md §5.1）。
+ * 两个远端端口都可能为空（例如预览或裁剪过的装配）。空着时详情屏照实说明这条通路没接上：
+ * 本体那一侧摆一句「这版客户端不提供」，作用域那一侧把按钮停用并写明原因——都不假装做过了
+ * （rules.md §5.1）。
  */
 @Composable
 fun HistoryDetailRoute(
@@ -24,6 +27,7 @@ fun HistoryDetailRoute(
     onOpenSharing: (String) -> Unit,
     modifier: Modifier = Modifier,
     remoteHistoryMessageReader: RemoteHistoryMessageReader? = null,
+    remoteHistoryScopeWriter: RemoteHistoryScopeWriter? = null,
     technicalLog: TechnicalLog = SilentTechnicalLog,
 ) {
     val viewModel: HistoryDetailViewModel =
@@ -32,6 +36,7 @@ fun HistoryDetailRoute(
                 historyIdentifier = historyIdentifier,
                 historyRepository = historyRepository,
                 remoteHistoryMessageReader = remoteHistoryMessageReader,
+                remoteHistoryScopeWriter = remoteHistoryScopeWriter,
                 technicalLog = technicalLog,
             )
         }

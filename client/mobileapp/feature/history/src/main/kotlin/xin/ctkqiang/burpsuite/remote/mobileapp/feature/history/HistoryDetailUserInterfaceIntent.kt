@@ -7,4 +7,7 @@ sealed interface HistoryDetailUserInterfaceIntent {
 
     /** 重新取一次报文本体；上一次失败后用户能自己再试。 */
     data object ReloadHistoryMessage : HistoryDetailUserInterfaceIntent
+
+    /** 把这条记录的主机加入 Burp 作用域；加过之后用户还能再点，插件的写入本身是幂等的。 */
+    data object AddHistoryHostToScope : HistoryDetailUserInterfaceIntent
 }

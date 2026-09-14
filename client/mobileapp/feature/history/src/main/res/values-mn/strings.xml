@@ -73,6 +73,17 @@
     <string name="history_detail_action_share">Хуваалцах / экспортлох</string>
     <string name="history_detail_action_send_to_repeater">Рипитер рүү илгээх</string>
     <string name="history_detail_reason_send_to_repeater">клиентэд рипитер-командын порт хараахан байхгүй</string>
+    <string name="history_detail_action_add_to_scope">Хостийг scope-д нэмэх</string>
+    <string name="history_detail_reason_add_to_scope">клиентэд scope-бичих порт хараахан байхгүй</string>
+
+    <string name="history_detail_scope_conclusion_added">Хост scope-д нэмэгдлээ</string>
+    <string name="history_detail_scope_conclusion_not_paired">Энэ төхөөрөмж Burp-тай хослогдоогүй</string>
+    <string name="history_detail_scope_conclusion_unreachable">Яг одоо Burp-д хүрэх боломжгүй</string>
+    <string name="history_detail_scope_conclusion_not_supported">Энэ плагины бүтэцэд scope-ийн цэг байхгүй</string>
+    <string name="history_detail_scope_conclusion_writer_unavailable">Энэ клиентэд scope-бичих порт байхгүй</string>
+    <string name="history_detail_scope_conclusion_record_missing">Burp энэ бичлэгийг хадгалахаа больсон</string>
+    <string name="history_detail_scope_conclusion_malformed">Burp буцаасан байтыг энэ клиент уншиж чадахгүй</string>
+    <string name="history_detail_scope_conclusion_refused">Burp энэ scope-ийн бичилтийг татгалзсан</string>
 
     <string name="history_relative_just_now">саяхан</string>
     <plurals name="history_relative_seconds">

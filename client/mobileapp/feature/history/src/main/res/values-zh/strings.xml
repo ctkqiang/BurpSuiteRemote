@@ -73,6 +73,17 @@
     <string name="history_detail_action_share">分享或导出</string>
     <string name="history_detail_action_send_to_repeater">送往重放</string>
     <string name="history_detail_reason_send_to_repeater">客户端还没有重放命令端口</string>
+    <string name="history_detail_action_add_to_scope">把主机加入作用域</string>
+    <string name="history_detail_reason_add_to_scope">客户端还没有作用域写入端口</string>
+
+    <string name="history_detail_scope_conclusion_added">主机已加入作用域</string>
+    <string name="history_detail_scope_conclusion_not_paired">这台设备还没和 Burp 建立可用配对</string>
+    <string name="history_detail_scope_conclusion_unreachable">现在连不上 Burp</string>
+    <string name="history_detail_scope_conclusion_not_supported">这版插件不提供作用域端点</string>
+    <string name="history_detail_scope_conclusion_writer_unavailable">这版客户端没有接上作用域写入端口</string>
+    <string name="history_detail_scope_conclusion_record_missing">Burp 里已经没有这条记录</string>
+    <string name="history_detail_scope_conclusion_malformed">Burp 回的字节客户端读不懂</string>
+    <string name="history_detail_scope_conclusion_refused">Burp 拒绝了这次作用域写入</string>
 
     <string name="history_relative_just_now">刚刚</string>
     <plurals name="history_relative_seconds">

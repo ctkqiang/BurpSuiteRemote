@@ -301,6 +301,7 @@ fun BurpsuiteRemoteNavigationHost(
                                 navController.openRoute(BurpRemoteRoute.sharing(identifier))
                             },
                             remoteHistoryMessageReader = navigationDependencies.remoteHistoryMessageReader,
+                            remoteHistoryScopeWriter = navigationDependencies.remoteHistoryScopeWriter,
                             technicalLog = technicalLog,
                         )
                     }
