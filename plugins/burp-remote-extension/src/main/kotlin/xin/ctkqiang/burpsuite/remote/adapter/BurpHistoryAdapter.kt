@@ -105,7 +105,13 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
         }
 
     // 字段之间用 NUL 分隔：HTTP 头与路径里不会出现 NUL，拼接不会跨字段撞车。
-    // 状态码缺席时用 [ABSENT_STATUS_CODE_TEXT] 而不是空串：空串会让「没有状态码」与「状态码为空文本」撞成同一个身份。
+    //
+    // identifier 只能依赖请求端不可变字段（端口、TLS 标志、主机、方法、路径、发生时刻）。
+    // 响应端字段（statusCode、mimeType、responseLength、duration）在 Burp 里是"后来补上"的——
+    // 一条 entry 刚进入代理历史时 statusCode=null，等响应到齐才变成具体值；如果 identifier
+    // 里带了这些可变字段，同一条 entry 在两个时刻就会算出两个不同的 identifier，事件流发的是
+    // 旧的，REST 端点收到的是新的，mobile 端用事件里的 identifier 拉不到 REST 里的那条，
+    // 于是所有报文详情都变"Burp 里已经没有这条记录"。
     private fun digestOf(entry: BurpProxyHistoryEntry): Long {
         val canonicalText =
             listOf(
@@ -116,8 +122,6 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
                 entry.method,
                 entry.path,
                 entry.occurredAtEpochMilliseconds.toString(),
-                entry.statusCode?.toString() ?: ABSENT_STATUS_CODE_TEXT,
-                entry.mimeTypeText,
             ).joinToString(IDENTIFIER_FIELD_SEPARATOR)
         return fnvOneAHashOf(canonicalText.toByteArray(StandardCharsets.UTF_8))
     }
@@ -145,8 +149,6 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
         private const val HEXADECIMAL_PADDING = '0'
 
         private const val IDENTIFIER_FIELD_SEPARATOR = "\u0000"
-
-        private const val ABSENT_STATUS_CODE_TEXT = "no-response"
 
         private const val FNV_OFFSET_BASIS = -3750763034362895579L
 
