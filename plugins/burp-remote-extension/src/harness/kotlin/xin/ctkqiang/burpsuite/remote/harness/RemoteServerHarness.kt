@@ -192,10 +192,13 @@ private suspend fun growProxyHistory(
                 host = HARNESS_TARGET_HOST,
                 port = HARNESS_TARGET_PORT,
                 isSecure = true,
+                destinationInternetProtocolAddress = HARNESS_TARGET_ADDRESS,
                 path = "/harness/$entryOrdinal",
                 listenerPort = remotePort,
                 statusCode = 200,
                 mimeTypeText = "JSON",
+                responseLength = HARNESS_RESPONSE_LENGTH,
+                durationMilliseconds = HARNESS_DURATION_MILLISECONDS,
             ),
         )
         historySignalSource.signalHistoryMayHaveGrown()
@@ -243,6 +246,12 @@ private const val EVENT_INTERVAL_MILLISECONDS = 3_000L
 private const val HARNESS_TARGET_HOST = "harness.example.com"
 
 private const val HARNESS_TARGET_PORT = 443
+
+private const val HARNESS_TARGET_ADDRESS = "203.0.113.10"
+
+private const val HARNESS_RESPONSE_LENGTH = 512L
+
+private const val HARNESS_DURATION_MILLISECONDS = 37L
 
 private const val LOOPBACK_HOST_ADDRESS = "127.0.0.1"
 

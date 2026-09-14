@@ -31,8 +31,42 @@ class BurpHistoryAdapterTest {
         assertEquals(StubProxyHistoryEntry.DEFAULT_METHOD, item.textAt("method"))
         assertEquals(StubProxyHistoryEntry.DEFAULT_HOST, item.textAt("host"))
         assertEquals(StubProxyHistoryEntry.DEFAULT_PATH, item.textAt("path"))
-        assertEquals(StubProxyHistoryEntry.DEFAULT_STATUS_CODE.toString(), item.textAt("status"))
+        assertEquals(StubProxyHistoryEntry.DEFAULT_LISTENER_PORT.toString(), item.textAt("listenerPort"))
+        assertEquals(StubProxyHistoryEntry.DEFAULT_STATUS_CODE.toString(), item.textAt("statusCode"))
+        assertEquals(StubProxyHistoryEntry.DEFAULT_MIME_TYPE_TEXT, item.textAt("mimeType"))
+        assertEquals(StubProxyHistoryEntry.DEFAULT_IS_SECURE.toString(), item.textAt("usesTls"))
+        assertEquals("https", item.textAt("scheme"))
+        assertEquals(
+            StubProxyHistoryEntry.DEFAULT_DESTINATION_INTERNET_PROTOCOL_ADDRESS,
+            item.textAt("destinationInternetProtocolAddress"),
+        )
+        assertEquals(StubProxyHistoryEntry.DEFAULT_RESPONSE_LENGTH.toString(), item.textAt("responseLength"))
+        assertEquals(
+            StubProxyHistoryEntry.DEFAULT_DURATION_MILLISECONDS.toString(),
+            item.textAt("durationMilliseconds"),
+        )
         assertEquals(adapter.toHistoryIdentifier(StubProxyHistoryEntry()).value, item.textAt("historyIdentifier"))
+    }
+
+    @Test
+    fun `an entry that is not secure and carries no response reports no response facts`() {
+        val stubEntry =
+            StubProxyHistoryEntry(
+                isSecure = false,
+                destinationInternetProtocolAddress = null,
+                statusCode = 0,
+                responseLength = null,
+                durationMilliseconds = null,
+                hasResponse = false,
+            )
+        val adapter = createAdapter(stubEntry)
+
+        val item = historyItemsOf(adapter)[0]
+
+        assertEquals("http", item.textAt("scheme"))
+        assertEquals(JsonNull, item.jsonObject["destinationInternetProtocolAddress"])
+        assertEquals(JsonNull, item.jsonObject["responseLength"])
+        assertEquals(JsonNull, item.jsonObject["durationMilliseconds"])
     }
 
     @Test
@@ -53,7 +87,20 @@ class BurpHistoryAdapterTest {
         val adapter = createAdapter(StubProxyHistoryEntry())
 
         assertEquals(
-            setOf("historyIdentifier", "method", "host", "path", "status"),
+            setOf(
+                "historyIdentifier",
+                "method",
+                "host",
+                "path",
+                "scheme",
+                "statusCode",
+                "mimeType",
+                "usesTls",
+                "listenerPort",
+                "destinationInternetProtocolAddress",
+                "responseLength",
+                "durationMilliseconds",
+            ),
             historyItemsOf(adapter)[0].jsonObject.keys,
         )
     }

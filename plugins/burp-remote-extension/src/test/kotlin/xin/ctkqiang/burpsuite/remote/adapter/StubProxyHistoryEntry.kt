@@ -9,10 +9,13 @@ class StubProxyHistoryEntry(
     override val host: String = DEFAULT_HOST,
     override val port: Int = DEFAULT_PORT,
     override val isSecure: Boolean = DEFAULT_IS_SECURE,
+    override val destinationInternetProtocolAddress: String? = DEFAULT_DESTINATION_INTERNET_PROTOCOL_ADDRESS,
     override val path: String = DEFAULT_PATH,
     override val listenerPort: Int = DEFAULT_LISTENER_PORT,
     override val statusCode: Int = DEFAULT_STATUS_CODE,
     override val mimeTypeText: String = DEFAULT_MIME_TYPE_TEXT,
+    override val responseLength: Long? = DEFAULT_RESPONSE_LENGTH,
+    override val durationMilliseconds: Long? = DEFAULT_DURATION_MILLISECONDS,
     override val hasResponse: Boolean = DEFAULT_HAS_RESPONSE,
     private val requestHeadersText: String = DEFAULT_REQUEST_HEADERS_TEXT,
     private val requestBodyText: String = DEFAULT_REQUEST_BODY_TEXT,
@@ -38,6 +41,8 @@ class StubProxyHistoryEntry(
 
         const val DEFAULT_IS_SECURE: Boolean = true
 
+        const val DEFAULT_DESTINATION_INTERNET_PROTOCOL_ADDRESS: String = "203.0.113.10"
+
         const val DEFAULT_PATH: String = "/api/user"
 
         const val DEFAULT_LISTENER_PORT: Int = 8_080
@@ -45,6 +50,10 @@ class StubProxyHistoryEntry(
         const val DEFAULT_STATUS_CODE: Int = 200
 
         const val DEFAULT_MIME_TYPE_TEXT: String = "JSON"
+
+        const val DEFAULT_RESPONSE_LENGTH: Long = 128L
+
+        const val DEFAULT_DURATION_MILLISECONDS: Long = 42L
 
         const val DEFAULT_HAS_RESPONSE: Boolean = true
 

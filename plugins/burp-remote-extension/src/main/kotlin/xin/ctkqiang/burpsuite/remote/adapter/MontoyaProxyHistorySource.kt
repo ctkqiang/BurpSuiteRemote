@@ -36,6 +36,8 @@ private class MontoyaProxyHistoryEntry(private val historyEntry: ProxyHttpReques
 
     override val isSecure: Boolean = request.httpService().secure()
 
+    override val destinationInternetProtocolAddress: String? = request.httpService().ipAddress()
+
     override val path: String = request.path()
 
     override val listenerPort: Int = historyEntry.listenerPort()
@@ -43,6 +45,13 @@ private class MontoyaProxyHistoryEntry(private val historyEntry: ProxyHttpReques
     override val statusCode: Int = if (response != null) response.statusCode().toInt() else NO_RESPONSE_STATUS_CODE
 
     override val mimeTypeText: String = describeMimeType(historyEntry.mimeType())
+
+    // 没有响应就没有正文长度可言，这里给 null 而不是 0：0 是个合法的空响应长度，两者不能混为一谈。
+    override val responseLength: Long? = response?.let { historyResponse -> historyResponse.body().length().toLong() }
+
+    // 同理，没有响应时计时数据没有意义；Montoya 的 timingData() 直接返回对象，不判空会读到一段零耗时。
+    override val durationMilliseconds: Long? =
+        response?.let { historyEntry.timingData().timeBetweenRequestSentAndEndOfResponse().toMillis() }
 
     override val hasResponse: Boolean = response != null
 

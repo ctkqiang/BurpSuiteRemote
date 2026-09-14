@@ -11,10 +11,13 @@ class HarnessProxyHistoryEntry(
     override val host: String,
     override val port: Int,
     override val isSecure: Boolean,
+    override val destinationInternetProtocolAddress: String?,
     override val path: String,
     override val listenerPort: Int,
     override val statusCode: Int,
     override val mimeTypeText: String,
+    override val responseLength: Long?,
+    override val durationMilliseconds: Long?,
 ) : BurpProxyHistoryEntry {
     override val hasResponse: Boolean = true
 

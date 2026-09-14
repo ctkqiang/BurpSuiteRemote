@@ -3,7 +3,9 @@
 package xin.ctkqiang.burpsuite.remote.adapter
 
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -41,8 +43,43 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
             put(METHOD_FIELD, entry.method)
             put(HOST_FIELD, entry.host)
             put(PATH_FIELD, entry.path)
-            put(STATUS_FIELD, entry.statusCode)
+            put(SCHEME_FIELD, schemeTextOf(entry))
+            put(STATUS_CODE_FIELD, entry.statusCode)
+            put(MIME_TYPE_FIELD, entry.mimeTypeText)
+            put(USES_TLS_FIELD, entry.isSecure)
+            put(LISTENER_PORT_FIELD, entry.listenerPort)
+            putAbsentableText(DESTINATION_INTERNET_PROTOCOL_ADDRESS_FIELD, entry.destinationInternetProtocolAddress)
+            putAbsentableNumber(RESPONSE_LENGTH_FIELD, entry.responseLength)
+            putAbsentableNumber(DURATION_MILLISECONDS_FIELD, entry.durationMilliseconds)
         }
+
+    // 没有值的字段写成显式 null，而不是省略键：键集因此固定，客户端能区分"这次没报"与"这类条目根本没有这个字段"。
+    // 两个分支各写各的，是因为 `put` 按值的静态类型重载：`fieldValue ?: JsonNull` 会被推成 Any，反而一个重载都匹配不上。
+    private fun JsonObjectBuilder.putAbsentableText(
+        fieldName: String,
+        fieldValue: String?,
+    ) {
+        if (fieldValue == null) {
+            put(fieldName, JsonNull)
+        } else {
+            put(fieldName, fieldValue)
+        }
+    }
+
+    private fun JsonObjectBuilder.putAbsentableNumber(
+        fieldName: String,
+        fieldValue: Number?,
+    ) {
+        if (fieldValue == null) {
+            put(fieldName, JsonNull)
+        } else {
+            put(fieldName, fieldValue)
+        }
+    }
+
+    // 协议方案由是否经 TLS 推出，两处各写一遍迟早会分叉；线上沿用客户端既有的小写写法。
+    private fun schemeTextOf(entry: BurpProxyHistoryEntry): String =
+        if (entry.isSecure) HTTPS_SCHEME_TEXT else HTTP_SCHEME_TEXT
 
     /**
      * 由 Burp 给出的字段推导条目身份。
@@ -123,6 +160,28 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
 
         private const val PATH_FIELD = "path"
 
+        // 元数据与事件走领域字段名，客户端投射按同一套名字取值。
+        private const val SCHEME_FIELD = "scheme"
+
+        private const val STATUS_CODE_FIELD = "statusCode"
+
+        private const val MIME_TYPE_FIELD = "mimeType"
+
+        private const val USES_TLS_FIELD = "usesTls"
+
+        private const val LISTENER_PORT_FIELD = "listenerPort"
+
+        private const val DESTINATION_INTERNET_PROTOCOL_ADDRESS_FIELD = "destinationInternetProtocolAddress"
+
+        private const val RESPONSE_LENGTH_FIELD = "responseLength"
+
+        private const val DURATION_MILLISECONDS_FIELD = "durationMilliseconds"
+
+        private const val HTTPS_SCHEME_TEXT = "https"
+
+        private const val HTTP_SCHEME_TEXT = "http"
+
+        // 按标识取回报文的那条端点沿用 `status`：它对应的客户端 DTO 是既有的协议契约，改名要一并升版本（rules.md §7.6）。
         private const val STATUS_FIELD = "status"
 
         private const val REQUEST_HEADERS_FIELD = "requestHeaders"

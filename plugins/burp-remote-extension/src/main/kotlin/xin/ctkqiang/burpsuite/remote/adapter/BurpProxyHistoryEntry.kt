@@ -23,6 +23,9 @@ interface BurpProxyHistoryEntry {
     /** 是否经 TLS。 */
     val isSecure: Boolean
 
+    /** 目标主机的互联网协议地址；Burp 没给出时为 null。 */
+    val destinationInternetProtocolAddress: String?
+
     /** 请求路径，含查询串。 */
     val path: String
 
@@ -34,6 +37,12 @@ interface BurpProxyHistoryEntry {
 
     /** Burp 判定的响应 MIME 类型描述。 */
     val mimeTypeText: String
+
+    /** 响应正文字节数；尚无响应时为 null。 */
+    val responseLength: Long?
+
+    /** 请求发出到响应收完的耗时，毫秒；尚无响应时为 null。 */
+    val durationMilliseconds: Long?
 
     /** 是否已经拿到响应。 */
     val hasResponse: Boolean
