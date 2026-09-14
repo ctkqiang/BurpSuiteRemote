@@ -63,6 +63,8 @@
     <string name="pairing_conclusion_device_not_paired">插件不认这台设备，请先在插件面板发起配对。</string>
     <string name="pairing_conclusion_pairing_code_mismatch">配对码不匹配，请核对后重试。</string>
     <string name="pairing_conclusion_pairing_session_expired">插件侧的配对会话已过期，请重新扫一张票据。</string>
+    <!-- 结论之外还差的那一句：结论说的是「哪里不对」，这一条说的是「现在做什么」。 -->
+    <string name="pairing_next_step_refresh_ticket">到 Burp 的 Burp Remote 标签页按「刷新配对码」，再扫新出现的二维码；一张票据只认一次。</string>
     <string name="pairing_conclusion_unreachable">插件不可达，请检查地址、端口与网络。</string>
     <string name="pairing_conclusion_failed">配对失败，具体原因见技术日志。</string>
 

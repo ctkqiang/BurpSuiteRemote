@@ -278,6 +278,11 @@ private fun PairingOutcomeSection(uiState: BurpConnectionUserInterfaceState) {
                 text = stringResource(pairingRejectionResourceOf(uiState.pairingRejectionReason)),
                 tone = BurpRemoteStatusTone.Danger,
             )
+            // 结论说的是「哪里不对」，这一条说的是「现在做什么」。只给前者，用户就会对着同一张
+            // 已经作废的二维码反复扫——那是这一屏最常见的一次空转。
+            conclusion.nextStepResource?.let { resource ->
+                SectionNote(text = stringResource(resource))
+            }
         }
     }
 }

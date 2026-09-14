@@ -1,7 +1,9 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,6 +13,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.feature.connection.BurpRemoteScan
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemotePairingConclusion
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
 /**
@@ -53,6 +56,8 @@ internal fun PairingScannerDialogLayer(
                 PairingStatus(
                     text = stringResource(conclusion.messageResource),
                     tone = BurpRemoteStatusTone.Danger,
+                    // 只说「会话已过期」，用户就会对着同一张作废的二维码反复扫；这一枚才是他要做的动作。
+                    nextStep = conclusion.nextStepResource?.let { resource -> stringResource(resource) },
                 )
 
             else -> Unit
@@ -64,8 +69,17 @@ internal fun PairingScannerDialogLayer(
 private fun PairingStatus(
     text: String,
     tone: BurpRemoteStatusTone,
+    nextStep: String? = null,
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        BurpRemoteStatusPill(text = text, tone = tone)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+        ) {
+            BurpRemoteStatusPill(text = text, tone = tone)
+            nextStep?.let { step ->
+                BurpRemoteStatusPill(text = step, tone = BurpRemoteStatusTone.Warning)
+            }
+        }
     }
 }

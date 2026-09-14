@@ -63,6 +63,8 @@
     <string name="pairing_conclusion_device_not_paired">Burp does not accept this device. Start pairing from the extension.</string>
     <string name="pairing_conclusion_pairing_code_mismatch">The pairing code does not match. Check it and retry.</string>
     <string name="pairing_conclusion_pairing_session_expired">The pairing session on Burp has expired. Scan a fresh ticket.</string>
+    <!-- 结论之外还差的那一句：结论说的是「哪里不对」，这一条说的是「现在做什么」。 -->
+    <string name="pairing_next_step_refresh_ticket">In the Burp Remote tab press "Refresh pairing code", then scan the code that appears. A ticket works only once.</string>
     <string name="pairing_conclusion_unreachable">Burp is unreachable. Check the address, the port and your network.</string>
     <string name="pairing_conclusion_failed">Pairing failed. See the technical log for the exact cause.</string>
 

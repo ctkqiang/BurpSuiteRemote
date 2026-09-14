@@ -63,6 +63,8 @@
     <string name="pairing_conclusion_device_not_paired">Burp akzeptiert dieses Gerät nicht. Bitte die Kopplung in der Erweiterung starten.</string>
     <string name="pairing_conclusion_pairing_code_mismatch">Der Kopplungscode passt nicht. Bitte prüfen und erneut versuchen.</string>
     <string name="pairing_conclusion_pairing_session_expired">Die Kopplungssitzung in Burp ist abgelaufen. Bitte ein neues Ticket scannen.</string>
+    <!-- 结论之外还差的那一句：结论说的是「哪里不对」，这一条说的是「现在做什么」。 -->
+    <string name="pairing_next_step_refresh_ticket">Drücken Sie im Burp-Remote-Tab auf "Kopplungscode erneuern" und scannen Sie den neu erscheinenden Code. Ein Ticket ist nur einmal gültig.</string>
     <string name="pairing_conclusion_unreachable">Burp ist nicht erreichbar. Adresse, Port und Netzwerk prüfen.</string>
     <string name="pairing_conclusion_failed">Kopplung fehlgeschlagen. Die genaue Ursache steht im technischen Log.</string>
 

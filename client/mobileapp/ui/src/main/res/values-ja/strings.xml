@@ -63,6 +63,8 @@
     <string name="pairing_conclusion_device_not_paired">Burp はこの端末を受け付けません。拡張機能からペアリングを開始してください。</string>
     <string name="pairing_conclusion_pairing_code_mismatch">ペアリングコードが一致しません。確認して再試行してください。</string>
     <string name="pairing_conclusion_pairing_session_expired">Burp 上のペアリングセッションは期限切れです。新しいチケットをスキャンしてください。</string>
+    <!-- 结论之外还差的那一句：结论说的是「哪里不对」，这一条说的是「现在做什么」。插件面板没有日文资源，按钮以英文呈现。 -->
+    <string name="pairing_next_step_refresh_ticket">Burp Remote タブで "Refresh pairing code" を押し、新しく表示されたコードをスキャンしてください。チケットは一度しか使えません。</string>
     <string name="pairing_conclusion_unreachable">Burp に到達できません。アドレス、ポート、ネットワークを確認してください。</string>
     <string name="pairing_conclusion_failed">ペアリングに失敗しました。正確な原因は技術ログを確認してください。</string>
 
