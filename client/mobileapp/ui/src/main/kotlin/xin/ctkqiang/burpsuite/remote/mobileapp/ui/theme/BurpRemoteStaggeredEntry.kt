@@ -15,9 +15,16 @@ import androidx.compose.ui.unit.dp
  *
  * 错峰让一列同级信息按阅读顺序落下，用户因此看得出哪些是同一批；纯位移没有信息量，
  * 所以这里只做很短的位移加上淡入。
+ *
+ * 只在首批项上生效：懒加载列表里，一行是滚进视口那一刻才组合的，若每一行都淡一次，
+ * 用户滚动时会看到一排接一排地闪——那些行本来就该是已经画好的。首屏之内才值得入场。
  */
 @Composable
 fun Modifier.burpRemoteStaggeredEntry(index: Int): Modifier {
+    if (index >= MAXIMUM_STAGGERED_ITEM_COUNT) {
+        return this
+    }
+
     val entryProgress = remember { Animatable(START_PROGRESS) }
     val entryTranslationPixels = with(LocalDensity.current) { ENTRY_TRANSLATION.toPx() }
 
@@ -27,7 +34,7 @@ fun Modifier.burpRemoteStaggeredEntry(index: Int): Modifier {
             animationSpec =
                 tween(
                     durationMillis = BurpRemoteMotion.DURATION_REGULAR,
-                    delayMillis = staggerDelayFor(index),
+                    delayMillis = index * STAGGER_STEP_MILLISECONDS,
                     easing = BurpRemoteMotion.EasingStandard,
                 ),
         )
@@ -39,16 +46,12 @@ fun Modifier.burpRemoteStaggeredEntry(index: Int): Modifier {
     }
 }
 
-// 前几项才错峰：一屏之外的项等它滚到眼前时早就该画好了，继续延迟只会让它看起来像卡住。
-private fun staggerDelayFor(index: Int): Int =
-    if (index >= MAXIMUM_STAGGERED_ITEM_COUNT) {
-        MAXIMUM_STAGGERED_ITEM_COUNT * STAGGER_STEP_MILLISECONDS
-    } else {
-        index * STAGGER_STEP_MILLISECONDS
-    }
+// 首屏大约能看到这么多行；再多就属于「滚进来时早该画好」的那一批。
+private const val MAXIMUM_STAGGERED_ITEM_COUNT = 8
+
+// 一屏之内的项最多等 7 档，仍在一瞬之内；超过这个数的项不再入场。
+private const val STAGGER_STEP_MILLISECONDS = 30
 
 private val ENTRY_TRANSLATION = 8.dp
-private const val STAGGER_STEP_MILLISECONDS = 30
-private const val MAXIMUM_STAGGERED_ITEM_COUNT = 8
 private const val START_PROGRESS = 0f
 private const val END_PROGRESS = 1f
