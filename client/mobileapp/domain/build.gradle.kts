@@ -18,6 +18,9 @@ dependencies {
     // 用 api：领域模型公开的属性带着身份值类型，藏起来会让使用方拿到模型却读不到身份值。
     api(project(":core:model"))
 
+    // 用 api：控制命令出现在端口签名里，发令方（界面）与实现方都要能构造并读到这些类型（rules.md §6.2）。
+    api(project(":core:protocol"))
+
     implementation(libs.kotlinx.coroutines.core)
 
     testImplementation(libs.junit.jupiter)

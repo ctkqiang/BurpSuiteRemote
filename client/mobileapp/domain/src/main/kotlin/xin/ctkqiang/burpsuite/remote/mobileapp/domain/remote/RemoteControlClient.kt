@@ -3,6 +3,8 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote
 import kotlinx.coroutines.flow.Flow
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.OperationIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.command.RemoteCommand
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.event.JournalEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ConnectionState
 
@@ -45,4 +47,24 @@ interface RemoteControlClient {
 
     /** 取当前状态快照，对应 GET /v1/snapshot；成功后本地续传基准一并推到快照那一刻。 */
     suspend fun requestSnapshot(configuration: RemoteConnectionConfiguration): RemoteResult<RemoteRuntimeState>
+
+    /**
+     * 为一条即将发出的命令取一个新的执行身份。
+     *
+     * 身份格式是两端协议契约（rules.md §11），发令方不自己编，只从这一个入口取；
+     * 取到之后必须原样放进命令对象，重试时复用同一个值，插件据此去重（rules.md §5.5）。
+     */
+    fun nextOperationIdentifier(): OperationIdentifier
+
+    /**
+     * 执行一条控制命令。
+     *
+     * 命令类型不出现在报文中（rules.md §11）：命令对象决定打到插件哪个端点，插件按端点分派；
+     * 命令自带的执行身份原样上行，因此重试不会产生第二次副作用。插件尚未提供该端点时，
+     * 结果如实为 [RemoteFailure.ActionNotSupported]，界面才知道该说「服务端还没做」。
+     */
+    suspend fun dispatch(
+        configuration: RemoteConnectionConfiguration,
+        command: RemoteCommand,
+    ): RemoteResult<Unit>
 }

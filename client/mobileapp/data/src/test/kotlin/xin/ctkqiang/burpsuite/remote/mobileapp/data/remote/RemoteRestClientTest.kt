@@ -11,13 +11,20 @@ import io.ktor.http.headersOf
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.InterceptIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.OperationIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.PairingChallengeIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.PairingCode
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.RepeaterRequestIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.command.AddHistoryToScope
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.command.DropIntercept
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.command.ExecuteRepeater
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.command.ForwardIntercept
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.command.ShareHistory
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.PairingAttempt
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteConnectionConfiguration
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteFailure
@@ -94,11 +101,18 @@ class RemoteRestClientTest {
         }
 
     @Test
-    fun `a control command carries a freshly generated operation identifier`() =
+    fun `a dispatched command carries its own operation identifier to the plugin`() =
         runBlocking {
             val restClient = restClientRespondingWith(SUCCEEDED_COMMAND_RESPONSE)
 
-            val result = restClient.forwardIntercept(CONFIGURATION, INTERCEPT_IDENTIFIER)
+            val result =
+                restClient.dispatch(
+                    CONFIGURATION,
+                    ForwardIntercept(
+                        interceptIdentifier = INTERCEPT_IDENTIFIER,
+                        operationIdentifier = FIXED_OPERATION_IDENTIFIER,
+                    ),
+                )
 
             assertEquals(RemoteResult.Succeeded(Unit), result)
             val request = recordedRequests.single()
@@ -109,11 +123,36 @@ class RemoteRestClientTest {
         }
 
     @Test
+    fun `a scope command addresses the history item whose host is to be included`() =
+        runBlocking {
+            val restClient = restClientRespondingWith(SUCCEEDED_COMMAND_RESPONSE)
+
+            val result =
+                restClient.dispatch(
+                    CONFIGURATION,
+                    AddHistoryToScope(
+                        historyIdentifier = HISTORY_IDENTIFIER,
+                        operationIdentifier = FIXED_OPERATION_IDENTIFIER,
+                    ),
+                )
+
+            assertEquals(RemoteResult.Succeeded(Unit), result)
+            assertEquals("${RemoteEndpointPath.SCOPE}/history_1", recordedRequests.single().url.encodedPath)
+        }
+
+    @Test
     fun `a repeater execution command addresses the request by its identifier`() =
         runBlocking {
             val restClient = restClientRespondingWith(SUCCEEDED_COMMAND_RESPONSE)
 
-            val result = restClient.executeRepeater(CONFIGURATION, RepeaterRequestIdentifier("repeater_7"))
+            val result =
+                restClient.dispatch(
+                    CONFIGURATION,
+                    ExecuteRepeater(
+                        repeaterRequestIdentifier = RepeaterRequestIdentifier("repeater_7"),
+                        operationIdentifier = FIXED_OPERATION_IDENTIFIER,
+                    ),
+                )
 
             assertEquals(RemoteResult.Succeeded(Unit), result)
             assertEquals("${RemoteEndpointPath.REPEATER}/repeater_7/execute", recordedRequests.single().url.encodedPath)
@@ -124,7 +163,14 @@ class RemoteRestClientTest {
         runBlocking {
             val restClient = restClientRespondingWith(REJECTED_MISSING_OPERATION_IDENTIFIER_RESPONSE)
 
-            val result = restClient.dropIntercept(CONFIGURATION, INTERCEPT_IDENTIFIER)
+            val result =
+                restClient.dispatch(
+                    CONFIGURATION,
+                    DropIntercept(
+                        interceptIdentifier = INTERCEPT_IDENTIFIER,
+                        operationIdentifier = FIXED_OPERATION_IDENTIFIER,
+                    ),
+                )
 
             assertEquals(RemoteResult.Failed(RemoteFailure.MissingOperationIdentifier), result)
         }
@@ -134,9 +180,34 @@ class RemoteRestClientTest {
         runBlocking {
             val restClient = restClientRespondingWith(FAILED_NOT_IMPLEMENTED_RESPONSE)
 
-            val result = restClient.executeRepeater(CONFIGURATION, RepeaterRequestIdentifier("repeater_7"))
+            val result =
+                restClient.dispatch(
+                    CONFIGURATION,
+                    ExecuteRepeater(
+                        repeaterRequestIdentifier = RepeaterRequestIdentifier("repeater_7"),
+                        operationIdentifier = FIXED_OPERATION_IDENTIFIER,
+                    ),
+                )
 
             assertEquals(RemoteResult.Failed(RemoteFailure.ActionNotSupported), result)
+        }
+
+    @Test
+    fun `a command the plugin has no route for never leaves the phone`() =
+        runBlocking {
+            val restClient = restClientRespondingWith(SUCCEEDED_COMMAND_RESPONSE)
+
+            val result =
+                restClient.dispatch(
+                    CONFIGURATION,
+                    ShareHistory(
+                        historyIdentifier = HISTORY_IDENTIFIER,
+                        operationIdentifier = FIXED_OPERATION_IDENTIFIER,
+                    ),
+                )
+
+            assertEquals(RemoteResult.Failed(RemoteFailure.ActionNotSupported), result)
+            assertTrue(recordedRequests.isEmpty())
         }
 
     @Test
@@ -208,6 +279,8 @@ class RemoteRestClientTest {
         val FIXED_OPERATION_IDENTIFIER = OperationIdentifier("operation_0000000000000001")
 
         val INTERCEPT_IDENTIFIER = InterceptIdentifier("intercept_1")
+
+        val HISTORY_IDENTIFIER = HistoryIdentifier("history_1")
 
         val CONFIGURATION =
             RemoteConnectionConfiguration(host = "127.0.0.1", port = 9000, deviceName = "test-device")

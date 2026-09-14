@@ -20,6 +20,9 @@ object RemoteEndpointPath {
     /** 拦截队列；单条操作在其后追加「/」、拦截标识与下列动作后缀。 */
     const val INTERCEPTS = "/v1/intercepts"
 
+    /** 修改一条被拦截的报文。 */
+    const val INTERCEPT_MODIFY_SUFFIX = "/modify"
+
     /** 放行一条被拦截的报文。 */
     const val INTERCEPT_FORWARD_SUFFIX = "/forward"
 
@@ -31,6 +34,9 @@ object RemoteEndpointPath {
 
     /** 执行一条 Repeater 请求。 */
     const val REPEATER_EXECUTE_SUFFIX = "/execute"
+
+    /** 作用域；把某条历史记录的主机加入作用域时，在其后追加「/」与历史标识。 */
+    const val SCOPE = "/v1/scope"
 
     /** 事件通道。 */
     const val EVENTS = "/v1/events"

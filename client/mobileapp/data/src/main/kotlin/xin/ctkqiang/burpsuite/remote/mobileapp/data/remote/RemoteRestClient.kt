@@ -20,10 +20,9 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
-import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.InterceptIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.OperationIdentifier
-import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.RepeaterRequestIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.RemoteProtocolVersion
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.command.RemoteCommand
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.PairingAttempt
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteConnectionConfiguration
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteFailure
@@ -107,36 +106,29 @@ class RemoteRestClient(
             RemoteResponseDecoder::decodeHistoryMessage,
         )
 
-    /** 放行一条被拦截的报文，对应 POST /v1/intercepts/{interceptIdentifier}/forward。 */
-    suspend fun forwardIntercept(
-        configuration: RemoteConnectionConfiguration,
-        interceptIdentifier: InterceptIdentifier,
-    ): RemoteResult<Unit> =
-        executeControlCommand(
-            configuration,
-            interceptPath(interceptIdentifier, RemoteEndpointPath.INTERCEPT_FORWARD_SUFFIX),
-        )
+    /**
+     * 取一个新的执行身份。
+     *
+     * 发令方必须在构造命令对象之前拿到它，所以这里不是挂起函数；取到之后原样放进命令，
+     * 重试复用同一个值，插件据此去重（rules.md §5.5）。
+     */
+    fun nextOperationIdentifier(): OperationIdentifier = operationIdentifierGenerator.generate()
 
-    /** 丢弃一条被拦截的报文，对应 POST /v1/intercepts/{interceptIdentifier}/drop。 */
-    suspend fun dropIntercept(
+    /**
+     * 执行一条控制命令。
+     *
+     * 命令自带的执行身份原样上行，因此重试不会产生第二次副作用；插件没有这条路由时不去打扰它，
+     * 也不编一个成功，直接如实回 [RemoteFailure.ActionNotSupported]。
+     */
+    suspend fun dispatch(
         configuration: RemoteConnectionConfiguration,
-        interceptIdentifier: InterceptIdentifier,
-    ): RemoteResult<Unit> =
-        executeControlCommand(
-            configuration,
-            interceptPath(interceptIdentifier, RemoteEndpointPath.INTERCEPT_DROP_SUFFIX),
-        )
-
-    /** 执行一条 Repeater 请求，对应 POST /v1/repeater/{repeaterRequestIdentifier}/execute。 */
-    suspend fun executeRepeater(
-        configuration: RemoteConnectionConfiguration,
-        repeaterRequestIdentifier: RepeaterRequestIdentifier,
-    ): RemoteResult<Unit> =
-        executeControlCommand(
-            configuration,
-            RemoteEndpointPath.REPEATER + "/" + repeaterRequestIdentifier.value.encodeURLPathPart() +
-                RemoteEndpointPath.REPEATER_EXECUTE_SUFFIX,
-        )
+        command: RemoteCommand,
+    ): RemoteResult<Unit> {
+        val path =
+            RemoteCommandEndpoint.pathOf(command)
+                ?: return RemoteResult.Failed(RemoteFailure.ActionNotSupported)
+        return executeControlCommand(configuration, path, command.operationIdentifier)
+    }
 
     private suspend fun <Value> readQuery(
         configuration: RemoteConnectionConfiguration,
@@ -195,6 +187,7 @@ class RemoteRestClient(
     private suspend fun executeControlCommand(
         configuration: RemoteConnectionConfiguration,
         path: String,
+        operationIdentifier: OperationIdentifier,
     ): RemoteResult<Unit> =
         when (
             val envelopeResult =
@@ -204,7 +197,7 @@ class RemoteRestClient(
                     isTlsEnabled = configuration.isTlsEnabled,
                     httpMethod = HttpMethod.Post,
                     path = path,
-                    operationIdentifier = operationIdentifierGenerator.generate(),
+                    operationIdentifier = operationIdentifier,
                 )
         ) {
             is RemoteResult.Failed -> envelopeResult
@@ -312,11 +305,6 @@ class RemoteRestClient(
         )
         return RemoteResult.Failed(failure)
     }
-
-    private fun interceptPath(
-        interceptIdentifier: InterceptIdentifier,
-        actionSuffix: String,
-    ): String = RemoteEndpointPath.INTERCEPTS + "/" + interceptIdentifier.value.encodeURLPathPart() + actionSuffix
 
     private fun restUrl(
         host: String,

@@ -153,6 +153,17 @@ class CommandSerializationTest {
         assertEquals(command, roundTrip(ShareHistory.serializer(), command))
     }
 
+    @Test
+    fun `AddHistoryToScope survives a serialization round trip`() {
+        val command =
+            AddHistoryToScope(
+                historyIdentifier = HISTORY_IDENTIFIER,
+                operationIdentifier = OPERATION_IDENTIFIER,
+            )
+
+        assertEquals(command, roundTrip(AddHistoryToScope.serializer(), command))
+    }
+
     // 编解码共用同一个 Json 实例：两边配置不同会掩盖契约问题
     private fun <T> roundTrip(
         serializer: KSerializer<T>,

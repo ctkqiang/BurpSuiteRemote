@@ -21,6 +21,8 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.HistoryIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.model.OperationIdentifier
+import xin.ctkqiang.burpsuite.remote.mobileapp.core.protocol.command.RemoteCommand
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.eventstore.JournalEventIngestor
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.event.JournalEvent
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ConnectionState
@@ -148,6 +150,13 @@ class KtorRemoteControlClient(
     override suspend fun requestSnapshot(
         configuration: RemoteConnectionConfiguration,
     ): RemoteResult<RemoteRuntimeState> = restClient.requestSnapshot(configuration)
+
+    override fun nextOperationIdentifier(): OperationIdentifier = restClient.nextOperationIdentifier()
+
+    override suspend fun dispatch(
+        configuration: RemoteConnectionConfiguration,
+        command: RemoteCommand,
+    ): RemoteResult<Unit> = restClient.dispatch(configuration, command)
 
     private suspend fun runReconnectionLoop(configuration: RemoteConnectionConfiguration) {
         var attemptNumber = 0
