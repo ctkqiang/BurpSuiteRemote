@@ -92,6 +92,14 @@ private val LanguagePreference.labelResource: Int
             LanguagePreference.English -> R.string.settings_language_english
             LanguagePreference.Chinese -> R.string.settings_language_chinese
             LanguagePreference.German -> R.string.settings_language_german
+            LanguagePreference.Japanese -> R.string.settings_language_japanese
+            LanguagePreference.Korean -> R.string.settings_language_korean
+            LanguagePreference.Thai -> R.string.settings_language_thai
+            LanguagePreference.Malay -> R.string.settings_language_malay
+            LanguagePreference.Tibetan -> R.string.settings_language_tibetan
+            LanguagePreference.Uyghur -> R.string.settings_language_uyghur
+            LanguagePreference.Russian -> R.string.settings_language_russian
+            LanguagePreference.French -> R.string.settings_language_french
         }
 
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。

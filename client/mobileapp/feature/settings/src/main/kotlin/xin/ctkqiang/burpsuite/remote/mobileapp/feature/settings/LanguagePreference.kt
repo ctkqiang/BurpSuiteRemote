@@ -1,10 +1,13 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings
 
 /**
- * 界面语言（plan §46）。四种，没有更多。
+ * 界面语言（plan §46）。
  *
  * 与主题一样，写进偏好文件的是 [storageValue] 而不是枚举名：以后重命名枚举条目时，
  * 用户机器上已有的偏好不该失效。
+ *
+ * 语言列表会随着 `values-*` 资源目录一起长大，因此这里不写死「有多少种」：加了资源目录却没加枚举，
+ * 选择器里就选不到；反过来加了枚举却没资源目录，选了会回落到默认语言。两者必须成对出现。
  */
 enum class LanguagePreference {
     /** 跟随系统语言。 */
@@ -18,9 +21,33 @@ enum class LanguagePreference {
 
     /** 德语。 */
     German,
+
+    /** 日语。 */
+    Japanese,
+
+    /** 韩语。 */
+    Korean,
+
+    /** 泰语。 */
+    Thai,
+
+    /** 马来语。 */
+    Malay,
+
+    /** 藏语。 */
+    Tibetan,
+
+    /** 维吾尔语。 */
+    Uyghur,
+
+    /** 俄语。 */
+    Russian,
+
+    /** 法语。 */
+    French,
     ;
 
-    /** 写进偏好文件的值。 */
+    /** 写进偏好文件的值，同时也是 Android 资源的语言限定符。 */
     val storageValue: String
         get() =
             when (this) {
@@ -28,6 +55,14 @@ enum class LanguagePreference {
                 English -> "en"
                 Chinese -> "zh"
                 German -> "de"
+                Japanese -> "ja"
+                Korean -> "ko"
+                Thai -> "th"
+                Malay -> "ms"
+                Tibetan -> "bo"
+                Uyghur -> "ug"
+                Russian -> "ru"
+                French -> "fr"
             }
 
     /** 对应的语言标签；跟随系统时为空。 */
