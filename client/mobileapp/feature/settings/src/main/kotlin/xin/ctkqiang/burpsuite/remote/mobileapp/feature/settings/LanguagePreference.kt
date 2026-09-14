@@ -34,11 +34,20 @@ enum class LanguagePreference {
     /** 马来语。 */
     Malay,
 
+    /** 藏语。 */
+    Tibetan,
+
+    /** 维吾尔语。 */
+    Uyghur,
+
     /** 俄语。 */
     Russian,
 
     /** 法语。 */
     French,
+
+    /** 蒙古文（西里尔书写；传统蒙古文是竖排文字，需要额外字体，见资源层说明）。 */
+    Mongolian,
     ;
 
     /** 写进偏好文件的值，同时也是 Android 资源的语言限定符。 */
@@ -53,8 +62,11 @@ enum class LanguagePreference {
                 Korean -> "ko"
                 Thai -> "th"
                 Malay -> "ms"
+                Tibetan -> "bo"
+                Uyghur -> "ug"
                 Russian -> "ru"
                 French -> "fr"
+                Mongolian -> "mn"
             }
 
     /** 对应的语言标签；跟随系统时为空。 */
