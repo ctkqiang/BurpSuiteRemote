@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_appearance_title">外観</string>
+    <string name="settings_appearance_subtitle">アプリ全体の配色</string>
+
+    <string name="settings_theme_heading">テーマ</string>
+    <string name="settings_theme_headline">この選択はすべての場所に適用されます</string>
+    <string name="settings_theme_detail">すべての画面、リスト、ピルがテーマから色を取るため、ここで切り替えるとアプリ全体が一度に再配色されます。選択はこの端末に保存されます。</string>
+    <string name="settings_theme_selected">選択中</string>
+
+    <string name="settings_theme_automatic">システムに従う</string>
+    <string name="settings_theme_automatic_detail">システムがライトの間はライト、ダークの間はダーク。システムが自らのスケジュールで切り替えるときも追従します。</string>
+    <string name="settings_theme_light">ライト</string>
+    <string name="settings_theme_light_detail">システムがダークでもライト配色を維持します。屋外で便利です。</string>
+    <string name="settings_theme_dark">ダーク</string>
+    <string name="settings_theme_dark_detail">システムがライトでもダーク配色を維持します。夜は目にやさしくなります。</string>
+
+    <string name="settings_language_title">言語</string>
+    <string name="settings_language_subtitle">すべての画面とメッセージの言語</string>
+    <string name="settings_language_heading">インターフェース言語</string>
+    <string name="settings_language_headline">変更するとインターフェースが再起動します</string>
+    <string name="settings_language_detail">表示されるすべての文字列は選択した言語のリソースから取得されるため、切り替えるとインターフェースが一度再構築されます。保存済みデータには触れません。</string>
+    <string name="settings_language_selected">選択中</string>
+    <!-- 语言名按各自的语言书写，三种语言里都一样。 -->
+    <string name="settings_language_automatic">システムに従う</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_chinese">简体中文</string>
+    <string name="settings_language_german">Deutsch</string>
+    <string name="settings_language_japanese">日本語</string>
+    <string name="settings_language_korean">한국어</string>
+    <string name="settings_language_thai">ไทย</string>
+    <string name="settings_language_malay">Bahasa Melayu</string>
+    <string name="settings_language_russian">Русский</string>
+    <string name="settings_language_french">Français</string>
+
+    <string name="settings_security_title">セキュリティ</string>
+    <string name="settings_security_subtitle">このクライアントが拒否すること</string>
+    <string name="settings_security_redaction_heading">墨消し</string>
+    <string name="settings_security_redaction_headline">エクスポート時のみマスク</string>
+    <string name="settings_security_redaction_body">機密値はエクスポートされたコピーでのみマスクされます。保存された元データが書き換えられることはありません。</string>
+    <string name="settings_security_logging_heading">ログ記録</string>
+    <string name="settings_security_logging_headline">本文と認証情報はログに残しません</string>
+    <string name="settings_security_logging_body">リクエストとレスポンスの本文、Cookie、Authorization ヘッダー、トークンはログに記録されません。技術ログには識別子、件数、失敗名だけが記録されます。</string>
+    <string name="settings_security_pairing_heading">ペアリング</string>
+    <string name="settings_security_pairing_headline">ペアリング済み端末がなければ制御できません</string>
+    <string name="settings_security_pairing_body">制御コマンドを受け付けるには、端末がペアリング済みである必要があります。ローカルネットワークは信頼されないものとして扱われます。</string>
+    <string name="settings_security_reason_heading">まだ設定できないもの</string>
+    <string name="settings_security_reason">設定可能な墨消しの既定値には、まだ存在しない設定ポートが必要です</string>
+
+    <string name="settings_storage_title">ストレージ</string>
+    <string name="settings_storage_subtitle">ローカルデータの保存場所と、そこから出ていくもの</string>
+    <string name="settings_storage_database_heading">ローカルデータベース</string>
+    <string name="settings_storage_database_headline">このアプリ専用</string>
+    <string name="settings_storage_database_body">イベントジャーナルとその投影は、このアプリのプライベートストレージに保存されます。共有ストレージには何も書き込まれません。</string>
+    <string name="settings_storage_export_heading">エクスポート</string>
+    <string name="settings_storage_export_headline">ファイルピッカーで指定した場所だけ</string>
+    <string name="settings_storage_export_body">エクスポートバンドルは、システムのファイルピッカーで選んだ場所にだけ書き込まれます。このアプリは二つ目のコピーを保持しません。</string>
+    <string name="settings_storage_maintenance_heading">メンテナンス</string>
+    <string name="settings_storage_reason_heading">まだできないこと</string>
+    <string name="settings_storage_reason">ローカルデータの消去と移行には、まだ存在しないストレージポートが必要です</string>
+
+    <!-- 关于与开发者信息。名字、邮箱与仓库地址是事实，交给翻译既没意义还会被拼错，因此不进翻译条目。 -->
+    <string name="about_application_name" translatable="false">Burpsuite Remote</string>
+    <string name="about_author_value" translatable="false">ctkqiang 钟智强</string>
+    <string name="about_email_value" translatable="false">johnmelodymel@qq.com</string>
+    <string name="about_source_value" translatable="false">https://github.com/ctkqiang/BurpSuiteRemote.git</string>
+
+    <string name="about_tagline">Burp Remote 拡張機能のモバイルクライアント</string>
+    <string name="about_developer_heading">開発者</string>
+    <string name="about_author_label">作者</string>
+    <string name="about_email_label">メール</string>
+    <string name="about_source_heading">ソース</string>
+    <string name="about_source_label">リポジトリ</string>
+    <string name="about_open_source_heading">オープンソース</string>
+    <string name="about_open_source_headline">このアプリのすべての主張はコードで検証できます</string>
+    <string name="about_open_source_body">ソースは公開されているため、このインターフェースで説明されている各動作には、その裏付けとなるコード行があります。技術ログはこの端末上だけに書き込まれ、どこにもアップロードされません。</string>
+</resources>

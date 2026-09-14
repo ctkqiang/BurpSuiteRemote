@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sharing_title">共有 / エクスポート</string>
+    <string name="sharing_absent_value">—</string>
+    <string name="sharing_loading_headline">このレコードを読み込み中…</string>
+    <string name="sharing_loading">レコードをローカル投影から読み取っています。</string>
+    <string name="sharing_not_found_headline">このレコードはありません</string>
+    <string name="sharing_not_found">レコードはもうローカル投影にないため、エクスポートできるものはありません。</string>
+
+    <string name="sharing_subject_heading">エクスポートされる内容</string>
+    <string name="sharing_request_line_label">リクエスト行</string>
+    <string name="sharing_host_label">ホスト</string>
+    <string name="sharing_identifier_label">履歴識別子</string>
+
+    <string name="sharing_scope_heading">エクスポートの範囲</string>
+    <string name="sharing_scope_headline">この端末が保持しているものだけ</string>
+    <string name="sharing_scope_note">エクスポートにはマニフェスト、墨消しレポート、この端末に保存されているフィールドが含まれます。リクエストとレスポンスのバイトはまだ取得されないため、含まれません。バンドルはそれを自ら明示し、埋め合わせようとはしません。</string>
+
+    <string name="sharing_scan_heading">機密データスキャン</string>
+    <string name="sharing_scan_count_label">スキャンした行数</string>
+    <string name="sharing_scan_empty_headline">機密データは見つかりませんでした</string>
+    <string name="sharing_scan_empty">エクスポートされるフィールドに、認証情報ヘッダー、ベアラートークン、JSON Web Token、メールアドレスは見つかりませんでした。</string>
+
+    <string name="sharing_kind_authorization_header">Authorization ヘッダー</string>
+    <string name="sharing_kind_cookie_header">Cookie ヘッダー</string>
+    <string name="sharing_kind_set_cookie_header">Set-Cookie ヘッダー</string>
+    <string name="sharing_kind_api_key_header">API キーヘッダー</string>
+    <string name="sharing_kind_bearer_token">ベアラートークン</string>
+    <string name="sharing_kind_json_web_token">JSON Web Token</string>
+    <string name="sharing_kind_email_address">メールアドレス</string>
+
+    <string name="sharing_preview_heading">墨消しプレビュー</string>
+    <string name="sharing_preview_headline">端末から出ていくのはこれです</string>
+    <string name="sharing_preview_note">墨消しはこのエクスポートコピーにだけ適用されます。保存された元データはバイト単位で正確なまま維持され、書き換えられることはありません。</string>
+
+    <string name="sharing_confirm_heading">確認</string>
+    <string name="sharing_confirm_action">確認してエクスポート</string>
+    <string name="sharing_state_exported">エクスポート済み</string>
+    <string name="sharing_exported">エクスポートバンドルを、選択した場所に書き込みました。</string>
+    <string name="sharing_state_failed">エクスポートに失敗しました</string>
+    <string name="sharing_export_failed">エクスポートを書き込めませんでした。別の場所で再試行してください。</string>
+
+    <!-- 写进导出包 notice.txt 的说明；导出文件是给用户看的，因此文案同样走资源。 -->
+    <string name="sharing_export_notice">Burpsuite Remote エクスポートバンドル\n\nこのアーカイブは Burpsuite Remote モバイルクライアントによって生成されました。\nmanifest.json、redaction-report.json、この通知が含まれます。\n\n範囲: 端末に保存されているフィールドだけが含まれます。リクエストとレスポンスの\nバイトは、このクライアントではまだ取得されないため、エクスポートに含まれません。\n\n墨消し: 機密値はこのエクスポートコピーでのみマスクされました。\n保存された元データは変更されていません。</string>
+</resources>

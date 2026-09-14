@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="repeater_title">リピーター</string>
+    <string name="repeater_subtitle">ライブセッションと実行ポートが必要です</string>
+    <string name="repeater_mode_live">LIVE</string>
+    <string name="repeater_mode_offline">OFFLINE</string>
+
+    <string name="repeater_connection_heading">接続</string>
+    <string name="repeater_connection_state_label">セッション状態</string>
+    <string name="repeater_connection_state_disconnected">切断済み</string>
+    <string name="repeater_connection_state_discovering">検出中</string>
+    <string name="repeater_connection_state_connecting">接続中</string>
+    <string name="repeater_connection_state_authenticating">認証中</string>
+    <string name="repeater_connection_state_synchronising">同期中</string>
+    <string name="repeater_connection_state_connected">接続済み</string>
+    <string name="repeater_connection_state_reconnecting">再接続中</string>
+    <string name="repeater_connection_state_resynchronisation_required">再同期が必要です</string>
+    <string name="repeater_connection_state_authentication_failed">認証に失敗しました</string>
+    <string name="repeater_connection_state_protocol_error">プロトコルエラー</string>
+    <string name="repeater_connection_state_timed_out">タイムアウト</string>
+    <string name="repeater_connection_state_server_unavailable">サーバーに到達できません</string>
+
+    <string name="repeater_loading_headline">セッション状態を読み取り中</string>
+    <string name="repeater_loading_detail">セッション状態をローカル投影から読み取っています。</string>
+    <string name="repeater_error_headline">セッション状態を読み取れませんでした</string>
+    <string name="repeater_error_read_failed">セッション状態をこの端末から読み取れませんでした</string>
+    <string name="repeater_error_action">再試行</string>
+
+    <string name="repeater_request_list_heading">保存済みリクエスト</string>
+    <string name="repeater_request_list_empty_headline">リピーターリクエストはありません</string>
+    <string name="repeater_request_list_empty_detail">リピーターリクエストはまだこの端末に保存されておらず、空白を埋めるために何かを捏造することはありません。</string>
+
+    <string name="repeater_execution_heading">実行</string>
+    <string name="repeater_execution_empty_headline">まだ何も実行されていません</string>
+    <string name="repeater_execution_empty_detail">実行結果はプラグインから取得されます。その経路ができるまでは、この画面はセッション状態だけを表示します。</string>
+
+    <string name="repeater_reason_headline">不足しているもの</string>
+    <string name="repeater_reason_request_list">クライアントにはまだリピーター投影ポートがありません</string>
+    <string name="repeater_reason_execute">クライアントにはまだリピーターコマンドポートがありません</string>
+    <string name="repeater_action_create">新しいリピーターリクエスト</string>
+    <string name="repeater_action_execute">実行</string>
+</resources>

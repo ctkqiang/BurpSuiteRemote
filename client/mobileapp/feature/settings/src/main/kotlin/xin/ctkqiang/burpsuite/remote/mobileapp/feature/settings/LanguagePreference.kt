@@ -34,12 +34,6 @@ enum class LanguagePreference {
     /** 马来语。 */
     Malay,
 
-    /** 藏语。 */
-    Tibetan,
-
-    /** 维吾尔语。 */
-    Uyghur,
-
     /** 俄语。 */
     Russian,
 
@@ -59,8 +53,6 @@ enum class LanguagePreference {
                 Korean -> "ko"
                 Thai -> "th"
                 Malay -> "ms"
-                Tibetan -> "bo"
-                Uyghur -> "ug"
                 Russian -> "ru"
                 French -> "fr"
             }

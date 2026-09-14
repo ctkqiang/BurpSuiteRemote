@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">ライブ履歴</string>
+    <string name="history_subtitle">メタデータのみ — 本文は要求時に取得</string>
+    <string name="history_absent_value">—</string>
+    <string name="history_action_refresh">更新</string>
+
+    <string name="history_response_length_label">サイズ</string>
+    <string name="history_response_length_value">%1$d B</string>
+    <string name="history_duration_label">所要時間</string>
+    <string name="history_duration_value">%1$d ms</string>
+
+    <string name="history_loading_headline">ローカル投影を読み取り中</string>
+    <string name="history_loading_detail">履歴投影をこの端末から読み取っています。</string>
+    <string name="history_empty_headline">何も流れていません</string>
+    <string name="history_empty_detail">ライブ履歴は空です。Burp に接続してプロキシ経由でトラフィックを送ると、プラグインが転送したそばからここにレコードが現れます。「表示するものがない」ことは「何も起きなかった」ことではなく、「この端末に何も届かなかった」ことを意味します。</string>
+
+    <string name="history_error_headline">履歴投影を読み取れませんでした</string>
+    <string name="history_error_read_failed">履歴投影をこの端末から読み取れませんでした</string>
+    <string name="history_error_action">再試行</string>
+
+    <string name="history_detail_title">リクエスト詳細</string>
+    <string name="history_detail_loading_headline">このレコードを読み込み中…</string>
+    <string name="history_detail_loading">レコードをローカル投影から読み取っています。</string>
+    <string name="history_detail_not_found_headline">このレコードはありません</string>
+    <string name="history_detail_not_found">レコードはもうローカル投影にありません。スナップショットに置き換えられた可能性があります。</string>
+    <string name="history_detail_value_yes">はい</string>
+    <string name="history_detail_value_no">いいえ</string>
+
+    <string name="history_detail_summary_heading">概要</string>
+    <string name="history_detail_request_heading">リクエスト</string>
+    <string name="history_detail_request_line_label">リクエスト行</string>
+    <string name="history_detail_host_label">ホスト</string>
+    <string name="history_detail_scheme_label">スキーム</string>
+    <string name="history_detail_tls_label">TLS</string>
+    <string name="history_detail_destination_address_label">宛先アドレス</string>
+    <string name="history_detail_listener_port_label">リスナーポート</string>
+
+    <string name="history_detail_response_heading">レスポンス</string>
+    <string name="history_detail_status_code_label">ステータスコード</string>
+    <string name="history_detail_mime_type_label">MIME タイプ</string>
+    <string name="history_detail_response_length_label">レスポンス長</string>
+    <string name="history_detail_duration_label">所要時間</string>
+
+    <string name="history_detail_record_heading">ローカルレコード</string>
+    <string name="history_detail_saved_at_label">保存日時</string>
+    <string name="history_detail_annotation_count_label">注釈</string>
+    <string name="history_detail_last_annotated_at_label">最終注釈</string>
+    <string name="history_detail_title_label">タイトル</string>
+    <string name="history_detail_edited_label">編集済み</string>
+
+    <string name="history_detail_timeline_heading">タイムライン</string>
+    <string name="history_detail_sequence_number_label">イベント連番</string>
+    <string name="history_detail_occurred_at_label">観測日時</string>
+
+    <string name="history_detail_message_heading">メッセージ</string>
+    <string name="history_detail_request_headers_label">リクエストヘッダー</string>
+    <string name="history_detail_request_body_label">リクエスト本文</string>
+    <string name="history_detail_response_headers_label">レスポンスヘッダー</string>
+    <string name="history_detail_response_body_label">レスポンス本文</string>
+    <string name="history_detail_message_absent">Burp はこの部分を取得していません</string>
+    <string name="history_detail_message_retry">もう一度取得</string>
+
+    <string name="history_detail_message_failure_not_paired">この端末は Burp とペアリングされていません</string>
+    <string name="history_detail_message_failure_unreachable">今 Burp に到達できません</string>
+    <string name="history_detail_message_failure_not_supported">このプラグインのビルドはメッセージ本文を返せません</string>
+    <string name="history_detail_message_failure_record_missing">Burp はもうこのレコードを保持していません</string>
+    <string name="history_detail_message_failure_malformed">Burp が返したバイトをこのクライアントは読み取れません</string>
+    <string name="history_detail_message_failure_refused">Burp がこの読み取りを拒否しました</string>
+
+    <string name="history_detail_actions_heading">操作</string>
+    <string name="history_detail_reason_headline">これが欠けている理由</string>
+    <string name="history_detail_action_share">共有 / エクスポート</string>
+    <string name="history_detail_action_send_to_repeater">リピーターへ送る</string>
+    <string name="history_detail_reason_send_to_repeater">クライアントにはまだリピーターコマンドポートがありません</string>
+
+    <string name="history_relative_just_now">たった今</string>
+    <plurals name="history_relative_seconds">
+        <item quantity="other">%1$d 秒前</item>
+    </plurals>
+    <plurals name="history_relative_minutes">
+        <item quantity="other">%1$d 分前</item>
+    </plurals>
+    <plurals name="history_relative_hours">
+        <item quantity="other">%1$d 時間前</item>
+    </plurals>
+    <plurals name="history_relative_days">
+        <item quantity="other">%1$d 日前</item>
+    </plurals>
+</resources>

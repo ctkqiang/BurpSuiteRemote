@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connection_title">Burp 接続</string>
+    <string name="connection_absent_value">—</string>
+    <string name="connection_mode_live">LIVE</string>
+    <string name="connection_mode_offline">OFFLINE</string>
+
+    <string name="connection_status_heading">接続状態</string>
+    <string name="connection_server_address_label">サーバーアドレス</string>
+    <string name="connection_server_address_absent">未設定</string>
+    <string name="connection_server_port_label">ポート</string>
+
+    <string name="connection_state_disconnected">切断済み</string>
+    <string name="connection_state_discovering">検出中</string>
+    <string name="connection_state_connecting">接続中</string>
+    <string name="connection_state_authenticating">認証中</string>
+    <string name="connection_state_synchronising">同期中</string>
+    <string name="connection_state_connected">接続済み</string>
+    <string name="connection_state_reconnecting">再接続中</string>
+    <string name="connection_state_resynchronisation_required">再同期が必要です</string>
+    <string name="connection_state_authentication_failed">認証に失敗しました</string>
+    <string name="connection_state_protocol_error">プロトコルエラー</string>
+    <string name="connection_state_timed_out">タイムアウト</string>
+    <string name="connection_state_server_unavailable">サーバーに到達できません</string>
+
+    <string name="connection_scan_heading">ペアリングコードをスキャン</string>
+    <string name="connection_scan_headline">カメラを QR コードに向けてください</string>
+    <string name="connection_scan_detail">拡張機能の Burp Remote タブでコードを生成し、それをスキャンします。コードにはアドレス、ポート、使い捨てのペアリングコードが含まれるため、この端末を設定する唯一の手段です。</string>
+    <string name="connection_scan_action">スキャナーを開く</string>
+
+    <string name="connection_scanner_status_searching">QR コードを探しています…</string>
+    <string name="connection_scanner_status_pending">カメラ権限を待っています…</string>
+    <string name="connection_scanner_status_permission_denied">カメラへのアクセスが拒否されました</string>
+    <string name="connection_scanner_status_undecodable">そのコードはペアリングチケットではありません</string>
+    <string name="connection_scanner_status_expired">そのチケットは期限切れです</string>
+    <string name="connection_scanner_status_protocol">プロトコルバージョンが一致しません</string>
+    <string name="connection_scanner_close_action">スキャナーを閉じる</string>
+
+    <string name="connection_scanner_mode_camera">カメラ</string>
+    <string name="connection_scanner_mode_manual">ペアリングテキスト</string>
+    <string name="connection_scanner_manual_headline">スキャンできない場合</string>
+    <string name="connection_scanner_manual_detail">QR コードの隣に拡張機能が表示するペアリングテキストを貼り付けます。スキャンしたコードとまったく同じ検証、同じペアリングリクエストを通ります。</string>
+
+    <string name="connection_scanner_permission_denied_headline">カメラへのアクセスが拒否されました</string>
+    <string name="connection_scanner_permission_denied_detail">カメラがないと QR コードを読み取れず、この端末を設定できません。スキャンするには権限を許可してください。Android がプロンプトを表示しなくなった場合は、システム設定でこのアプリのカメラ権限を有効にしてください。</string>
+    <string name="connection_scanner_permission_request_action">カメラアクセスを許可</string>
+    <string name="connection_scanner_permission_pending_headline">カメラ権限を待っています</string>
+    <string name="connection_scanner_permission_pending_detail">Android がカメラ権限を要求しています。許可されると、ここにファインダーが開きます。</string>
+
+    <string name="connection_ticket_heading">ペアリングチケット</string>
+    <string name="connection_ticket_host_label">ホスト</string>
+    <string name="connection_ticket_port_label">ポート</string>
+    <string name="connection_ticket_protocol_version_label">チケットのプロトコルバージョン</string>
+    <string name="connection_ticket_expires_at_label">有効期限</string>
+    <string name="connection_ticket_absent_headline">まだチケットをスキャンしていません</string>
+    <string name="connection_ticket_absent_detail">この端末ではまだ何もスキャンされていないため、ペアリングに使うアドレス、ポート、使い捨てコードがありません。</string>
+
+    <string name="connection_ticket_rejection_undecodable_headline">その QR コードはペアリングチケットではありません</string>
+    <string name="connection_ticket_rejection_undecodable_detail">コードは読み取れましたが、その内容はペアリングチケットの規約に一致しません。拡張機能の Burp Remote タブに表示されるコードをスキャンしてください。</string>
+    <string name="connection_ticket_rejection_expired_headline">このチケットは既に期限切れです</string>
+    <string name="connection_ticket_rejection_expired_detail">%1$s まで有効でした。拡張機能で新しいコードを生成してスキャンしてください。</string>
+    <string name="connection_ticket_rejection_protocol_headline">プロトコルバージョンがサポートされていません</string>
+    <string name="connection_ticket_rejection_protocol_detail">チケットはプロトコルバージョン %1$d を宣言していますが、このクライアントはバージョン %2$d を話します。古い方を更新して、新しいコードを生成してください。</string>
+
+    <string name="connection_manual_pairing_heading">ペアリングテキストを手入力</string>
+    <string name="connection_manual_pairing_headline">コードをスキャンできないときの代替手段</string>
+    <string name="connection_manual_pairing_hint">QR コードの隣に拡張機能が表示するペアリングテキストを貼り付けます。スキャンしたコードとまったく同じ経路を通るため、どちらの方法でも同じペアリングリクエストになります。</string>
+    <string name="connection_manual_pairing_text_label">ペアリングテキスト</string>
+    <string name="connection_manual_pairing_action">ペアリング</string>
+    <string name="connection_pairing_text_required_hint">まずペアリングテキストを貼り付けるか入力してください</string>
+
+    <string name="connection_pairing_result_heading">ペアリング結果</string>
+    <string name="connection_pairing_succeeded_headline">プラグインがこの端末を受け付けました</string>
+    <string name="connection_pairing_succeeded_detail">認証情報はこの端末に保存されます。接続はバックグラウンドで続行できます。</string>
+    <string name="connection_pairing_rejection_code">ペアリングコードがプラグインの発行したものと一致しませんでした</string>
+    <string name="connection_pairing_rejection_session_expired">ペアリングセッションは既に期限切れです。新しいコードを生成してください</string>
+    <string name="connection_pairing_rejection_session_unavailable">プラグインはもうこのペアリングセッションを認識していません。新しいコードをスキャンしてください</string>
+    <string name="connection_pairing_rejection_protocol">両者のプロトコルバージョンが一致していません</string>
+    <string name="connection_pairing_rejection_authentication">この端末の識別情報は拒否されました</string>
+    <string name="connection_pairing_rejection_unreachable">プラグインに到達できませんでした。アドレス、ポート、Burp が起動しているかを確認してください</string>
+    <string name="connection_pairing_rejection_not_supported">プラグインはまだこのエンドポイントを実装していません</string>
+    <string name="connection_pairing_rejection_unknown">プラグインが、このクライアントの認識できない失敗を返しました</string>
+    <string name="connection_pairing_in_flight">ペアリング中…</string>
+
+    <string name="connection_unavailable_headline">この操作はまだ利用できません</string>
+    <string name="connection_reason_no_transport">このビルドではまだリモートトランスポートが接続されていません</string>
+    <string name="connection_reason_no_ticket">先にペアリングチケットをスキャンするか、上のフィールドにペアリングテキストを貼り付けてください</string>
+    <string name="connection_reason_ticket_unusable">スキャンしたチケットはそのままでは使えません。理由は上に書かれています</string>
+
+    <string name="connection_paired_heading">ペアリング済み端末</string>
+    <string name="connection_paired_state_paired">ペアリング済み</string>
+    <string name="connection_paired_state_unpaired">未ペアリング</string>
+    <string name="connection_paired_headline">ペアリング情報はこの端末に保存されています</string>
+    <string name="connection_paired_detail_paired">下のアドレスとポートは、スキャンしたチケットから取得したものです。もう一度ペアリングすると認証情報を置き換えられます。ペアリングを解除すると、両側でこの端末を忘れます。</string>
+    <string name="connection_paired_detail_unpaired">まだ認証情報は保存されていません。チケットをスキャンしてペアリングすると、アドレスとポートがそこから書き込まれます。</string>
+    <string name="connection_paired_host_label">ペアリング済みホスト</string>
+    <string name="connection_paired_port_label">ペアリング済みポート</string>
+    <string name="connection_paired_re_pair_action">もう一度ペアリング</string>
+    <string name="connection_paired_clear_action">ペアリングを解除</string>
+
+    <string name="connection_endpoint_heading">サーバーアドレスとポート</string>
+    <string name="connection_endpoint_headline">プラグインが待ち受ける場所</string>
+    <string name="connection_endpoint_detail">既定のポートは %1$d です。ペアリングするとチケットからこの二つの値が書き込まれます。別のホストに向ける場合はここで編集して保存してください。</string>
+    <string name="connection_endpoint_host_label">ホスト</string>
+    <string name="connection_endpoint_port_label">ポート</string>
+    <string name="connection_endpoint_default_port_hint">既定のポート %1$d</string>
+    <string name="connection_endpoint_invalid_port_hint">ポートは 1 から 65535 の整数でなければなりません</string>
+    <string name="connection_endpoint_save_action">保存</string>
+
+    <string name="connection_retry_heading">接続</string>
+    <string name="connection_retry_headline">Burp へのセッションを開く</string>
+    <string name="connection_retry_detail">接続するとセッションが開いたままになり、イベントがローカルジャーナルへ流れ込みます。ダッシュボードで下に引っ張るか、失敗後にここで再試行してください。</string>
+    <string name="connection_retry_action">接続を再試行</string>
+    <string name="connection_retry_disabled_hint">まずアドレスとポートを保存してください</string>
+</resources>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="components_not_implemented_reason">未実装です: %1$s</string>
+    <string name="components_unavailable_reason">利用できません: %1$s</string>
+    <string name="components_absent_value">—</string>
+    <string name="components_navigate_back">戻る</string>
+    <string name="components_scanner_toggle_torch">ライトを切り替え</string>
+    <string name="components_retry">再試行</string>
+
+    <!-- 实时与离线是全局口径（plan §59），因此写作固定词形，三种语言都不翻译。 -->
+    <string name="components_mode_live">LIVE</string>
+    <string name="components_mode_offline">OFFLINE</string>
+
+    <string name="navigation_section_dashboard">ダッシュボード</string>
+    <string name="navigation_section_live">ライブ</string>
+    <string name="navigation_section_settings">設定</string>
+
+    <!-- 分区索引按组排列：每组一个标题，组内几行共用一个描边容器。 -->
+    <string name="navigation_group_connection">接続</string>
+    <string name="navigation_group_interface">インターフェース</string>
+    <string name="navigation_group_data">データとセキュリティ</string>
+    <string name="navigation_group_about">このアプリについて</string>
+
+    <string name="navigation_entry_live_history">履歴</string>
+    <string name="navigation_entry_live_intercept">インターセプト</string>
+    <string name="navigation_entry_live_repeater">リピーター</string>
+    <string name="navigation_entry_settings_burp_connection">Burp 接続</string>
+    <string name="navigation_entry_settings_appearance">外観</string>
+    <string name="navigation_entry_settings_language">言語</string>
+    <string name="navigation_entry_settings_security">セキュリティ</string>
+    <string name="navigation_entry_settings_storage">ストレージ</string>
+    <string name="navigation_entry_settings_about">このアプリについて</string>
+
+    <!-- 每一行补一句它通向什么：索引页的价值在于点之前就知道会去哪，而不是点进去再退回来。 -->
+    <string name="navigation_entry_live_history_detail">プラグインが転送したすべてのリクエスト。新しい順です。</string>
+    <string name="navigation_entry_live_intercept_detail">あなたが判断するまでプラグインが保留しているリクエスト。</string>
+    <string name="navigation_entry_live_repeater_detail">保存したリクエストを再送信し、レスポンスを比較します。</string>
+    <string name="navigation_entry_settings_burp_connection_detail">アドレス、ポート、ペアリングチケット、ライブ接続状態。</string>
+    <string name="navigation_entry_settings_appearance_detail">ライト / ダーク、およびシステムに従うかどうか。</string>
+    <string name="navigation_entry_settings_language_detail">すべての文字列が一致するように、インターフェースを一度再構築します。</string>
+    <string name="navigation_entry_settings_security_detail">この端末に何が保存され、どのように保護されるか。</string>
+    <string name="navigation_entry_settings_storage_detail">ローカルデータベースのサイズと、取得済みデータの消去方法。</string>
+    <string name="navigation_entry_settings_about_detail">作者、連絡先、ソースコードの場所。</string>
+
+    <string name="connection_state_disconnected">切断済み</string>
+    <string name="connection_state_discovering">検出中</string>
+    <string name="connection_state_connecting">接続中</string>
+    <string name="connection_state_authenticating">認証中</string>
+    <string name="connection_state_synchronising">同期中</string>
+    <string name="connection_state_connected">接続済み</string>
+    <string name="connection_state_reconnecting">再接続中</string>
+    <string name="connection_state_resynchronisation_required">再同期が必要です</string>
+    <string name="connection_state_authentication_failed">認証に失敗しました</string>
+    <string name="connection_state_protocol_error">プロトコルエラー</string>
+    <string name="connection_state_timed_out">タイムアウト</string>
+    <string name="connection_state_server_unavailable">サーバーに到達できません</string>
+
+    <!-- 配对结论逐条分开写：每一种都对应不同的下一步，合并成一句等于让用户自己猜。 -->
+    <string name="pairing_conclusion_succeeded">ペアリング済み。Burp に接続中…</string>
+    <string name="pairing_conclusion_malformed_ticket">このコードは Burpsuite Remote のペアリングチケットではありません。</string>
+    <string name="pairing_conclusion_ticket_expired">このペアリングチケットは期限切れです。新しいものをスキャンしてください。</string>
+    <string name="pairing_conclusion_protocol_version_unsupported">プロトコルバージョンが一致しません。Burpsuite Remote または拡張機能を更新してください。</string>
+    <string name="pairing_conclusion_device_not_paired">Burp はこの端末を受け付けません。拡張機能からペアリングを開始してください。</string>
+    <string name="pairing_conclusion_pairing_code_mismatch">ペアリングコードが一致しません。確認して再試行してください。</string>
+    <string name="pairing_conclusion_pairing_session_expired">Burp 上のペアリングセッションは期限切れです。新しいチケットをスキャンしてください。</string>
+    <string name="pairing_conclusion_unreachable">Burp に到達できません。アドレス、ポート、ネットワークを確認してください。</string>
+    <string name="pairing_conclusion_failed">ペアリングに失敗しました。正確な原因は技術ログを確認してください。</string>
+
+    <!-- 日志面板的级别标签。级别同时用颜色与文字表达，不以颜色作为唯一线索。 -->
+    <string name="components_severity_debug">デバッグ</string>
+    <string name="components_severity_information">情報</string>
+    <string name="components_severity_warning">警告</string>
+    <string name="components_severity_error">エラー</string>
+
+    <!-- 日志分类标签。 -->
+    <string name="components_category_pairing">ペアリング</string>
+    <string name="components_category_transport">トランスポート</string>
+    <string name="components_category_event_stream">イベントストリーム</string>
+    <string name="components_category_event_ingestion">取り込み</string>
+    <string name="components_category_navigation">ナビゲーション</string>
+    <string name="components_category_user_interface">インターフェース</string>
+    <string name="components_category_failure">失敗</string>
+
+    <!-- 相对时间：全应用共用一套，各屏不再各写一份。 -->
+    <string name="components_relative_just_now">たった今</string>
+    <plurals name="components_relative_seconds">
+        <item quantity="other">%d 秒前</item>
+    </plurals>
+    <plurals name="components_relative_minutes">
+        <item quantity="other">%d 分前</item>
+    </plurals>
+    <plurals name="components_relative_hours">
+        <item quantity="other">%d 時間前</item>
+    </plurals>
+    <plurals name="components_relative_days">
+        <item quantity="other">%d 日前</item>
+    </plurals>
+</resources>

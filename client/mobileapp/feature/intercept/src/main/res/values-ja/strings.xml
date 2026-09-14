@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intercept_title">インターセプト・キュー</string>
+    <string name="intercept_subtitle">プラグインがメタデータとして転送したものだけ</string>
+    <string name="intercept_absent_value">—</string>
+    <string name="intercept_action_refresh">更新</string>
+
+    <string name="intercept_state_pending">保留中</string>
+    <string name="intercept_state_modified">変更済み</string>
+    <string name="intercept_state_forwarded">転送済み</string>
+    <string name="intercept_state_dropped">破棄済み</string>
+
+    <string name="intercept_loading_headline">インターセプト・キューを読み取り中</string>
+    <string name="intercept_loading_detail">インターセプト投影をこの端末から読み取っています。</string>
+    <string name="intercept_empty_headline">待機中のものはありません</string>
+    <string name="intercept_empty_detail">現在保留されているリクエストはありません。プラグインがインターセプト中で、まだ転送も破棄もされていないリクエストがあるときにだけ、ここに項目が現れます。</string>
+
+    <string name="intercept_error_headline">インターセプト・キューを読み取れませんでした</string>
+    <string name="intercept_error_read_failed">インターセプト投影をこの端末から読み取れませんでした</string>
+    <string name="intercept_error_action">再試行</string>
+
+    <string name="intercept_detail_title">インターセプト項目</string>
+    <string name="intercept_detail_loading_headline">このインターセプト項目を読み込み中…</string>
+    <string name="intercept_detail_loading">項目をローカル投影から読み取っています。</string>
+    <string name="intercept_detail_not_found_headline">この項目はありません</string>
+    <string name="intercept_detail_not_found">インターセプト項目はもうローカル投影にありません。</string>
+
+    <string name="intercept_detail_summary_heading">概要</string>
+    <string name="intercept_detail_request_heading">リクエスト</string>
+    <string name="intercept_detail_request_line_label">リクエスト行</string>
+    <string name="intercept_detail_host_label">ホスト</string>
+    <string name="intercept_detail_sequence_number_label">イベント連番</string>
+    <string name="intercept_detail_created_at_label">作成日時</string>
+    <string name="intercept_detail_updated_at_label">最終変更日時</string>
+
+    <string name="intercept_detail_editor_heading">変更</string>
+    <string name="intercept_detail_editor_headline">この端末上だけの下書き</string>
+    <string name="intercept_detail_editor_local_only">これらの編集はこの端末上にだけ残ります。プラグインにはまだインターセプトのエンドポイントがなく、何も送信されず、Burp に保持されたリクエストは変更されません。</string>
+    <string name="intercept_detail_request_headers_label">リクエストヘッダー</string>
+
+    <string name="intercept_detail_actions_heading">操作</string>
+    <string name="intercept_detail_action_submit">変更を適用</string>
+    <string name="intercept_detail_action_forward">転送</string>
+    <string name="intercept_detail_action_drop">破棄</string>
+    <string name="intercept_detail_reason_headline">無効になっている理由</string>
+    <string name="intercept_detail_reason_command">プラグインはインターセプトのエンドポイントに not_implemented を返し、クライアントにはそのためのコマンドポートがありません</string>
+
+    <string name="intercept_relative_just_now">たった今</string>
+    <plurals name="intercept_relative_seconds">
+        <item quantity="other">%1$d 秒前</item>
+    </plurals>
+    <plurals name="intercept_relative_minutes">
+        <item quantity="other">%1$d 分前</item>
+    </plurals>
+    <plurals name="intercept_relative_hours">
+        <item quantity="other">%1$d 時間前</item>
+    </plurals>
+    <plurals name="intercept_relative_days">
+        <item quantity="other">%1$d 日前</item>
+    </plurals>
+</resources>
