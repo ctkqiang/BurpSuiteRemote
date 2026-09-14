@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryAdapter
 import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryEventPublisher
+import xin.ctkqiang.burpsuite.remote.adapter.BurpScopeAdapter
 import xin.ctkqiang.burpsuite.remote.protocol.DEFAULT_REMOTE_PORT
 import xin.ctkqiang.burpsuite.remote.protocol.PairingTicket
 import xin.ctkqiang.burpsuite.remote.protocol.PairingTicketEncoder
@@ -62,6 +63,9 @@ private suspend fun runHarness() {
     val historyAdapter = BurpHistoryAdapter(historySource)
     val historySignalSource = HarnessProxyHistorySignalSource()
 
+    // 作用域适配层复用同一个历史适配器：手机只发历史标识，主机串由插件读当下的事实拼出，两条链路因此不会对同一个标识给出两种地址。
+    val scopeAdapter = BurpScopeAdapter(historyAdapter, HarnessScopeWriter())
+
     val remoteHttpServer =
         RemoteHttpServer(
             devicePairingService = devicePairingService,
@@ -76,6 +80,7 @@ private suspend fun runHarness() {
             connectionRegistry = connectionRegistry,
             eventStream = eventStream,
             historyAdapter = historyAdapter,
+            scopeAdapter = scopeAdapter,
             logSink = ::println,
             remotePort = remotePort,
         )

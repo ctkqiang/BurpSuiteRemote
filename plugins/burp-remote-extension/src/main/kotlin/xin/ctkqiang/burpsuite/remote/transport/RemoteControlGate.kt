@@ -41,7 +41,7 @@ class RemoteControlGate(
         submittedDeviceIdentifier: DeviceIdentifier?,
         submittedOperationIdentifier: OperationIdentifier?,
         commandType: String,
-        executeCommand: () -> CommandResult,
+        executeCommand: (OperationIdentifier) -> CommandResult,
     ): CommandResult {
         val authenticatedDevice = resolveAuthenticatedDevice(submittedDeviceIdentifier)
         if (authenticatedDevice == null) {
@@ -67,7 +67,7 @@ class RemoteControlGate(
     private fun executeOrReplay(
         authenticatedDevice: DeviceIdentifier,
         operationIdentifier: OperationIdentifier,
-        executeCommand: () -> CommandResult,
+        executeCommand: (OperationIdentifier) -> CommandResult,
     ): CommandResult {
         val recordedResult = operationLog.findRecordedResult(operationIdentifier)
         if (recordedResult != null) {

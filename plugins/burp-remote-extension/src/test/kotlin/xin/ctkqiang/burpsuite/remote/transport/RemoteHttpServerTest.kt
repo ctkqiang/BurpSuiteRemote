@@ -25,8 +25,11 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryAdapter
 import xin.ctkqiang.burpsuite.remote.adapter.BurpProxyHistorySource
+import xin.ctkqiang.burpsuite.remote.adapter.BurpScopeAdapter
+import xin.ctkqiang.burpsuite.remote.adapter.BurpScopeWriter
 import xin.ctkqiang.burpsuite.remote.adapter.StubProxyHistoryEntry
 import xin.ctkqiang.burpsuite.remote.adapter.StubProxyHistorySource
+import xin.ctkqiang.burpsuite.remote.adapter.StubScopeWriter
 import xin.ctkqiang.burpsuite.remote.protocol.DEFAULT_REMOTE_PORT
 import xin.ctkqiang.burpsuite.remote.protocol.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteProtocolJson
@@ -106,6 +109,81 @@ class RemoteHttpServerTest {
                 }
 
             assertEquals(BURP_RUNTIME_FAILURE_CODE, failureCodeOf(response.bodyAsText()))
+        }
+
+    @Test
+    fun `including a known history entry in the scope writes exactly its host to the burp scope`() =
+        testApplication {
+            val historySource = StubProxyHistorySource(mutableListOf(StubProxyHistoryEntry()))
+            val scopeWriter = StubScopeWriter()
+            application {
+                createServer(historySource = historySource, scopeWriter = scopeWriter).installTo(this)
+            }
+            val historyIdentifier = BurpHistoryAdapter(historySource).toHistoryIdentifier(StubProxyHistoryEntry())
+
+            val response =
+                client.post("$SCOPE_PATH/${historyIdentifier.value}") {
+                    header(DEVICE_IDENTIFIER_HEADER, PAIRED_DEVICE.value)
+                    header(OPERATION_IDENTIFIER_HEADER, OPERATION_IDENTIFIER_TEXT)
+                }
+
+            assertEquals(OPERATION_IDENTIFIER_TEXT, operationIdentifierOf(response.bodyAsText()))
+            assertEquals(listOf("https://${StubProxyHistoryEntry.DEFAULT_HOST}"), scopeWriter.includedHostTexts)
+        }
+
+    @Test
+    fun `an unknown history identifier cannot be added to the scope`() =
+        testApplication {
+            val scopeWriter = StubScopeWriter()
+            application { createServer(scopeWriter = scopeWriter).installTo(this) }
+
+            val response =
+                client.post("$SCOPE_PATH/$UNKNOWN_HISTORY_IDENTIFIER") {
+                    header(DEVICE_IDENTIFIER_HEADER, PAIRED_DEVICE.value)
+                    header(OPERATION_IDENTIFIER_HEADER, OPERATION_IDENTIFIER_TEXT)
+                }
+
+            assertEquals(BURP_RUNTIME_FAILURE_CODE, failureCodeOf(response.bodyAsText()))
+            assertTrue(scopeWriter.includedHostTexts.isEmpty())
+        }
+
+    @Test
+    fun `replaying the same scope command answers with the first result and writes the host only once`() =
+        testApplication {
+            val historySource = StubProxyHistorySource(mutableListOf(StubProxyHistoryEntry()))
+            val scopeWriter = StubScopeWriter()
+            application {
+                createServer(historySource = historySource, scopeWriter = scopeWriter).installTo(this)
+            }
+            val historyIdentifier = BurpHistoryAdapter(historySource).toHistoryIdentifier(StubProxyHistoryEntry())
+            val scopeIncludePath = "$SCOPE_PATH/${historyIdentifier.value}"
+
+            repeat(2) {
+                val replayedResponse =
+                    client.post(scopeIncludePath) {
+                        header(DEVICE_IDENTIFIER_HEADER, PAIRED_DEVICE.value)
+                        header(OPERATION_IDENTIFIER_HEADER, OPERATION_IDENTIFIER_TEXT)
+                    }
+
+                assertEquals(OPERATION_IDENTIFIER_TEXT, operationIdentifierOf(replayedResponse.bodyAsText()))
+            }
+
+            assertEquals(1, scopeWriter.includedHostTexts.size)
+        }
+
+    @Test
+    fun `an unpaired device cannot add a history entry to the scope`() =
+        testApplication {
+            val scopeWriter = StubScopeWriter()
+            application { createServer(scopeWriter = scopeWriter).installTo(this) }
+
+            val response =
+                client.post("$SCOPE_PATH/$UNKNOWN_HISTORY_IDENTIFIER") {
+                    header(OPERATION_IDENTIFIER_HEADER, OPERATION_IDENTIFIER_TEXT)
+                }
+
+            assertEquals(DEVICE_NOT_PAIRED_CODE, rejectionReasonOf(response.bodyAsText()))
+            assertTrue(scopeWriter.includedHostTexts.isEmpty())
         }
 
     @Test
@@ -206,11 +284,13 @@ class RemoteHttpServerTest {
     private fun createServer(
         devicePairingService: DevicePairingService = createPairingService(),
         historySource: BurpProxyHistorySource = StubProxyHistorySource(mutableListOf(StubProxyHistoryEntry())),
+        scopeWriter: BurpScopeWriter = StubScopeWriter(),
         remotePort: Int = DEFAULT_REMOTE_PORT,
         logSink: (String) -> Unit = {},
     ): RemoteHttpServer {
         val pairedDeviceRegistry =
             PairedDeviceRegistry().apply { recordPairedDevice(PAIRED_DEVICE, TEST_INSTANT) }
+        val historyAdapter = BurpHistoryAdapter(historySource)
         return RemoteHttpServer(
             devicePairingService = devicePairingService,
             pairedDeviceRegistry = pairedDeviceRegistry,
@@ -223,7 +303,8 @@ class RemoteHttpServerTest {
                 ),
             connectionRegistry = RemoteConnectionRegistry(),
             eventStream = InMemoryRemoteEventStream(),
-            historyAdapter = BurpHistoryAdapter(historySource),
+            historyAdapter = historyAdapter,
+            scopeAdapter = BurpScopeAdapter(historyAdapter, scopeWriter),
             logSink = logSink,
             remotePort = remotePort,
         )
@@ -258,6 +339,9 @@ class RemoteHttpServerTest {
     private fun failureCodeOf(responseBody: String): String? =
         resultOf(responseBody)?.get("error")?.jsonObject?.get("code")?.jsonPrimitive?.content
 
+    private fun operationIdentifierOf(responseBody: String): String? =
+        resultOf(responseBody)?.get(OPERATION_IDENTIFIER_FIELD)?.jsonPrimitive?.content
+
     private fun payloadOf(responseBody: String): JsonObject? =
         RemoteProtocolJson.instance.parseToJsonElement(responseBody).jsonObject["payload"]?.jsonObject
 
@@ -281,6 +365,8 @@ class RemoteHttpServerTest {
 
         private const val HISTORY_PATH = "/v1/history"
 
+        private const val SCOPE_PATH = "/v1/scope"
+
         private const val INTERCEPTS_PATH = "/v1/intercepts"
 
         private const val HISTORY_ITEMS_FIELD = "historyItems"
@@ -298,6 +384,8 @@ class RemoteHttpServerTest {
         private const val OPERATION_IDENTIFIER_HEADER = "X-Burp-Remote-Operation-Identifier"
 
         private const val DEVICE_IDENTIFIER_FIELD = "deviceIdentifier"
+
+        private const val OPERATION_IDENTIFIER_FIELD = "operationIdentifier"
 
         private const val DEVICE_NOT_PAIRED_CODE = "device_not_paired"
 

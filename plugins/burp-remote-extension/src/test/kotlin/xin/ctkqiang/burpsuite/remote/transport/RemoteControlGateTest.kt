@@ -29,7 +29,7 @@ class RemoteControlGateTest {
                 DEVICE_IDENTIFIER,
                 OPERATION_IDENTIFIER,
                 COMMAND_TYPE,
-                ::notImplementedResult,
+                { notImplementedResult() },
             )
 
         assertEquals(CommandResult.Rejected(RejectionReason.DeviceNotPaired), commandResult)
@@ -39,7 +39,7 @@ class RemoteControlGateTest {
     fun `a control command without an operation identifier is rejected`() {
         val gate = createGate()
 
-        val commandResult = gate.handleControlCommand(DEVICE_IDENTIFIER, null, COMMAND_TYPE, ::notImplementedResult)
+        val commandResult = gate.handleControlCommand(DEVICE_IDENTIFIER, null, COMMAND_TYPE) { notImplementedResult() }
 
         assertEquals(CommandResult.Rejected(RejectionReason.MissingOperationIdentifier), commandResult)
     }
@@ -65,6 +65,19 @@ class RemoteControlGateTest {
     }
 
     @Test
+    fun `the execution action receives the operation identifier it must answer with`() {
+        val gate = createGate()
+        var receivedOperationIdentifier: OperationIdentifier? = null
+
+        gate.handleControlCommand(DEVICE_IDENTIFIER, OPERATION_IDENTIFIER, COMMAND_TYPE) { operationIdentifier ->
+            receivedOperationIdentifier = operationIdentifier
+            notImplementedResult()
+        }
+
+        assertEquals(OPERATION_IDENTIFIER, receivedOperationIdentifier)
+    }
+
+    @Test
     fun `exceeding the burst capacity is rejected as rate limited`() {
         val gate = createGate(bucketCapacity = 2)
 
@@ -73,21 +86,21 @@ class RemoteControlGateTest {
                 DEVICE_IDENTIFIER,
                 FIRST_OPERATION_IDENTIFIER,
                 COMMAND_TYPE,
-                ::notImplementedResult,
+                { notImplementedResult() },
             )
         val secondResult =
             gate.handleControlCommand(
                 DEVICE_IDENTIFIER,
                 SECOND_OPERATION_IDENTIFIER,
                 COMMAND_TYPE,
-                ::notImplementedResult,
+                { notImplementedResult() },
             )
         val thirdResult =
             gate.handleControlCommand(
                 DEVICE_IDENTIFIER,
                 THIRD_OPERATION_IDENTIFIER,
                 COMMAND_TYPE,
-                ::notImplementedResult,
+                { notImplementedResult() },
             )
 
         assertTrue(firstResult is CommandResult.Failed)
@@ -104,14 +117,14 @@ class RemoteControlGateTest {
                 DEVICE_IDENTIFIER,
                 OPERATION_IDENTIFIER,
                 COMMAND_TYPE,
-                ::notImplementedResult,
+                { notImplementedResult() },
             )
         val repeatedResult =
             gate.handleControlCommand(
                 DEVICE_IDENTIFIER,
                 OPERATION_IDENTIFIER,
                 COMMAND_TYPE,
-                ::notImplementedResult,
+                { notImplementedResult() },
             )
 
         assertEquals(firstResult, repeatedResult)

@@ -25,6 +25,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryAdapter
+import xin.ctkqiang.burpsuite.remote.adapter.BurpScopeAdapter
 import xin.ctkqiang.burpsuite.remote.protocol.CommandResult
 import xin.ctkqiang.burpsuite.remote.protocol.DEFAULT_REMOTE_PORT
 import xin.ctkqiang.burpsuite.remote.protocol.DeviceIdentifier
@@ -58,6 +59,7 @@ class RemoteHttpServer(
     private val connectionRegistry: RemoteConnectionRegistry,
     private val eventStream: RemoteEventStream,
     private val historyAdapter: BurpHistoryAdapter,
+    private val scopeAdapter: BurpScopeAdapter,
     private val logSink: (String) -> Unit,
     private val remotePort: Int = DEFAULT_REMOTE_PORT,
 ) {
@@ -164,14 +166,31 @@ class RemoteHttpServer(
                 }
             }
 
+            // 加入作用域：手机只发历史标识，主机串由插件读 Burp 当下的事实拼出，过期记录也写不错地址。
+            // 写入落在执行动作里：幂等重放走的是首次记录的结果，不会再写一次 Burp 作用域。
+            post(SCOPE_PATH) {
+                val historyIdentifierText =
+                    call.parameters[HISTORY_IDENTIFIER_ROUTE_PARAMETER]
+                        ?.takeIf { identifierText -> identifierText.isNotBlank() }
+                call.respondControlCommand(COMMAND_TYPE_SCOPE_INCLUDE) { operationIdentifier ->
+                    // 没有对应记录时主机串为 null：不新增错误码，复用既有的运行时失败码（错误码集合是跨端协议）。
+                    historyIdentifierText
+                        ?.let { identifierText ->
+                            scopeAdapter.includeHistoryHostInScope(HistoryIdentifier(identifierText))
+                        }
+                        ?.let { CommandResult.Succeeded(operationIdentifier) }
+                        ?: failedResult(RemoteErrorCode.BurpRuntimeFailure, isRetryable = false)
+                }
+            }
+
             // 以下端点仍然依赖尚未实现的 Burp 能力（拦截队列、Repeater），因此只回「尚未实现」。
             get(INTERCEPTS_PATH) { call.respondAuthenticatedNotImplemented(RemoteMessageType.Query) }
             get(INTERCEPT_ITEM_PATH) { call.respondAuthenticatedNotImplemented(RemoteMessageType.Query) }
-            post(INTERCEPT_MODIFY_PATH) { call.respondUnimplementedControl(COMMAND_TYPE_INTERCEPT_MODIFY) }
-            post(INTERCEPT_FORWARD_PATH) { call.respondUnimplementedControl(COMMAND_TYPE_INTERCEPT_FORWARD) }
-            post(INTERCEPT_DROP_PATH) { call.respondUnimplementedControl(COMMAND_TYPE_INTERCEPT_DROP) }
-            post(REPEATER_PATH) { call.respondUnimplementedControl(COMMAND_TYPE_REPEATER_CREATE) }
-            post(REPEATER_EXECUTE_PATH) { call.respondUnimplementedControl(COMMAND_TYPE_REPEATER_EXECUTE) }
+            post(INTERCEPT_MODIFY_PATH) { call.respondControlCommand(COMMAND_TYPE_INTERCEPT_MODIFY) }
+            post(INTERCEPT_FORWARD_PATH) { call.respondControlCommand(COMMAND_TYPE_INTERCEPT_FORWARD) }
+            post(INTERCEPT_DROP_PATH) { call.respondControlCommand(COMMAND_TYPE_INTERCEPT_DROP) }
+            post(REPEATER_PATH) { call.respondControlCommand(COMMAND_TYPE_REPEATER_CREATE) }
+            post(REPEATER_EXECUTE_PATH) { call.respondControlCommand(COMMAND_TYPE_REPEATER_EXECUTE) }
         }
     }
 
@@ -216,13 +235,21 @@ class RemoteHttpServer(
         respondProtocolResult(messageType, failedResult(RemoteErrorCode.NotImplemented, isRetryable = false))
     }
 
-    private suspend fun ApplicationCall.respondUnimplementedControl(commandType: String) {
+    // 控制类端点共用这一条路径：命令类型由路由给出，执行动作由调用方给出。
+    // 默认动作回「尚未实现」：拦截队列与 Repeater 还没接入，编造出来的能力比明确的失败更糟。
+    // 幂等重放由闸门在进入执行动作之前拦下，因此执行动作里的副作用天然只发生一次。
+    private suspend fun ApplicationCall.respondControlCommand(
+        commandType: String,
+        executeCommand: (OperationIdentifier) -> CommandResult = { _ ->
+            failedResult(RemoteErrorCode.NotImplemented, isRetryable = false)
+        },
+    ) {
         val commandResult =
             controlGate.handleControlCommand(
                 submittedDeviceIdentifier = readDeviceIdentifier(),
                 submittedOperationIdentifier = readOperationIdentifier(),
                 commandType = commandType,
-                executeCommand = { failedResult(RemoteErrorCode.NotImplemented, isRetryable = false) },
+                executeCommand = executeCommand,
             )
         respondProtocolResult(RemoteMessageType.Command, commandResult)
     }
@@ -282,6 +309,7 @@ class RemoteHttpServer(
                 add(CAPABILITY_EVENT_STREAM)
                 add(CAPABILITY_SNAPSHOT)
                 add(CAPABILITY_HISTORY)
+                add(CAPABILITY_SCOPE)
             }
         }
 
@@ -370,6 +398,8 @@ class RemoteHttpServer(
 
         private const val HISTORY_IDENTIFIER_ROUTE_PARAMETER = "historyIdentifier"
 
+        private const val SCOPE_PATH = "/v1/scope/{historyIdentifier}"
+
         private const val INTERCEPTS_PATH = "/v1/intercepts"
 
         private const val INTERCEPT_ITEM_PATH = "/v1/intercepts/{interceptIdentifier}"
@@ -394,6 +424,8 @@ class RemoteHttpServer(
 
         private const val COMMAND_TYPE_REPEATER_EXECUTE = "repeater.execute"
 
+        private const val COMMAND_TYPE_SCOPE_INCLUDE = "scope.include"
+
         private const val DEVICE_IDENTIFIER_FIELD = "deviceIdentifier"
 
         private const val PROTOCOL_VERSION_FIELD = "protocolVersion"
@@ -417,5 +449,7 @@ class RemoteHttpServer(
         private const val CAPABILITY_SNAPSHOT = "snapshot"
 
         private const val CAPABILITY_HISTORY = "history"
+
+        private const val CAPABILITY_SCOPE = "scope"
     }
 }

@@ -20,6 +20,6 @@ class InMemoryRemoteOperationLog : RemoteOperationLog {
     // computeIfAbsent 在同一个键上串行执行映射函数：并发重复到达时只有第一个会真正执行命令。
     override fun recordResultIfAbsent(
         operationIdentifier: OperationIdentifier,
-        resultSupplier: () -> CommandResult,
-    ): CommandResult = recordedResults.computeIfAbsent(operationIdentifier) { resultSupplier() }
+        resultSupplier: (OperationIdentifier) -> CommandResult,
+    ): CommandResult = recordedResults.computeIfAbsent(operationIdentifier, resultSupplier::invoke)
 }

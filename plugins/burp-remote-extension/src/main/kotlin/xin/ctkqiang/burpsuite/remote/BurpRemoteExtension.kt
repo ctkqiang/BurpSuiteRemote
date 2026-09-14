@@ -11,8 +11,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryAdapter
 import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryEventPublisher
+import xin.ctkqiang.burpsuite.remote.adapter.BurpScopeAdapter
 import xin.ctkqiang.burpsuite.remote.adapter.MontoyaProxyHistorySignalSource
 import xin.ctkqiang.burpsuite.remote.adapter.MontoyaProxyHistorySource
+import xin.ctkqiang.burpsuite.remote.adapter.MontoyaScopeWriter
 import xin.ctkqiang.burpsuite.remote.protocol.DEFAULT_REMOTE_PORT
 import xin.ctkqiang.burpsuite.remote.security.DevicePairingService
 import xin.ctkqiang.burpsuite.remote.security.PairedDeviceRegistry
@@ -63,6 +65,9 @@ class BurpRemoteExtension : BurpExtension {
 
         val historyAdapter = BurpHistoryAdapter(MontoyaProxyHistorySource(montoyaApi.proxy()))
 
+        // 作用域适配层复用同一个历史适配器：手机只发历史标识，主机串由插件读 Burp 当下的事实拼出。
+        val scopeAdapter = BurpScopeAdapter(historyAdapter, MontoyaScopeWriter(montoyaApi.scope()))
+
         // 兜底扫描需要自己的作用域：生命周期与扩展绑定，卸载时连同订阅一起取消。
         val historySweepScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -82,6 +87,7 @@ class BurpRemoteExtension : BurpExtension {
                 connectionRegistry = RemoteConnectionRegistry(),
                 eventStream = eventStream,
                 historyAdapter = historyAdapter,
+                scopeAdapter = scopeAdapter,
                 logSink = montoyaApi.logging()::logToOutput,
             )
 

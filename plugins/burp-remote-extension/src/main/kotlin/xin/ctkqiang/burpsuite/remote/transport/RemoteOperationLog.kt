@@ -19,9 +19,10 @@ interface RemoteOperationLog {
      * 首次到达时执行并记录结果；重复到达时直接返回首次记录的结果。
      *
      * 「查出不存在」与「执行并写入」必须是一个原子动作，否则同一操作标识并发到达时会被执行两次。
+     * 执行动作必须拿到操作标识：成功结果里要回填它，客户端才能与自己的请求对上账。
      */
     fun recordResultIfAbsent(
         operationIdentifier: OperationIdentifier,
-        resultSupplier: () -> CommandResult,
+        resultSupplier: (OperationIdentifier) -> CommandResult,
     ): CommandResult
 }
