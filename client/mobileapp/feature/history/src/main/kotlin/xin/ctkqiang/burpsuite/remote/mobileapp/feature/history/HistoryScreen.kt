@@ -2,15 +2,16 @@ package xin.ctkqiang.burpsuite.remote.mobileapp.feature.history
 
 import android.content.res.Resources
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,11 +28,11 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteEmptyState
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteErrorState
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteListItem
-import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteListItemGroup
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemotePullToRefresh
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSkeletonRow
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.burpRemoteListRowChrome
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
@@ -68,12 +69,13 @@ fun HistoryScreen(
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
+                // 行与行之间不留间距：首行到末行是同一张卡，一有间距就断成几张各自独立的卡片。
+                // 骨架行不属于这张卡，它要的那一档间距在自己身上补。
                 contentPadding =
                     PaddingValues(
                         horizontal = BurpRemoteSpacing.ScreenEdge,
                         vertical = BurpRemoteSpacing.ExtraLarge,
                     ),
-                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ListItemGap),
             ) {
                 recordItems(uiState = uiState, onIntent = onIntent)
             }
@@ -105,7 +107,13 @@ private fun LazyListScope.recordItems(
                 count = SKELETON_ROW_COUNT,
                 key = { index -> "$LOADING_KEY-$index" },
             ) { index ->
-                Box(modifier = Modifier.burpRemoteStaggeredEntry(index = index)) {
+                Box(
+                    modifier =
+                        Modifier
+                            // 骨架行各自是一件独立的占位，彼此之间要留出与列表一致的那一档间距。
+                            .padding(bottom = BurpRemoteSpacing.ListItemGap)
+                            .burpRemoteStaggeredEntry(index = index),
+                ) {
                     BurpRemoteSkeletonRow()
                 }
             }
@@ -119,59 +127,82 @@ private fun LazyListScope.recordItems(
             }
 
         else ->
-            item(key = RECORDS_KEY) {
-                Box(modifier = Modifier.animateItem()) {
-                    HistoryRecordGroup(
-                        records = uiState.records,
-                        now = uiState.now,
-                        onOpenRecord = { identifier ->
-                            onIntent(HistoryUserInterfaceIntent.OpenHistoryRecord(identifier))
-                        },
-                    )
-                }
-            }
+            recordRows(records = uiState.records, now = uiState.now, onIntent = onIntent)
     }
 }
 
 /**
- * 一屏记录共用的分组容器：整组一张描边卡，行与行之间只画一条分隔线。
+ * 一条记录一个懒加载项。
  *
- * 一屏记录互相之间的关系是「同一串历史里前后相邻的几条」，共用一张容器才读得成一条时间线；
- * 每行各自一张卡片时，这一层关系就没了，取而代之的是一堆各自独立的方框。
+ * 此前整表被塞进**一个**懒惰列表项，于是首帧要把每一条都组合、测量一遍：记录一多，一帧就顶不住，
+ * 滚动时还额外拉起几百个入场动画。逐条成项之后，参与一帧工作的只有视口里那几行。
  *
- * 行内的错峰入场挂在每一行上，因此新记录仍然是一条条落下，而不是整组一起弹出来。
- *
- * @param records 这一屏仍在实时投影里的记录，按事件序号升序。
- * @param now 相对时间的参照点。
- * @param onOpenRecord 打开某条记录的详情；参数是这条记录的历史标识。
+ * 整组共用一张卡的观感由 [burpRemoteListRowChrome] 按行在组内的位置画出来，因此观感不变。
  */
-@Composable
-private fun HistoryRecordGroup(
+private fun LazyListScope.recordRows(
     records: List<HistoryRecord>,
     now: Instant,
+    onIntent: (HistoryUserInterfaceIntent) -> Unit,
+) {
+    itemsIndexed(
+        items = records,
+        key = { _, record -> record.historyIdentifier.value },
+    ) { index, record ->
+        HistoryRecordRow(
+            record = record,
+            now = now,
+            // 外框与入场动画在这里构造：animateItem 只在惰性列表项的作用域里可用。
+            // 入场动画排在最外，整行（含外框）一起落下；透明度交给入场动画管，所以关掉 animateItem 的淡入。
+            modifier =
+                Modifier
+                    .burpRemoteStaggeredEntry(index = index)
+                    .animateItem(fadeInSpec = null)
+                    .burpRemoteListRowChrome(
+                        isFirstRow = index == 0,
+                        isLastRow = index == records.lastIndex,
+                    ),
+            showsDivider = index != records.lastIndex,
+            onOpenRecord = { identifier ->
+                onIntent(HistoryUserInterfaceIntent.OpenHistoryRecord(identifier))
+            },
+        )
+    }
+}
+
+/**
+ * 列表里的一条历史记录。
+ *
+ * 读法与前一致：方法色标、请求行（方法 + 主机 + 路径，等宽）、状态胶囊，第二行是相对时间。
+ * 卡片外框由调用方按这一行在组内的位置给（[burpRemoteListRowChrome]）：首行带上边与上圆角，
+ * 末行带下边与下圆角，中间只画两侧，于是这几行看上去仍是一张卡里的几行。
+ *
+ * @param modifier 调用方给的外框与位移动画；惰性列表项的外框只能在那里构造。
+ */
+@Composable
+private fun HistoryRecordRow(
+    record: HistoryRecord,
+    now: Instant,
+    modifier: Modifier,
+    showsDivider: Boolean,
     onOpenRecord: (String) -> Unit,
 ) {
     val absentValue = stringResource(R.string.history_absent_value)
 
-    BurpRemoteListItemGroup {
-        records.forEachIndexed { index, record ->
-            BurpRemoteListItem(
-                title = requestLineOf(record = record, absentValue = absentValue),
-                modifier = Modifier.burpRemoteStaggeredEntry(index = index),
-                subtitle = relativeTimeText(now = now, moment = record.occurredAt),
-                titleIsTechnical = true,
-                leading = { MethodMarker(tone = methodToneOf(record.method)) },
-                trailing = {
-                    BurpRemoteStatusPill(
-                        text = record.statusCode?.toString() ?: absentValue,
-                        tone = statusToneOf(record.statusCode),
-                    )
-                },
-                showsDivider = index != records.lastIndex,
-                onClick = { onOpenRecord(record.historyIdentifier.value) },
+    BurpRemoteListItem(
+        title = requestLineOf(record = record, absentValue = absentValue),
+        modifier = modifier,
+        subtitle = relativeTimeText(now = now, moment = record.occurredAt),
+        titleIsTechnical = true,
+        leading = { MethodMarker(tone = methodToneOf(record.method)) },
+        trailing = {
+            BurpRemoteStatusPill(
+                text = record.statusCode?.toString() ?: absentValue,
+                tone = statusToneOf(record.statusCode),
             )
-        }
-    }
+        },
+        showsDivider = showsDivider,
+        onClick = { onOpenRecord(record.historyIdentifier.value) },
+    )
 }
 
 /** 方法色标：一竖条按方法语义着色，与拦截、归档两个列表是同一个意思。 */
@@ -330,9 +361,6 @@ private const val SECONDS_PER_DAY = 86_400L
 private const val ERROR_KEY = "error"
 private const val LOADING_KEY = "loading"
 private const val EMPTY_KEY = "empty"
-
-// 整块记录是一个懒惰列表项：一组的描边与底色只有一份，行是它内部的几行。
-private const val RECORDS_KEY = "records"
 
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。
 @Preview(name = "有记录浅色", showBackground = true)

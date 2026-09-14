@@ -32,11 +32,15 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTok
 /**
  * 列表行：标题、可选说明、左右两个插槽，右侧可挂一枚「进入下一级」的箭头。
  *
- * 行的底色与描边由外面那层容器（[BurpRemoteListItemGroup]）给，它自己只画内容——这样一整组行看起来
- * 是一张卡里的几行，而不是几张各自独立的卡片叠在一起。
+ * 行的底色与描边通常由外面那层容器（[BurpRemoteListItemGroup]）给，它自己只画内容——这样一整组行看起来
+ * 是一张卡里的几行，而不是几张各自独立的卡片叠在一起。惰性列表里没法用那份容器（一个容器要求在
+ * 同一帧里组合出组内所有行），改由每一行自带外框，见 [burpRemoteListRowChrome]。
  *
  * [showsDivider] 由调用方按位置决定：只有调用方知道谁是这一组的最后一行，而最后一行下面那条线
  * 会与容器的下边框贴成两条，看起来像画歪了。
+ *
+ * [modifier] 加在最外层，管住「这一行 + 它下面那条分隔线」：行外框的左右边线要一直画到分隔线底部，
+ * 位移与淡入也该连分隔线一起走。
  *
  * @param title 这一行做什么。
  * @param subtitle 补一句它影响什么；不需要解释时留空，不要为了填满而写废话。
@@ -72,69 +76,73 @@ fun BurpRemoteListItem(
             label = "list-item-press-scale",
         )
 
-    Row(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .graphicsLayer {
-                    scaleX = pressScale
-                    scaleY = pressScale
-                }
-                .then(
-                    if (onClick != null) {
-                        Modifier.clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                        ) {
-                            haptics.tap()
-                            onClick()
-                        }
-                    } else {
-                        Modifier
-                    },
-                )
-                .defaultMinSize(minHeight = BurpRemoteSizing.MinimumTouchTarget)
-                .padding(
-                    horizontal = BurpRemoteSpacing.Large,
-                    vertical = BurpRemoteSpacing.Medium,
-                ),
-        horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (leading != null) {
-            leading()
-        }
-        Column(
-            modifier = Modifier.weight(weight = 1f, fill = true),
-            verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ExtraSmall),
+    // 调用方的 modifier 加在最外层，管住「这一行 + 它下面那条分隔线」：外框的左右两条边线要一直画到
+    // 分隔线底部，位移与淡入也该连分隔线一起走；只加在行上，边线会在每条分隔线那里断掉一档。
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        scaleX = pressScale
+                        scaleY = pressScale
+                    }
+                    .then(
+                        if (onClick != null) {
+                            Modifier.clickable(
+                                interactionSource = interactionSource,
+                                indication = null,
+                            ) {
+                                haptics.tap()
+                                onClick()
+                            }
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .defaultMinSize(minHeight = BurpRemoteSizing.MinimumTouchTarget)
+                    .padding(
+                        horizontal = BurpRemoteSpacing.Large,
+                        vertical = BurpRemoteSpacing.Medium,
+                    ),
+            horizontalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.Small),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            BurpRemoteText(
-                text = title,
-                style = if (titleIsTechnical) tokens.typography.technical else tokens.typography.body,
-                colour = tokens.colourScheme.contentPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            if (subtitle != null) {
+            if (leading != null) {
+                leading()
+            }
+            Column(
+                modifier = Modifier.weight(weight = 1f, fill = true),
+                verticalArrangement = Arrangement.spacedBy(BurpRemoteSpacing.ExtraSmall),
+            ) {
                 BurpRemoteText(
-                    text = subtitle,
-                    style = tokens.typography.caption,
-                    colour = tokens.colourScheme.contentSecondary,
-                    maxLines = SUBTITLE_MAX_LINES,
+                    text = title,
+                    style = if (titleIsTechnical) tokens.typography.technical else tokens.typography.body,
+                    colour = tokens.colourScheme.contentPrimary,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                if (subtitle != null) {
+                    BurpRemoteText(
+                        text = subtitle,
+                        style = tokens.typography.caption,
+                        colour = tokens.colourScheme.contentSecondary,
+                        maxLines = SUBTITLE_MAX_LINES,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+            if (trailing != null) {
+                trailing()
+            }
+            if (showsChevron) {
+                ChevronGlyph(modifier = Modifier.size(BurpRemoteSizing.InlineIcon))
             }
         }
-        if (trailing != null) {
-            trailing()
-        }
-        if (showsChevron) {
-            ChevronGlyph(modifier = Modifier.size(BurpRemoteSizing.InlineIcon))
-        }
-    }
 
-    if (showsDivider) {
-        ListDivider()
+        if (showsDivider) {
+            ListDivider()
+        }
     }
 }
 
