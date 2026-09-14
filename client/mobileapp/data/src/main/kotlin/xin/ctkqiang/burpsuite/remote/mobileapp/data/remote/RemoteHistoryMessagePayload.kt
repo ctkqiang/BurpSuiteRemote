@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
  * /v1/history/{historyIdentifier} 的载荷形状。
  *
  * 字段集与插件侧 `BurpHistoryAdapter` 的构造函数一一对应：插件只发这九项，客户端因此不替它多编字段
- * （rules.md §11）。四个文本项带有默认值，是因为插件在响应未到达时发的是 JSON null——
- * 少一个默认值就会把「没有这段字节」解析成契约错误，那是把正常结局当故障。
+ * （rules.md §11）。四个文本项带默认值、状态码也可为空，是因为插件在响应未到达时发的是 JSON null——
+ * 少一个容得下 null 的默认值就会把「没有这段字节」解析成契约错误，那是把正常结局当故障。
  *
  * @property historyIdentifier 插件为这条记录算出的稳定标识。
  * @property method 请求方法。
@@ -25,7 +25,7 @@ data class RemoteHistoryMessagePayload(
     val method: String,
     val host: String,
     val path: String,
-    val status: Int,
+    val status: Int? = null,
     val requestHeaders: String? = null,
     val requestBody: String? = null,
     val responseHeaders: String? = null,

@@ -137,6 +137,55 @@ class RemoteResponseDecoderTest {
     }
 
     @Test
+    fun `a history message payload whose response never arrived keeps the status absent`() {
+        // 插件对「响应没回来」发的是 JSON null。null 不是契约错误，它跟其他四个文本字段一样是
+        // 「根本没有这段东西」；把 null 当成故障就会让每一次被中断的请求都显示成解析失败。
+        val nullStatusPayload =
+            jsonPayload(
+                """{"historyIdentifier":"history_1","method":"GET","host":"api.example.com",""" +
+                    """"path":"/api/user","status":null}""",
+            )
+        val omittedStatusPayload =
+            jsonPayload(
+                """{"historyIdentifier":"history_1","method":"GET","host":"api.example.com",""" +
+                    """"path":"/api/user"}""",
+            )
+
+        assertEquals(
+            RemoteResult.Succeeded(
+                RemoteHistoryMessage(
+                    historyIdentifier = "history_1",
+                    method = "GET",
+                    host = "api.example.com",
+                    path = "/api/user",
+                    statusCode = null,
+                    requestHeaders = null,
+                    requestBody = null,
+                    responseHeaders = null,
+                    responseBody = null,
+                ),
+            ),
+            RemoteResponseDecoder.decodeHistoryMessage(nullStatusPayload),
+        )
+        assertEquals(
+            RemoteResult.Succeeded(
+                RemoteHistoryMessage(
+                    historyIdentifier = "history_1",
+                    method = "GET",
+                    host = "api.example.com",
+                    path = "/api/user",
+                    statusCode = null,
+                    requestHeaders = null,
+                    requestBody = null,
+                    responseHeaders = null,
+                    responseBody = null,
+                ),
+            ),
+            RemoteResponseDecoder.decodeHistoryMessage(omittedStatusPayload),
+        )
+    }
+
+    @Test
     fun `a history message payload missing an identifier is malformed`() {
         assertEquals(
             RemoteResult.Failed(RemoteFailure.MalformedServerResponse),

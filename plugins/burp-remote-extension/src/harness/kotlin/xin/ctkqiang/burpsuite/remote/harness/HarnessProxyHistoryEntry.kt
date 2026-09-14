@@ -3,6 +3,7 @@
 package xin.ctkqiang.burpsuite.remote.harness
 
 import xin.ctkqiang.burpsuite.remote.adapter.BurpProxyHistoryEntry
+import java.nio.charset.StandardCharsets
 
 /** 夹具使用的代理历史条目；正文固定成一小段无害文本，端到端要验证的是事件通道而不是正文读取。 */
 class HarnessProxyHistoryEntry(
@@ -14,18 +15,22 @@ class HarnessProxyHistoryEntry(
     override val destinationInternetProtocolAddress: String?,
     override val path: String,
     override val listenerPort: Int,
-    override val statusCode: Int,
+    override val statusCode: Int?,
     override val mimeTypeText: String,
     override val responseLength: Long?,
     override val durationMilliseconds: Long?,
 ) : BurpProxyHistoryEntry {
-    override val hasResponse: Boolean = true
+    // 有没有响应，看状态码在不在；把两件事拆成两个字段就会允许「有响应却没有状态码」这种自相矛盾的状态。
+    override val hasResponse: Boolean = statusCode != null
 
     override fun readRequestHeadersText(): String = "$method $path HTTP/1.1\r\nHost: $host\r\n"
 
     override fun readRequestBodyText(): String = ""
 
-    override fun readResponseHeadersText(): String = "HTTP/1.1 $statusCode OK\r\n"
+    override fun readRequestBytes(): ByteArray =
+        (readRequestHeadersText() + readRequestBodyText()).toByteArray(StandardCharsets.UTF_8)
+
+    override fun readResponseHeadersText(): String = statusCode?.let { "HTTP/1.1 $it OK\r\n" } ?: ""
 
     override fun readResponseBodyText(): String = ""
 }

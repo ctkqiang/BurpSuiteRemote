@@ -2,6 +2,8 @@
 
 package xin.ctkqiang.burpsuite.remote.adapter
 
+import java.nio.charset.StandardCharsets
+
 /** 一条测试用的历史条目；它只实现薄接口，因此映射测试不必构造任何 Montoya 类型。 */
 class StubProxyHistoryEntry(
     override val occurredAtEpochMilliseconds: Long = DEFAULT_OCCURRED_AT_EPOCH_MILLISECONDS,
@@ -12,7 +14,7 @@ class StubProxyHistoryEntry(
     override val destinationInternetProtocolAddress: String? = DEFAULT_DESTINATION_INTERNET_PROTOCOL_ADDRESS,
     override val path: String = DEFAULT_PATH,
     override val listenerPort: Int = DEFAULT_LISTENER_PORT,
-    override val statusCode: Int = DEFAULT_STATUS_CODE,
+    override val statusCode: Int? = DEFAULT_STATUS_CODE,
     override val mimeTypeText: String = DEFAULT_MIME_TYPE_TEXT,
     override val responseLength: Long? = DEFAULT_RESPONSE_LENGTH,
     override val durationMilliseconds: Long? = DEFAULT_DURATION_MILLISECONDS,
@@ -29,6 +31,10 @@ class StubProxyHistoryEntry(
     override fun readResponseHeadersText(): String? = responseHeadersText
 
     override fun readResponseBodyText(): String? = responseBodyText
+
+    // 由两个文本字段推出来，替身因此自洽：配什么头、什么正文，拿到的字节就是它们的原文。
+    override fun readRequestBytes(): ByteArray =
+        (readRequestHeadersText() + readRequestBodyText()).toByteArray(StandardCharsets.UTF_8)
 
     companion object {
         const val DEFAULT_OCCURRED_AT_EPOCH_MILLISECONDS: Long = 1_757_660_000_000L

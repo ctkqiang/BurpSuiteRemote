@@ -42,7 +42,8 @@ private class MontoyaProxyHistoryEntry(private val historyEntry: ProxyHttpReques
 
     override val listenerPort: Int = historyEntry.listenerPort()
 
-    override val statusCode: Int = if (response != null) response.statusCode().toInt() else NO_RESPONSE_STATUS_CODE
+    // 没有响应就没有状态码；给 null 而不是 0，0 不是任何 HTTP 状态码，用它当哨兵只会让线上多出一个假的 200 之外的值。
+    override val statusCode: Int? = response?.statusCode()?.toInt()
 
     override val mimeTypeText: String = describeMimeType(historyEntry.mimeType())
 
@@ -58,6 +59,9 @@ private class MontoyaProxyHistoryEntry(private val historyEntry: ProxyHttpReques
     override fun readRequestHeadersText(): String = headersTextOf(request)
 
     override fun readRequestBodyText(): String = request.bodyToString()
+
+    // toByteArray 给的就是 Burp 手上那段请求，含请求行与头部；重放要的正是它，不是按字符串重拼的近似值。
+    override fun readRequestBytes(): ByteArray = request.toByteArray().getBytes()
 
     override fun readResponseHeadersText(): String? =
         response?.let { historyResponse ->
@@ -78,8 +82,6 @@ private class MontoyaProxyHistoryEntry(private val historyEntry: ProxyHttpReques
     private fun describeMimeType(mimeType: MimeType?): String = mimeType?.description() ?: MIME_TYPE_UNKNOWN_TEXT
 
     private companion object {
-        private const val NO_RESPONSE_STATUS_CODE = 0
-
         private const val MIME_TYPE_UNKNOWN_TEXT = "unknown"
     }
 }

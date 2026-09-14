@@ -32,8 +32,8 @@ interface BurpProxyHistoryEntry {
     /** 承接该请求的代理监听端口。 */
     val listenerPort: Int
 
-    /** 响应状态码；尚无响应时为 0。 */
-    val statusCode: Int
+    /** 响应状态码；尚无响应时为 null，与 [responseLength]、[durationMilliseconds] 同一条规矩。 */
+    val statusCode: Int?
 
     /** Burp 判定的响应 MIME 类型描述。 */
     val mimeTypeText: String
@@ -58,4 +58,7 @@ interface BurpProxyHistoryEntry {
 
     /** 读取响应体原文；尚无响应时为 null。 */
     fun readResponseBodyText(): String?
+
+    /** 读取请求原文的原始字节，含请求行、头部与正文；重放按字节走，字符编码不参与。 */
+    fun readRequestBytes(): ByteArray
 }

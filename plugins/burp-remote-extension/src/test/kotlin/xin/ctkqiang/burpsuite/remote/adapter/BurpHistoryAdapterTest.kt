@@ -54,7 +54,7 @@ class BurpHistoryAdapterTest {
             StubProxyHistoryEntry(
                 isSecure = false,
                 destinationInternetProtocolAddress = null,
-                statusCode = 0,
+                statusCode = null,
                 responseLength = null,
                 durationMilliseconds = null,
                 hasResponse = false,
@@ -64,6 +64,8 @@ class BurpHistoryAdapterTest {
         val item = historyItemsOf(adapter)[0]
 
         assertEquals("http", item.textAt("scheme"))
+        // 没有响应就不是「状态码 0」而是「没有状态码」；写 0 会让界面把哨兵当成真实读到的值画出来。
+        assertEquals(JsonNull, item.jsonObject["statusCode"])
         assertEquals(JsonNull, item.jsonObject["destinationInternetProtocolAddress"])
         assertEquals(JsonNull, item.jsonObject["responseLength"])
         assertEquals(JsonNull, item.jsonObject["durationMilliseconds"])
@@ -121,11 +123,18 @@ class BurpHistoryAdapterTest {
 
     @Test
     fun `a message whose response has not arrived yet reports no response text`() {
-        val stubEntry = StubProxyHistoryEntry(hasResponse = false, responseHeadersText = null, responseBodyText = null)
+        val stubEntry =
+            StubProxyHistoryEntry(
+                statusCode = null,
+                hasResponse = false,
+                responseHeadersText = null,
+                responseBodyText = null,
+            )
         val adapter = createAdapter(stubEntry)
 
         val message = adapter.buildHistoryMessagePayload(adapter.toHistoryIdentifier(stubEntry))
 
+        assertEquals(JsonNull, message?.jsonObject?.get("status"))
         assertEquals(JsonNull, message?.jsonObject?.get("responseHeaders"))
         assertEquals(JsonNull, message?.jsonObject?.get("responseBody"))
     }

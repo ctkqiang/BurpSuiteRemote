@@ -44,7 +44,7 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
             put(HOST_FIELD, entry.host)
             put(PATH_FIELD, entry.path)
             put(SCHEME_FIELD, schemeTextOf(entry))
-            put(STATUS_CODE_FIELD, entry.statusCode)
+            putAbsentableNumber(STATUS_CODE_FIELD, entry.statusCode)
             put(MIME_TYPE_FIELD, entry.mimeTypeText)
             put(USES_TLS_FIELD, entry.isSecure)
             put(LISTENER_PORT_FIELD, entry.listenerPort)
@@ -97,7 +97,7 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
             put(METHOD_FIELD, entry.method)
             put(HOST_FIELD, entry.host)
             put(PATH_FIELD, entry.path)
-            put(STATUS_FIELD, entry.statusCode)
+            putAbsentableNumber(STATUS_FIELD, entry.statusCode)
             put(REQUEST_HEADERS_FIELD, entry.readRequestHeadersText())
             put(REQUEST_BODY_FIELD, entry.readRequestBodyText())
             put(RESPONSE_HEADERS_FIELD, entry.readResponseHeadersText())
@@ -105,6 +105,7 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
         }
 
     // 字段之间用 NUL 分隔：HTTP 头与路径里不会出现 NUL，拼接不会跨字段撞车。
+    // 状态码缺席时用 [ABSENT_STATUS_CODE_TEXT] 而不是空串：空串会让「没有状态码」与「状态码为空文本」撞成同一个身份。
     private fun digestOf(entry: BurpProxyHistoryEntry): Long {
         val canonicalText =
             listOf(
@@ -115,7 +116,7 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
                 entry.method,
                 entry.path,
                 entry.occurredAtEpochMilliseconds.toString(),
-                entry.statusCode.toString(),
+                entry.statusCode?.toString() ?: ABSENT_STATUS_CODE_TEXT,
                 entry.mimeTypeText,
             ).joinToString(IDENTIFIER_FIELD_SEPARATOR)
         return fnvOneAHashOf(canonicalText.toByteArray(StandardCharsets.UTF_8))
@@ -144,6 +145,8 @@ class BurpHistoryAdapter(private val historySource: BurpProxyHistorySource) {
         private const val HEXADECIMAL_PADDING = '0'
 
         private const val IDENTIFIER_FIELD_SEPARATOR = "\u0000"
+
+        private const val ABSENT_STATUS_CODE_TEXT = "no-response"
 
         private const val FNV_OFFSET_BASIS = -3750763034362895579L
 
