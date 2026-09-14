@@ -57,7 +57,7 @@
 
     <!-- 关于与开发者信息。名字、邮箱与仓库地址是事实，交给翻译既没意义还会被拼错，因此不进翻译条目。 -->
     <string name="about_application_name" translatable="false">Burpsuite Remote</string>
-    <string name="about_author_value" translatable="false">ctkqiang 钟智强</string>
+    <string name="about_author_value" translatable="false">哪吒网络安全的钟智强 &lt;ctkqiang&gt;</string>
     <string name="about_email_value" translatable="false">johnmelodymel@qq.com</string>
     <string name="about_source_value" translatable="false">https://github.com/ctkqiang/BurpSuiteRemote.git</string>
 
