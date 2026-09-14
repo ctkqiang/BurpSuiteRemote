@@ -93,13 +93,6 @@ private val LanguagePreference.labelResource: Int
             LanguagePreference.Chinese -> R.string.settings_language_chinese
             LanguagePreference.German -> R.string.settings_language_german
             LanguagePreference.Japanese -> R.string.settings_language_japanese
-            LanguagePreference.Korean -> R.string.settings_language_korean
-            LanguagePreference.Thai -> R.string.settings_language_thai
-            LanguagePreference.Malay -> R.string.settings_language_malay
-            LanguagePreference.Tibetan -> R.string.settings_language_tibetan
-            LanguagePreference.Uyghur -> R.string.settings_language_uyghur
-            LanguagePreference.Russian -> R.string.settings_language_russian
-            LanguagePreference.French -> R.string.settings_language_french
             LanguagePreference.Mongolian -> R.string.settings_language_mongolian
         }
 

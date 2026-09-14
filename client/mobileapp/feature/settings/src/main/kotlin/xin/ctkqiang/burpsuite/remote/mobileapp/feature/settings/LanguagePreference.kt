@@ -25,27 +25,6 @@ enum class LanguagePreference {
     /** 日语。 */
     Japanese,
 
-    /** 韩语。 */
-    Korean,
-
-    /** 泰语。 */
-    Thai,
-
-    /** 马来语。 */
-    Malay,
-
-    /** 藏语。 */
-    Tibetan,
-
-    /** 维吾尔语。 */
-    Uyghur,
-
-    /** 俄语。 */
-    Russian,
-
-    /** 法语。 */
-    French,
-
     /** 蒙古文（西里尔书写；传统蒙古文是竖排文字，需要额外字体，见资源层说明）。 */
     Mongolian,
     ;
@@ -59,13 +38,6 @@ enum class LanguagePreference {
                 Chinese -> "zh"
                 German -> "de"
                 Japanese -> "ja"
-                Korean -> "ko"
-                Thai -> "th"
-                Malay -> "ms"
-                Tibetan -> "bo"
-                Uyghur -> "ug"
-                Russian -> "ru"
-                French -> "fr"
                 Mongolian -> "mn"
             }
 
