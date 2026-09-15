@@ -1,0 +1,60 @@
+@startuml architecture-en
+
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+skinparam roundCorner 10
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam packageStyle frame
+
+package "Burp Suite" {
+    [Burp Proxy] as Proxy
+    [Montoya API] as API
+}
+
+package "Plugin (burp-remote-extension)" {
+    [History Publisher] as HP
+    [Intercept Handler] as IH
+    [Repeater API] as RA
+    [Remote HTTP Server] as HS
+    [InMemoryRemoteEventStream] as ES
+    [DevicePairingService] as DPS
+    [RemoteControlGate] as RCG
+    [PairedDeviceRegistry] as PDR
+    [Rate Limiter] as RL
+    [Audit Logger] as AL
+}
+
+package "Android App (mobileapp)" {
+    [Ktor Client] as KC
+    [Event Ingestor] as EI
+    [Room Database] as DB
+    [Journal Projection] as JP
+    [MVI ViewModels] as VM
+    [Jetpack Compose UI] as UI
+    [Haze Glass Bar] as GLB
+}
+
+Proxy --> API
+API --> HP : history events
+API --> IH : intercept decisions
+HP --> ES : appendEvent
+IH --> ES : appendEvent
+RA --> ES : appendEvent
+
+HS --> ES : streamEvents
+HS --> RCG : control commands
+RCG --> DPS : authenticate
+DPS --> PDR : register/retrieve
+RCG --> RL : tryAcquire
+RCG --> AL : log
+
+KC --> HS : WebSocket + REST
+KC --> EI : events
+EI --> DB : journal write
+DB --> JP : projection
+JP --> VM : state
+VM --> UI : render
+UI --> GLB
+
+@end

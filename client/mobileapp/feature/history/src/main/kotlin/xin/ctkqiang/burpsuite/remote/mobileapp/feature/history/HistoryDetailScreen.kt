@@ -87,12 +87,18 @@ fun HistoryDetailScreen(
                         messageFailure = uiState.messageFailure,
                         scopeConclusion = uiState.scopeConclusion,
                         isScopeWriteAvailable = uiState.isScopeWriteAvailable,
+                        repeaterConclusion = uiState.repeaterConclusion,
+                        isRepeaterWriteAvailable = uiState.isRepeaterWriteAvailable,
                         onReloadMessage = {
                             haptics.tap()
                             onIntent(HistoryDetailUserInterfaceIntent.ReloadHistoryMessage)
                         },
                         onAddToScope = {
                             onIntent(HistoryDetailUserInterfaceIntent.AddHistoryHostToScope)
+                        },
+                        onSendToRepeater = {
+                            haptics.tap()
+                            onIntent(HistoryDetailUserInterfaceIntent.SendToRepeater)
                         },
                         onShare = {
                             haptics.tap()
@@ -123,8 +129,11 @@ private fun RecordDetail(
     messageFailure: HistoryMessageReadFailure?,
     scopeConclusion: HistoryScopeWriteConclusion?,
     isScopeWriteAvailable: Boolean,
+    repeaterConclusion: HistoryRepeaterConclusion?,
+    isRepeaterWriteAvailable: Boolean,
     onReloadMessage: () -> Unit,
     onAddToScope: () -> Unit,
+    onSendToRepeater: () -> Unit,
     onShare: () -> Unit,
 ) {
     val tokens = LocalBurpRemoteDesignTokens.current
@@ -265,17 +274,27 @@ private fun RecordDetail(
                     tone = toneOf(conclusion),
                 )
             }
-            // 送往重放要发控制命令，客户端还没有那条通路；按钮保持禁用并写明原因。
+            // 送往重放把这条请求推到 Repeater；写入端口没接上或本体还没取回时按钮停用并说明原因。
             BurpRemoteButton(
                 text = stringResource(R.string.history_detail_action_send_to_repeater),
-                onClick = {},
+                onClick = onSendToRepeater,
                 style = BurpRemoteButtonStyle.Secondary,
-                isEnabled = false,
+                isEnabled = isRepeaterWriteAvailable,
             )
-            BurpRemoteEmptyState(
-                headline = stringResource(R.string.history_detail_reason_headline),
-                detail = stringResource(R.string.history_detail_reason_send_to_repeater),
-            )
+            if (!isRepeaterWriteAvailable) {
+                BurpRemoteText(
+                    text = stringResource(R.string.history_detail_reason_send_to_repeater),
+                    style = tokens.typography.label,
+                    colour = tokens.colourScheme.contentSecondary,
+                )
+            }
+            // 按下的结论就地摆一句并按类着色——每种结论的下一步都不同，合并成一句「失败了」等于把排查丢回给用户。
+            repeaterConclusion?.let { conclusion ->
+                BurpRemoteStatusPill(
+                    text = stringResource(conclusion.messageResource),
+                    tone = toneOf(conclusion),
+                )
+            }
         }
     }
 }
@@ -479,6 +498,24 @@ private fun toneOf(conclusion: HistoryScopeWriteConclusion): BurpRemoteStatusTon
     }
 
 /**
+ * 送给重放的结论色标：与作用域写入同一套分档——成功在线、学不会契约的危险、重试无用的中性、其余警告。
+ */
+private fun toneOf(conclusion: HistoryRepeaterConclusion): BurpRemoteStatusTone =
+    when (conclusion) {
+        HistoryRepeaterConclusion.Sent -> BurpRemoteStatusTone.Live
+        HistoryRepeaterConclusion.MalformedResponse -> BurpRemoteStatusTone.Danger
+        HistoryRepeaterConclusion.NotSupported,
+        HistoryRepeaterConclusion.WriterUnavailable,
+        HistoryRepeaterConclusion.MessageNotLoaded,
+        -> BurpRemoteStatusTone.Neutral
+
+        HistoryRepeaterConclusion.NotPaired,
+        HistoryRepeaterConclusion.Unreachable,
+        HistoryRepeaterConclusion.Refused,
+        -> BurpRemoteStatusTone.Warning
+    }
+
+/**
  * 挑语法着色：正文以 `{` 或 `[` 开头就按 JSON 上色。
  *
  * 请求头与响应头是 HTTP 文本，走纯文本；这一条判断只为了让响应体的 JSON 有字段名、字符串、
@@ -588,6 +625,28 @@ private fun HistoryDetailScreenScopeUnavailableDarkPreview() {
     BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
         HistoryDetailScreen(
             uiState = previewState().copy(isScopeWriteAvailable = false),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview(name = "已送往重放浅色", showBackground = true)
+@Composable
+private fun HistoryDetailScreenRepeaterSentLightPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Light) {
+        HistoryDetailScreen(
+            uiState = previewState().copy(repeaterConclusion = HistoryRepeaterConclusion.Sent),
+            onIntent = {},
+        )
+    }
+}
+
+@Preview(name = "无重放通路深色", showBackground = true)
+@Composable
+private fun HistoryDetailScreenRepeaterUnavailableDarkPreview() {
+    BurpsuiteRemoteTheme(themeMode = ThemeMode.Dark) {
+        HistoryDetailScreen(
+            uiState = previewState().copy(isRepeaterWriteAvailable = false),
             onIntent = {},
         )
     }

@@ -20,18 +20,28 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import burp.api.montoya.http.message.requests.HttpRequest
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
+import burp.api.montoya.http.Http as MontoyaHttp
 import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryAdapter
+import xin.ctkqiang.burpsuite.remote.adapter.BurpInterceptQueue
+import xin.ctkqiang.burpsuite.remote.adapter.BurpRepeaterStore
 import xin.ctkqiang.burpsuite.remote.adapter.BurpScopeAdapter
+import xin.ctkqiang.burpsuite.remote.adapter.InterceptDecision
+import xin.ctkqiang.burpsuite.remote.adapter.MontoyaInterceptedRequest
 import xin.ctkqiang.burpsuite.remote.protocol.CommandResult
 import xin.ctkqiang.burpsuite.remote.protocol.DEFAULT_REMOTE_PORT
 import xin.ctkqiang.burpsuite.remote.protocol.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.HistoryIdentifier
+import xin.ctkqiang.burpsuite.remote.protocol.InterceptIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.OperationIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.RejectionReason
+import xin.ctkqiang.burpsuite.remote.protocol.RepeaterRequestIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteClientMessage
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteError
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteErrorCode
@@ -42,6 +52,7 @@ import xin.ctkqiang.burpsuite.remote.protocol.RemoteResponse
 import xin.ctkqiang.burpsuite.remote.security.DevicePairingService
 import xin.ctkqiang.burpsuite.remote.security.PairedDeviceRegistry
 import xin.ctkqiang.burpsuite.remote.security.PairingOutcome
+import xin.ctkqiang.burpsuite.remote.transport.InMemoryRemoteEventStream
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.ServerSocket
@@ -57,11 +68,18 @@ class RemoteHttpServer(
     private val pairedDeviceRegistry: PairedDeviceRegistry,
     private val controlGate: RemoteControlGate,
     private val connectionRegistry: RemoteConnectionRegistry,
-    private val eventStream: RemoteEventStream,
+    private val eventStream: InMemoryRemoteEventStream,
     private val historyAdapter: BurpHistoryAdapter,
     private val scopeAdapter: BurpScopeAdapter,
     private val logSink: (String) -> Unit,
     private val remotePort: Int = DEFAULT_REMOTE_PORT,
+    private val clock: java.time.Clock = java.time.Clock.systemUTC(),
+    private val interceptQueue: BurpInterceptQueue? = null,
+    private val sendToRepeater: ((HttpRequest, String?) -> Unit)? = null,
+    /** Remote Repeater 内存存储；为 null 时 repeater 端点回 NotImplemented。 */
+    private val repeaterStore: BurpRepeaterStore? = null,
+    /** Montoya HTTP 服务，用于远程执行 repeater 请求（sendRequest）。 */
+    private val montoyaHttp: MontoyaHttp? = null,
 ) {
     private val lifecycleLock = Any()
 
@@ -90,6 +108,7 @@ class RemoteHttpServer(
             }
             return try {
                 runningServer = createAndStartServer()
+                // 序号由 InMemoryRemoteEventStream 统一分配，这里不需要再对齐。
                 logSink("Burp Remote 远程端点已启动：$LISTEN_HOST_ADDRESS:$remotePort")
                 true
             } catch (portUnavailable: IOException) {
@@ -184,16 +203,361 @@ class RemoteHttpServer(
                 }
             }
 
-            // 以下端点仍然依赖尚未实现的 Burp 能力（拦截队列、Repeater），因此只回「尚未实现」。
-            get(INTERCEPTS_PATH) { call.respondAuthenticatedNotImplemented(RemoteMessageType.Query) }
-            get(INTERCEPT_ITEM_PATH) { call.respondAuthenticatedNotImplemented(RemoteMessageType.Query) }
-            post(INTERCEPT_MODIFY_PATH) { call.respondControlCommand(COMMAND_TYPE_INTERCEPT_MODIFY) }
-            post(INTERCEPT_FORWARD_PATH) { call.respondControlCommand(COMMAND_TYPE_INTERCEPT_FORWARD) }
-            post(INTERCEPT_DROP_PATH) { call.respondControlCommand(COMMAND_TYPE_INTERCEPT_DROP) }
-            post(REPEATER_PATH) { call.respondControlCommand(COMMAND_TYPE_REPEATER_CREATE) }
-            post(REPEATER_EXECUTE_PATH) { call.respondControlCommand(COMMAND_TYPE_REPEATER_EXECUTE) }
+            // 拦截类端点：队列是真实的挂起点，REST 端点直接读写它。
+            get(INTERCEPTS_PATH) {
+                val queue = interceptQueue
+                if (queue == null) {
+                    call.respondAuthenticatedNotImplemented(RemoteMessageType.Query)
+                    return@get
+                }
+                call.respondAuthenticatedQuery(RemoteMessageType.Query) {
+                    buildJsonObject {
+                        putJsonArray(INTERCEPT_ITEMS_FIELD) {
+                            queue.snapshot().forEach { wrapped -> add(wrapped.buildMetadataPayload()) }
+                        }
+                    }
+                }
+            }
+            get(INTERCEPT_ITEM_PATH) {
+                val queue = interceptQueue
+                if (queue == null) {
+                    call.respondAuthenticatedNotImplemented(RemoteMessageType.Query)
+                    return@get
+                }
+                call.respondAuthenticatedQuery(RemoteMessageType.Query) {
+                    call.parameters[INTERCEPT_IDENTIFIER_ROUTE_PARAMETER]
+                        ?.let { identifierText -> InterceptIdentifier(identifierText) }
+                        ?.let { queue.find(it) }
+                        ?.let { wrapped -> wrapped.buildMessagePayload() }
+                }
+            }
+            post(INTERCEPT_FORWARD_PATH) {
+                call.handleInterceptForward()
+            }
+            post(INTERCEPT_DROP_PATH) {
+                call.handleInterceptDrop()
+            }
+            post(INTERCEPT_MODIFY_PATH) {
+                call.handleInterceptModify()
+            }
+
+            // Repeater 列表 + 单条详情
+            get(REPEATERS_PATH) {
+                val store = repeaterStore
+                if (store == null) {
+                    call.respondAuthenticatedNotImplemented(RemoteMessageType.Query)
+                    return@get
+                }
+                call.respondAuthenticatedQuery(RemoteMessageType.Query) {
+                    buildJsonObject {
+                        putJsonArray(REPEATER_ITEMS_FIELD) {
+                            store.snapshot().forEach { add(buildRepeaterItemPayload(it)) }
+                        }
+                    }
+                }
+            }
+            get(REPEATER_ITEM_PATH) {
+                val store = repeaterStore
+                if (store == null) {
+                    call.respondAuthenticatedNotImplemented(RemoteMessageType.Query)
+                    return@get
+                }
+                val identifier = call.parameters[REPEATER_IDENTIFIER_ROUTE_PARAMETER]
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { xin.ctkqiang.burpsuite.remote.protocol.RepeaterRequestIdentifier(it) }
+                val stored = identifier?.let { store.find(it) }
+                call.respondAuthenticatedQuery(RemoteMessageType.Query) {
+                    stored?.let { buildRepeaterItemPayload(it) }
+                }
+            }
+
+            // Repeater create：手机推 requestText → 插件存 store → 同时 sendToRepeater 到 Burp PC tab → 发 created 事件
+            post(REPEATER_PATH) {
+                call.handleRepeaterCreate()
+            }
+
+            // Repeater execute：真执行 — 用 montoyaApi.http().sendRequest() 发请求，发 started/completed 事件，存结果回 store
+            post(REPEATER_EXECUTE_PATH) {
+                call.handleRepeaterExecute()
+            }
         }
     }
+
+    // --- Repeater 命令实现 ---
+
+    private suspend fun ApplicationCall.handleRepeaterCreate() {
+        val store = repeaterStore
+        if (store == null) {
+            respondControlCommand(COMMAND_TYPE_REPEATER_CREATE)
+            return
+        }
+        val body = receiveText()
+        if (body.isBlank()) {
+            respondControlCommand(COMMAND_TYPE_REPEATER_CREATE) { _ ->
+                failedResult(RemoteErrorCode.SerializationFailure, isRetryable = true)
+            }
+            return
+        }
+        val payload =
+            try {
+                RemoteProtocolJson.instance.parseToJsonElement(body).jsonObject
+            } catch (_: Exception) {
+                null
+            }
+        val requestText = (payload?.get(REQUEST_TEXT_FIELD) as? kotlinx.serialization.json.JsonPrimitive)?.contentOrNull
+        val tabName = (payload?.get(TAB_NAME_FIELD) as? kotlinx.serialization.json.JsonPrimitive)?.contentOrNull
+        if (requestText == null) {
+            respondControlCommand(COMMAND_TYPE_REPEATER_CREATE) { _ ->
+                failedResult(RemoteErrorCode.SerializationFailure, isRetryable = true)
+            }
+            return
+        }
+        // 先让 Montoya 解析一遍，防止存进去的 requestText 根本不是合法 HTTP 请求
+        try {
+            val request = HttpRequest.httpRequest(requestText)
+            val stored = store.create(requestText, tabName, java.time.Instant.now(clock))
+            // 有 sendToRepeater 回调就顺便推到 Burp PC 的 Repeater tab
+            sendToRepeater?.invoke(request, tabName)
+            // 发 repeater.created 事件，让手机端 projection 知道有新条目了
+            emitRepeaterCreated(stored, java.time.Instant.now(clock))
+            respondControlCommand(COMMAND_TYPE_REPEATER_CREATE) { op ->
+                CommandResult.Succeeded(op)
+            }
+        } catch (_: Exception) {
+            respondControlCommand(COMMAND_TYPE_REPEATER_CREATE) { _ ->
+                failedResult(RemoteErrorCode.BurpRuntimeFailure, isRetryable = false)
+            }
+        }
+    }
+
+    private suspend fun ApplicationCall.handleRepeaterExecute() {
+        val store = repeaterStore
+        val http = montoyaHttp
+        if (store == null || http == null) {
+            respondControlCommand(COMMAND_TYPE_REPEATER_EXECUTE)
+            return
+        }
+        val identifier = parameters[REPEATER_IDENTIFIER_ROUTE_PARAMETER]
+            ?.takeIf { it.isNotBlank() }
+            ?.let { xin.ctkqiang.burpsuite.remote.protocol.RepeaterRequestIdentifier(it) }
+        val stored = identifier?.let { store.find(it) }
+        if (stored == null) {
+            respondControlCommand(COMMAND_TYPE_REPEATER_EXECUTE) { _ ->
+                failedResult(RemoteErrorCode.EntityNotFound, isRetryable = false)
+            }
+            return
+        }
+
+        // 发 started 事件 — 让手机知道正在执行
+        emitRepeaterStarted(identifier, java.time.Instant.now(clock))
+
+        val (response, durationMs) = try {
+            @Suppress("DEPRECATION")
+            val request = HttpRequest.httpRequest(stored.requestText)
+            val start = System.currentTimeMillis()
+            val httpResponse = http.sendRequest(request)
+            val end = System.currentTimeMillis()
+            httpResponse to (end - start)
+        } catch (t: Throwable) {
+            // 哪怕发请求抛异常（DNS 失败、TLS 握手失败等），也要发 completed 事件，带上失败事实
+            val now = java.time.Instant.now(clock)
+            store.updateWithResult(identifier, null, -1L, now)
+            emitRepeaterCompleted(identifier, now, failed = true, statusCode = null, durationMs = null)
+            respondControlCommand(COMMAND_TYPE_REPEATER_EXECUTE) { _ ->
+                failedResult(RemoteErrorCode.BurpRuntimeFailure, isRetryable = false)
+            }
+            return
+        }
+
+        val now = java.time.Instant.now(clock)
+        store.updateWithResult(identifier, response, durationMs, now)
+        @Suppress("DEPRECATION")
+        val statusCode = response?.statusCode()?.toInt()
+        emitRepeaterCompleted(
+            identifier,
+            now,
+            failed = false,
+            statusCode = statusCode,
+            durationMs = durationMs,
+        )
+        respondControlCommand(COMMAND_TYPE_REPEATER_EXECUTE) { op -> CommandResult.Succeeded(op) }
+    }
+
+    private fun buildRepeaterItemPayload(stored: xin.ctkqiang.burpsuite.remote.adapter.StoredRepeaterRequest): kotlinx.serialization.json.JsonObject =
+        buildJsonObject {
+            put(REPEATER_IDENTIFIER_FIELD, stored.identifier.value)
+            put(CREATED_AT_FIELD, stored.createdAtEpochMilliseconds)
+            stored.tabName?.let { put(TAB_NAME_FIELD, it) }
+            put(REQUEST_TEXT_FIELD, stored.requestText)
+            stored.lastExecutedAtEpochMilliseconds?.let { put(LAST_EXECUTED_AT_FIELD, it) }
+            stored.lastStatusCode?.let { put(LAST_STATUS_CODE_FIELD, it) }
+            stored.lastResponseHeaders?.let { put(LAST_RESPONSE_HEADERS_FIELD, it) }
+            stored.lastResponseBody?.let { put(LAST_RESPONSE_BODY_FIELD, it) }
+            stored.lastDurationMilliseconds?.let { put(LAST_DURATION_FIELD, it) }
+        }
+
+    private fun emitRepeaterCreated(
+        stored: xin.ctkqiang.burpsuite.remote.adapter.StoredRepeaterRequest,
+        occurredAt: java.time.Instant,
+    ) {
+        // sequenceNumber 与 eventIdentifier 由 InMemoryRemoteEventStream.appendEvent 统一分配，
+        // 这里传占位值即可——避免与 History/Intercept 发布者各自维护计数器导致撞号。
+        eventStream.appendEvent(
+            xin.ctkqiang.burpsuite.remote.protocol.RemoteEventEnvelope(
+                protocolVersion = RemoteProtocolVersion.CURRENT_PROTOCOL_VERSION,
+                eventIdentifier = xin.ctkqiang.burpsuite.remote.protocol.EventIdentifier(""),
+                sequenceNumber = 0L,
+                occurredAt = occurredAt,
+                eventType = REPEATER_CREATED_EVENT_TYPE,
+                aggregateType = xin.ctkqiang.burpsuite.remote.protocol.AggregateType.RepeaterRequest,
+                aggregateIdentifier = xin.ctkqiang.burpsuite.remote.protocol.AggregateIdentifier(stored.identifier.value),
+                payload = buildJsonObject {
+                    put(REPEATER_IDENTIFIER_FIELD, stored.identifier.value)
+                    put(REQUEST_TEXT_FIELD, stored.requestText)
+                    stored.tabName?.let { put(TAB_NAME_FIELD, it) }
+                    put(CREATED_AT_FIELD, stored.createdAtEpochMilliseconds)
+                },
+            ),
+        )
+    }
+
+    private fun emitRepeaterStarted(
+        identifier: xin.ctkqiang.burpsuite.remote.protocol.RepeaterRequestIdentifier,
+        occurredAt: java.time.Instant,
+    ) {
+        eventStream.appendEvent(
+            xin.ctkqiang.burpsuite.remote.protocol.RemoteEventEnvelope(
+                protocolVersion = RemoteProtocolVersion.CURRENT_PROTOCOL_VERSION,
+                eventIdentifier = xin.ctkqiang.burpsuite.remote.protocol.EventIdentifier(""),
+                sequenceNumber = 0L,
+                occurredAt = occurredAt,
+                eventType = REPEATER_EXECUTION_STARTED_EVENT_TYPE,
+                aggregateType = xin.ctkqiang.burpsuite.remote.protocol.AggregateType.RepeaterRequest,
+                aggregateIdentifier = xin.ctkqiang.burpsuite.remote.protocol.AggregateIdentifier(identifier.value),
+                payload = buildJsonObject {
+                    put(REPEATER_IDENTIFIER_FIELD, identifier.value)
+                },
+            ),
+        )
+    }
+
+    private fun emitRepeaterCompleted(
+        identifier: xin.ctkqiang.burpsuite.remote.protocol.RepeaterRequestIdentifier,
+        occurredAt: java.time.Instant,
+        failed: Boolean,
+        statusCode: Int?,
+        durationMs: Long?,
+    ) {
+        eventStream.appendEvent(
+            xin.ctkqiang.burpsuite.remote.protocol.RemoteEventEnvelope(
+                protocolVersion = RemoteProtocolVersion.CURRENT_PROTOCOL_VERSION,
+                eventIdentifier = xin.ctkqiang.burpsuite.remote.protocol.EventIdentifier(""),
+                sequenceNumber = 0L,
+                occurredAt = occurredAt,
+                eventType = REPEATER_EXECUTION_COMPLETED_EVENT_TYPE,
+                aggregateType = xin.ctkqiang.burpsuite.remote.protocol.AggregateType.RepeaterRequest,
+                aggregateIdentifier = xin.ctkqiang.burpsuite.remote.protocol.AggregateIdentifier(identifier.value),
+                payload = buildJsonObject {
+                    put(REPEATER_IDENTIFIER_FIELD, identifier.value)
+                    put(EXECUTION_FAILED_FIELD, failed)
+                    statusCode?.let { put(LAST_STATUS_CODE_FIELD, it) }
+                    durationMs?.let { put(LAST_DURATION_FIELD, it) }
+                    put(LAST_EXECUTED_AT_FIELD, occurredAt.toEpochMilli())
+                },
+            ),
+        )
+    }
+
+    // --- Intercept 命令实现 ---
+
+    private suspend fun ApplicationCall.handleInterceptForward() {
+        val queue = interceptQueue
+        if (queue == null) {
+            respondControlCommand(COMMAND_TYPE_INTERCEPT_FORWARD)
+            return
+        }
+        val identifier = readInterceptIdentifier()
+        if (identifier == null) {
+            respondControlCommand(COMMAND_TYPE_INTERCEPT_FORWARD) { _ ->
+                failedResult(RemoteErrorCode.SerializationFailure, isRetryable = true)
+            }
+            return
+        }
+        respondControlCommand(COMMAND_TYPE_INTERCEPT_FORWARD) { op ->
+            if (queue.submitDecision(identifier, InterceptDecision.Forward())) {
+                CommandResult.Succeeded(op)
+            } else {
+                CommandResult.Succeeded(op)
+            }
+        }
+    }
+
+    private suspend fun ApplicationCall.handleInterceptDrop() {
+        val queue = interceptQueue
+        if (queue == null) {
+            respondControlCommand(COMMAND_TYPE_INTERCEPT_DROP)
+            return
+        }
+        val identifier = readInterceptIdentifier()
+        if (identifier == null) {
+            respondControlCommand(COMMAND_TYPE_INTERCEPT_DROP) { _ ->
+                failedResult(RemoteErrorCode.SerializationFailure, isRetryable = true)
+            }
+            return
+        }
+        respondControlCommand(COMMAND_TYPE_INTERCEPT_DROP) { op ->
+            if (queue.submitDecision(identifier, InterceptDecision.Drop)) {
+                CommandResult.Succeeded(op)
+            } else {
+                CommandResult.Succeeded(op)
+            }
+        }
+    }
+
+    private suspend fun ApplicationCall.handleInterceptModify() {
+        val queue = interceptQueue
+        if (queue == null) {
+            respondControlCommand(COMMAND_TYPE_INTERCEPT_MODIFY)
+            return
+        }
+        val identifier = readInterceptIdentifier()
+        if (identifier == null) {
+            respondControlCommand(COMMAND_TYPE_INTERCEPT_MODIFY) { _ ->
+                failedResult(RemoteErrorCode.SerializationFailure, isRetryable = true)
+            }
+            return
+        }
+        val body = receiveText()
+        val requestText =
+            try {
+                RemoteProtocolJson.instance.parseToJsonElement(body)
+                    .jsonObject
+                    .get(REQUEST_TEXT_FIELD)
+                    ?.let { (it as? kotlinx.serialization.json.JsonPrimitive)?.contentOrNull }
+            } catch (_: Exception) {
+                null
+            }
+        if (requestText == null) {
+            respondControlCommand(COMMAND_TYPE_INTERCEPT_MODIFY) { _ ->
+                failedResult(RemoteErrorCode.SerializationFailure, isRetryable = true)
+            }
+            return
+        }
+        respondControlCommand(COMMAND_TYPE_INTERCEPT_MODIFY) { op ->
+            try {
+                val modified = HttpRequest.httpRequest(requestText)
+                queue.submitDecision(identifier, InterceptDecision.Forward(modified))
+                CommandResult.Succeeded(op)
+            } catch (_: Exception) {
+                failedResult(RemoteErrorCode.BurpRuntimeFailure, isRetryable = false)
+            }
+        }
+    }
+
+    private fun ApplicationCall.readInterceptIdentifier(): InterceptIdentifier? =
+        parameters[INTERCEPT_IDENTIFIER_ROUTE_PARAMETER]
+            ?.takeIf { it.isNotBlank() }
+            ?.let { InterceptIdentifier(it) }
 
     private fun createAndStartServer(): EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration> =
         embeddedServer(
@@ -302,6 +666,7 @@ class RemoteHttpServer(
         }
 
     // 只列已经实现的能力：把未实现的也报上去，客户端会照着一个不存在的功能去设计交互。
+    // interceptQueue 和 sendToRepeater 为 null 时对应的能力不列出——比如测试场景。
     private fun buildCapabilitiesPayload(): JsonElement =
         buildJsonObject {
             putJsonArray(CAPABILITIES_FIELD) {
@@ -311,6 +676,8 @@ class RemoteHttpServer(
                 add(CAPABILITY_SNAPSHOT)
                 add(CAPABILITY_HISTORY)
                 add(CAPABILITY_SCOPE)
+                if (interceptQueue != null) add(CAPABILITY_INTERCEPT)
+                if (sendToRepeater != null) add(CAPABILITY_REPEATER)
             }
         }
 
@@ -413,7 +780,41 @@ class RemoteHttpServer(
 
         private const val REPEATER_PATH = "/v1/repeater"
 
+        private const val REPEATERS_PATH = "/v1/repeaters"
+
+        private const val REPEATER_ITEM_PATH = "/v1/repeaters/{repeaterRequestIdentifier}"
+
         private const val REPEATER_EXECUTE_PATH = "/v1/repeater/{repeaterRequestIdentifier}/execute"
+
+        private const val REPEATER_IDENTIFIER_ROUTE_PARAMETER = "repeaterRequestIdentifier"
+
+        private const val REPEATER_ITEMS_FIELD = "repeaterItems"
+
+        private const val REPEATER_IDENTIFIER_FIELD = "repeaterRequestIdentifier"
+
+        private const val REQUEST_TEXT_FIELD = "requestText"
+
+        private const val TAB_NAME_FIELD = "tabName"
+
+        private const val CREATED_AT_FIELD = "createdAtEpochMilliseconds"
+
+        private const val LAST_EXECUTED_AT_FIELD = "lastExecutedAtEpochMilliseconds"
+
+        private const val LAST_STATUS_CODE_FIELD = "lastStatusCode"
+
+        private const val LAST_RESPONSE_HEADERS_FIELD = "lastResponseHeaders"
+
+        private const val LAST_RESPONSE_BODY_FIELD = "lastResponseBody"
+
+        private const val LAST_DURATION_FIELD = "lastDurationMilliseconds"
+
+        private const val EXECUTION_FAILED_FIELD = "failed"
+
+        private const val REPEATER_CREATED_EVENT_TYPE = "repeater.created"
+
+        private const val REPEATER_EXECUTION_STARTED_EVENT_TYPE = "repeater.execution.started"
+
+        private const val REPEATER_EXECUTION_COMPLETED_EVENT_TYPE = "repeater.execution.completed"
 
         private const val COMMAND_TYPE_INTERCEPT_MODIFY = "intercept.modify"
 
@@ -452,5 +853,13 @@ class RemoteHttpServer(
         private const val CAPABILITY_HISTORY = "history"
 
         private const val CAPABILITY_SCOPE = "scope"
+
+        private const val CAPABILITY_INTERCEPT = "intercept"
+
+        private const val CAPABILITY_REPEATER = "repeater"
+
+        private const val INTERCEPT_IDENTIFIER_ROUTE_PARAMETER = "interceptIdentifier"
+
+        private const val INTERCEPT_ITEMS_FIELD = "interceptItems"
     }
 }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.RemoteServerEndpoint
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.SettingsRepository
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeFlavor
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 
 // 放顶层而不是类内伴生对象里：下面的属性委托在类外，看不到类内的成员。
@@ -39,6 +40,17 @@ class DataStoreSettingsRepository(
         }
     }
 
+    override fun observeThemeFlavor(): Flow<ThemeFlavor> =
+        context.settingsDataStore.data
+            .catch { emit(emptyPreferences()) }
+            .map { preferences -> ThemeFlavor.fromStorageValue(preferences[THEME_FLAVOR_KEY]) }
+
+    override suspend fun setThemeFlavor(themeFlavor: ThemeFlavor) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[THEME_FLAVOR_KEY] = themeFlavor.storageValue
+        }
+    }
+
     override fun observeServerEndpoint(): Flow<RemoteServerEndpoint?> =
         connectionSettingsStore.observeConnectionConfiguration().map { configuration ->
             configuration?.let { connected -> RemoteServerEndpoint(host = connected.host, port = connected.port) }
@@ -62,5 +74,6 @@ class DataStoreSettingsRepository(
 
     private companion object {
         val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
+        val THEME_FLAVOR_KEY = stringPreferencesKey("theme_flavor")
     }
 }

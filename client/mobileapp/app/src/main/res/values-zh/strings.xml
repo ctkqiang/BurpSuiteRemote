@@ -16,4 +16,39 @@
     <string name="connection_session_channel_description">正在与 Burp 保持会话期间常驻显示。</string>
     <string name="connection_session_title">正在保持与 Burp 的会话</string>
     <string name="connection_session_disconnect_action">断开</string>
+
+    <!-- 静态快捷入口：short label 在启动器长按应用图标时显示，long label 在拖到桌面后的快捷标签下显示。 -->
+    <string name="shortcut_dashboard_short">主面板</string>
+    <string name="shortcut_dashboard_long">打开主面板</string>
+    <string name="shortcut_history_short">历史</string>
+    <string name="shortcut_history_long">打开实时历史</string>
+    <string name="shortcut_intercept_short">拦截</string>
+    <string name="shortcut_intercept_long">打开实时拦截队列</string>
+    <string name="shortcut_repeater_short">重放</string>
+    <string name="shortcut_repeater_long">打开实时重放</string>
+    <string name="shortcut_connection_short">Burp 连接</string>
+    <string name="shortcut_connection_long">打开 Burp 连接设置</string>
+
+    <!-- 桌面小部件顶栏右侧的状态摘要；不超过 12 字符，否则会被截断。 -->
+    <string name="widget_status_unknown">未知</string>
+    <string name="widget_status_offline">离线</string>
+    <string name="widget_status_discovering">定位中</string>
+    <string name="widget_status_connecting">连接中</string>
+    <string name="widget_status_authenticating">认证中</string>
+    <string name="widget_status_synchronising">同步中</string>
+    <string name="widget_status_live">在线</string>
+    <string name="widget_status_reconnecting">重连中</string>
+    <string name="widget_status_resyncing">重同步</string>
+    <string name="widget_status_auth_failed">认证失败</string>
+    <string name="widget_status_protocol_error">协议错误</string>
+    <string name="widget_status_timed_out">超时</string>
+    <string name="widget_status_unreachable">不可达</string>
+
+    <!-- 统计小部件：选择器名字、目标主机缺省、三行计数标签与打开提示。 -->
+    <string name="widget_stats_label">Burpsuite Remote · 统计</string>
+    <string name="widget_stats_no_target">暂无目标</string>
+    <string name="widget_stats_live_label">实时</string>
+    <string name="widget_stats_intercepted_label">拦截中</string>
+    <string name="widget_stats_saved_label">已归档</string>
+    <string name="widget_stats_open_hint">点击打开</string>
 </resources>

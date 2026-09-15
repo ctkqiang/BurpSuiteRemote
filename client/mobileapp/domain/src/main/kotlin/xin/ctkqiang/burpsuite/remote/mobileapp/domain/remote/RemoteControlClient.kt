@@ -67,4 +67,19 @@ interface RemoteControlClient {
         configuration: RemoteConnectionConfiguration,
         command: RemoteCommand,
     ): RemoteResult<Unit>
+
+    /**
+     * 执行一条带请求体的控制命令。
+     *
+     * 与 [dispatch] 同路，但额外把 [requestBody] 作为 HTTP 正文发出去。插件端某些端点
+     * （例如 Repeater create、Intercept modify）从请求体里读取 `requestText` 等业务字段，
+     * 没有请求体时插件回 `SerializationFailure`，因此必须走这一条而不是裸 [dispatch]。
+     *
+     * 命令对象仍然决定端点路径与操作身份；[requestBody] 只承载插件端点要读的那些字段。
+     */
+    suspend fun dispatchWithBody(
+        configuration: RemoteConnectionConfiguration,
+        command: RemoteCommand,
+        requestBody: String,
+    ): RemoteResult<Unit>
 }

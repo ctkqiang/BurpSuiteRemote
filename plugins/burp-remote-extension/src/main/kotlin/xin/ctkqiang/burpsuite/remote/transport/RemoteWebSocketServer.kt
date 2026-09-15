@@ -12,8 +12,10 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import xin.ctkqiang.burpsuite.remote.protocol.DeviceIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteClientMessage
@@ -173,10 +175,29 @@ class RemoteWebSocketServer(
             requestedSequenceNumber <= eventStream.latestSequenceNumber()
 
     // 只按序号过滤，不自己造事件：客户端看到的每一条都来自事件日志。
+    //
+    // 同时读 incoming：客户端发来的 Close 帧（以及 TCP 断开导致的通道关闭）必须立刻终止这条会话，
+    // 否则事件流这一路 collect 会一直挂着，连接名额和设备关联要等 ping 超时（最多 30s）才释放——
+    // 表现就是「手机都关了，插件里还显示在线」。
     private suspend fun DefaultWebSocketServerSession.streamEventsAfter(sequenceNumber: Long) {
-        eventStream.observeEvents()
-            .filter { event -> event.sequenceNumber > sequenceNumber }
-            .collect { event -> sendEvent(event) }
+        coroutineScope {
+            val eventStreamingJob =
+                launch {
+                    eventStream.observeEvents()
+                        .filter { event -> event.sequenceNumber > sequenceNumber }
+                        .collect { event -> sendEvent(event) }
+                }
+            val incomingReaderJob =
+                launch {
+                    for (frame in incoming) {
+                        // 只关心 Close 帧；其余控制帧（Ping/Pong）由引擎层处理，这里跳过。
+                        if (frame is Frame.Close) break
+                    }
+                }
+            // 任一路结束就取消另一路：Close 帧到了、TCP 断了、发送失败了，都该让会话立刻收场。
+            incomingReaderJob.invokeOnCompletion { eventStreamingJob.cancel() }
+            eventStreamingJob.invokeOnCompletion { incomingReaderJob.cancel() }
+        }
     }
 
     private suspend fun DefaultWebSocketServerSession.receiveClientMessage(): RemoteClientMessage? {

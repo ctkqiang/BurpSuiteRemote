@@ -215,10 +215,11 @@ fun BurpsuiteRemoteNavigationHost(
                     },
                 )
             },
-            bottomBar = {
+            bottomBar = { hazeState ->
                 // 底栏只属于一级目的地：子页面与模态流程里它只会挡住返回路径。
                 if (isPrimaryDestination) {
                     BurpRemoteNavigationBar(
+                        hazeState = hazeState,
                         selectedSection = selectedSection,
                         onSectionSelected = { section ->
                             technicalLog.record(
@@ -302,6 +303,7 @@ fun BurpsuiteRemoteNavigationHost(
                             },
                             remoteHistoryMessageReader = navigationDependencies.remoteHistoryMessageReader,
                             remoteHistoryScopeWriter = navigationDependencies.remoteHistoryScopeWriter,
+                            remoteRepeaterWriter = navigationDependencies.remoteRepeaterWriter,
                             technicalLog = technicalLog,
                         )
                     }
@@ -334,7 +336,7 @@ fun BurpsuiteRemoteNavigationHost(
                 }
                 composable(BurpRemoteRoute.LIVE_REPEATER) {
                     RepeaterRoute(
-                        dashboardRepository = navigationDependencies.dashboardRepository,
+                        repeaterRepository = navigationDependencies.repeaterRepository,
                         technicalLog = technicalLog,
                     )
                 }

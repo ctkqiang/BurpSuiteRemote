@@ -101,6 +101,32 @@ class RemoteWebSocketServerTest {
     }
 
     @Test
+    fun `a client close frame releases the connection slot immediately`() {
+        val connectionRegistry = RemoteConnectionRegistry()
+        val eventStream = InMemoryRemoteEventStream()
+
+        withRunningEventServer(eventStream, connectionRegistry = connectionRegistry) { port ->
+            val probe = JdkWebSocketProbe.connect(port)
+            try {
+                probe.sendText(connectRequestText())
+                probe.sendText(authenticateRequestText(PAIRED_DEVICE_IDENTIFIER.value))
+                assertEquals(AUTHENTICATION_SUCCEEDED_CODE, probe.pollSignalCode())
+                probe.sendText(resumeRequestText(sequenceNumber = NO_RECEIVED_EVENT_SEQUENCE_NUMBER))
+
+                // 认证 + 续传完成后，连接名额已占、设备已关联。
+                assertEquals(1, connectionRegistry.connectedDeviceCount())
+
+                probe.close()
+
+                // 客户端发了 Close 帧后，插件端必须立刻收尾——不能等 ping 超时（最多 30s）才释放名额。
+                assertConnectionCountEventually(connectionRegistry, expected = 0)
+            } finally {
+                probe.close()
+            }
+        }
+    }
+
+    @Test
     fun `a resume request outside the retained window asks for a snapshot`() {
         val eventStream = InMemoryRemoteEventStream(maximumRetainedEventCount = RETAINED_EVENT_COUNT)
         eventStream.appendEvent(event(sequenceNumber = 1))
@@ -128,12 +154,13 @@ class RemoteWebSocketServerTest {
     private fun withRunningEventServer(
         eventStream: RemoteEventStream,
         logSink: (String) -> Unit = {},
+        connectionRegistry: RemoteConnectionRegistry = RemoteConnectionRegistry(),
         verification: (Int) -> Unit,
     ) {
         val webSocketServer =
             RemoteWebSocketServer(
                 controlGate = createControlGate(),
-                connectionRegistry = RemoteConnectionRegistry(),
+                connectionRegistry = connectionRegistry,
                 eventStream = eventStream,
                 logSink = logSink,
             )
@@ -213,6 +240,19 @@ class RemoteWebSocketServerTest {
             ?.jsonPrimitive
             ?.content
 
+    // 轮询而不是 sleep 固定时长：收尾通常毫秒级完成，轮询让测试快，只有真出问题才等到超时。
+    private fun assertConnectionCountEventually(
+        connectionRegistry: RemoteConnectionRegistry,
+        expected: Int,
+    ) {
+        val deadline = System.currentTimeMillis() + CONNECTION_SETTLE_TIMEOUT_MILLISECONDS
+        while (System.currentTimeMillis() < deadline) {
+            if (connectionRegistry.connectedDeviceCount() == expected) return
+            Thread.sleep(CONNECTION_POLL_INTERVAL_MILLISECONDS)
+        }
+        assertEquals(expected, connectionRegistry.connectedDeviceCount())
+    }
+
     private companion object {
         private val TEST_INSTANT: Instant = Instant.parse("2026-01-01T00:00:00Z")
 
@@ -233,6 +273,10 @@ class RemoteWebSocketServerTest {
         private const val RETAINED_EVENT_COUNT = 2
 
         private const val RECEIVE_TIMEOUT_MILLISECONDS = 2_000L
+
+        // 连接收尾应该在毫秒级完成；给 3 秒余量排除 CI 抖动，但远小于 ping 超时的 30 秒。
+        private const val CONNECTION_SETTLE_TIMEOUT_MILLISECONDS = 3_000L
+        private const val CONNECTION_POLL_INTERVAL_MILLISECONDS = 20L
 
         private const val STOP_GRACE_PERIOD_MILLISECONDS = 500L
 

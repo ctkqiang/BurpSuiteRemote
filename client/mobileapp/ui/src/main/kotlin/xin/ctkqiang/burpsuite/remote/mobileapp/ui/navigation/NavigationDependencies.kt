@@ -6,6 +6,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteControlClient
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.DashboardRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.HistoryRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.InterceptRepository
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.RepeaterRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.SettingsRepository
 
 /**
@@ -23,16 +24,19 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.SettingsRepositor
  * @property remotePairingCoordinator 配对入口；未接通时为空，连接屏据此把配对入口画成禁用。
  * @property remoteHistoryMessageReader 报文本体读取端口；未接通时为空，详情屏据此说明缺口。
  * @property remoteHistoryScopeWriter 作用域写入端口；未接通时为空，详情屏据此把「加入作用域」画成禁用。
+ * @property remoteRepeaterWriter Repeater 写入端口；未接通时为空，详情屏据此把「送往重放」画成禁用。
  * @property technicalLog 技术日志端口；由壳分给各屏，各屏不再各自去拿全局日志。
  */
 data class NavigationDependencies(
     val dashboardRepository: DashboardRepository,
     val historyRepository: HistoryRepository,
     val interceptRepository: InterceptRepository,
+    val repeaterRepository: RepeaterRepository,
     val settingsRepository: SettingsRepository,
     val remoteControlClient: RemoteControlClient?,
     val remotePairingCoordinator: RemotePairingCoordinator? = null,
     val remoteHistoryMessageReader: RemoteHistoryMessageReader? = null,
     val remoteHistoryScopeWriter: RemoteHistoryScopeWriter? = null,
+    val remoteRepeaterWriter: RemoteRepeaterWriter? = null,
     val technicalLog: TechnicalLog = SilentTechnicalLog,
 )

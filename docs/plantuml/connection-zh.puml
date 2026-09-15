@@ -1,0 +1,50 @@
+@startuml connection-zh
+
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipant underline
+skinparam sequenceLifeLineBorderColor #4A90D9
+
+title 连接生命周期（续传 + 断开）
+
+participant "Android 应用" as App
+participant "远程 WebSocket\n服务器" as WS
+participant "内存事件流" as ES
+participant "已配对设备\n登记处" as PDR
+
+== 连接 ==
+App -> WS: 打开 WebSocket\nws://host:9000/v1/events
+WS -> PDR: 验证 deviceIdentifier
+PDR --> WS: 已登记
+
+== 认证 ==
+WS --> App: 认证质询
+
+== 续传 ==
+App -> WS: 从 lastSequenceNumber\n续传
+WS -> ES: observeEvents(from = N)
+ES --> WS: 事件流
+
+== 事件流 ==
+loop 实时
+    ES -> WS: 事件 (N+1)
+    WS -> App: 推送事件
+    App -> App: 日志写入\n+ 投影
+end
+
+== 断开（手机关闭）==
+App -> WS: WebSocket Close 帧\n(NonCancellable)
+par 并发读
+    WS -> WS: 从 incoming 检测到\nClose 帧
+else
+    ES -> WS: （流结束）
+end
+WS -> PDR: 撤销设备关联
+WS -> WS: closeConnection()
+WS -> WS: 释放连接名额
+
+note over WS, PDR: 立即拆会话\n不等 30 秒 ping 超时
+
+@end

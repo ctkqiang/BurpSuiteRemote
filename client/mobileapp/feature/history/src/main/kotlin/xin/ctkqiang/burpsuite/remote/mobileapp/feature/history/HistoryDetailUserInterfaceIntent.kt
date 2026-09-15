@@ -10,4 +10,7 @@ sealed interface HistoryDetailUserInterfaceIntent {
 
     /** 把这条记录的主机加入 Burp 作用域；加过之后用户还能再点，插件的写入本身是幂等的。 */
     data object AddHistoryHostToScope : HistoryDetailUserInterfaceIntent
+
+    /** 把这条记录的原始请求文本推送到 Repeater；插件会存成一条新条目并顺手推到 Burp PC 的 Repeater tab。 */
+    data object SendToRepeater : HistoryDetailUserInterfaceIntent
 }

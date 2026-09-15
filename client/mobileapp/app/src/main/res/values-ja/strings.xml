@@ -16,4 +16,39 @@
     <string name="connection_session_channel_description">Burp とのセッションを維持している間だけ表示されます。</string>
     <string name="connection_session_title">Burp とのセッションを維持中</string>
     <string name="connection_session_disconnect_action">切断</string>
+
+    <!-- 静的ショートカット：short label はアプリアイコン長押し時、long label はデスクトップにドラッグ後のラベル。 -->
+    <string name="shortcut_dashboard_short">ダッシュボード</string>
+    <string name="shortcut_dashboard_long">ダッシュボードを開く</string>
+    <string name="shortcut_history_short">履歴</string>
+    <string name="shortcut_history_long">ライブ履歴を開く</string>
+    <string name="shortcut_intercept_short">インターセプト</string>
+    <string name="shortcut_intercept_long">ライブインターセプトキューを開く</string>
+    <string name="shortcut_repeater_short">リピーター</string>
+    <string name="shortcut_repeater_long">ライブリピーターを開く</string>
+    <string name="shortcut_connection_short">Burp 接続</string>
+    <string name="shortcut_connection_long">Burp 接続設定を開く</string>
+
+    <!-- ウィジェット右上の状態サマリー；12 文字以内。 -->
+    <string name="widget_status_unknown">不明</string>
+    <string name="widget_status_offline">オフライン</string>
+    <string name="widget_status_discovering">探索中</string>
+    <string name="widget_status_connecting">接続中</string>
+    <string name="widget_status_authenticating">認証中</string>
+    <string name="widget_status_synchronising">同期中</string>
+    <string name="widget_status_live">ライブ</string>
+    <string name="widget_status_reconnecting">再接続</string>
+    <string name="widget_status_resyncing">再同期</string>
+    <string name="widget_status_auth_failed">認証失敗</string>
+    <string name="widget_status_protocol_error">プロトコル</string>
+    <string name="widget_status_timed_out">タイムアウト</string>
+    <string name="widget_status_unreachable">到達不可</string>
+
+    <!-- 統計ウィジェット：選択名、対象ホストの既定値、3行のカウントラベルと開くヒント。 -->
+    <string name="widget_stats_label">Burpsuite Remote · 統計</string>
+    <string name="widget_stats_no_target">対象なし</string>
+    <string name="widget_stats_live_label">ライブ</string>
+    <string name="widget_stats_intercepted_label">インターセプト</string>
+    <string name="widget_stats_saved_label">保存済み</string>
+    <string name="widget_stats_open_hint">タップで開く</string>
 </resources>

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -40,6 +41,7 @@ import androidx.core.view.WindowCompat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.emptyFlow
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ConnectionState
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeFlavor
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguagePreference
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguagePreferenceRepository
@@ -78,7 +80,7 @@ class MainActivity : ComponentActivity() {
         }
 
         val application = application as RemoteControlApplication
-        val startRoute = debugStartRouteExtra()
+        val startRoute = startRouteExtra()
         val pairingTicketText = debugPairingTicketExtra()
         setContent {
             RemoteControlRoot(
@@ -90,10 +92,27 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // 只对可在调试的包生效：发布版忽略这个额外参数，免得外部 Intent 把应用指到任意一屏。
-    private fun debugStartRouteExtra(): String? {
+    /**
+     * 落地路由额外参数 [BurpRemoteIntents.EXTRA_START_ROUTE] 的统一入口。
+     *
+     * 两类来源都收：
+     * - 静态快捷入口与桌面小部件：Intent action 是 [android.content.Intent.ACTION_MAIN]，
+     *   由系统启动器（Launcher）代发，Launcher 是受信任的发起方，发布版也接受。
+     * - 调试注入：只在 isDebuggable 时接受，用于端到端联调。
+     *
+     * 不论来源，值都要进 [BurpRemoteIntents.SUPPORTED_SHORTCUT_ROUTES] 白名单才被采用；
+     * 白名单只含无参数的一级与子路由，因此「外部 Intent 把应用指到任意一屏」的副作用
+     * 仅限于跳到本应用的某个一级屏，不会泄露任何敏感动作。
+     */
+    private fun startRouteExtra(): String? {
+        val rawRoute = intent?.getStringExtra(BurpRemoteIntents.EXTRA_START_ROUTE) ?: return null
+        if (rawRoute !in BurpRemoteIntents.SUPPORTED_SHORTCUT_ROUTES) return null
+
+        val fromLauncherShortcut = intent?.action == Intent.ACTION_MAIN
         val isDebuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
-        return if (isDebuggable) intent?.getStringExtra(EXTRA_START_ROUTE) else null
+        // 调试注入递的路由不在白名单里时（例如「live/history/detail/{id}」），前面已 return，
+        // 这里只决定「是不是来自可信来源」：launcher 是，调试包也允许走这条路。
+        return if (fromLauncherShortcut || isDebuggable) rawRoute else null
     }
 
     // 端到端联调入口：模拟器给不出真实二维码画面，因此允许调试包直接递一张票据进来；发布版忽略它。
@@ -103,7 +122,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private companion object {
-        const val EXTRA_START_ROUTE = "startRoute"
         const val EXTRA_PAIRING_TICKET = "pairingTicket"
     }
 }
@@ -140,10 +158,20 @@ private fun RemoteControlRoot(
                 value = observedThemeMode
             }
         }
+    val themeFlavor by
+        produceState<ThemeFlavor?>(initialValue = null, navigationDependencies.settingsRepository) {
+            navigationDependencies.settingsRepository.observeThemeFlavor().collect { observedFlavor ->
+                value = observedFlavor
+            }
+        }
 
     val resolvedThemeMode = themeMode ?: return
+    val resolvedThemeFlavor = themeFlavor ?: return
 
-    BurpsuiteRemoteTheme(themeMode = resolvedThemeMode) {
+    BurpsuiteRemoteTheme(
+        themeMode = resolvedThemeMode,
+        themeFlavor = resolvedThemeFlavor,
+    ) {
         ApplySystemBarIconAppearance()
         ConnectionSessionEffect(navigationDependencies = navigationDependencies)
         CompositionLocalProvider(

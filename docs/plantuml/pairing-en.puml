@@ -1,0 +1,35 @@
+@startuml pairing-en
+
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipant underline
+skinparam sequenceLifeLineBorderColor #4A90D9
+
+title Pairing Flow
+
+actor User
+participant "Burp Remote\nTab" as Tab
+participant "DevicePairing\nService" as DPS
+participant "Remote HTTP\nServer" as HS
+participant "Android App" as App
+
+User -> Tab: clicks "Generate\nPairing Code"
+Tab -> DPS: generatePairingTicket()
+DPS --> Tab: pairingCode (8 chars,\n5 min expiry) + QR
+
+User -> App: scan QR code
+App -> HS: POST /v1/pair\n{challengeId, pairingCode}
+HS -> DPS: redeemPairingCode()
+alt valid code
+    DPS --> HS: DeviceIdentifier
+    HS -> DPS: registerDevice()
+    HS --> App: 200 OK\n{deviceIdentifier}
+    App -> App: store device identity
+    App -> HS: WebSocket connect\n(deviceIdentifier)
+else expired or mismatched
+    HS --> App: 403 Forbidden\n{reason}
+end
+
+@end

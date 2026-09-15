@@ -1,5 +1,6 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings
 
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeFlavor
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 
 /**
@@ -10,4 +11,5 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
  */
 sealed interface SettingsUserInterfaceIntent {
     data class SelectThemeMode(val themeMode: ThemeMode) : SettingsUserInterfaceIntent
+    data class SelectThemeFlavor(val themeFlavor: ThemeFlavor) : SettingsUserInterfaceIntent
 }

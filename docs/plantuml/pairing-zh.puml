@@ -1,0 +1,35 @@
+@startuml pairing-zh
+
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipant underline
+skinparam sequenceLifeLineBorderColor #4A90D9
+
+title 配对流程
+
+actor 用户
+participant "Burp Remote\n标签页" as Tab
+participant "设备配对\n服务" as DPS
+participant "远程 HTTP\n服务器" as HS
+participant "Android 应用" as App
+
+用户 -> Tab: 点击「生成\n配对码」
+Tab -> DPS: generatePairingTicket()
+DPS --> Tab: 配对码 (8 位,\n5 分钟有效) + 二维码
+
+用户 -> App: 扫二维码
+App -> HS: POST /v1/pair\n{challengeId, pairingCode}
+HS -> DPS: redeemPairingCode()
+alt 配对码有效
+    DPS --> HS: DeviceIdentifier
+    HS -> DPS: registerDevice()
+    HS --> App: 200 OK\n{deviceIdentifier}
+    App -> App: 存储设备身份
+    App -> HS: WebSocket 连接\n(deviceIdentifier)
+else 过期或不匹配
+    HS --> App: 403 Forbidden\n{原因}
+end
+
+@end

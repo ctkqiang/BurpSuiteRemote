@@ -72,7 +72,7 @@
     <string name="history_detail_reason_headline">Warum das fehlt</string>
     <string name="history_detail_action_share">Teilen oder exportieren</string>
     <string name="history_detail_action_send_to_repeater">An Repeater senden</string>
-    <string name="history_detail_reason_send_to_repeater">dem Client fehlt noch ein Repeater-Befehlskanal</string>
+    <string name="history_detail_reason_send_to_repeater">Dieser Client hat keinen Repeater-Schreibkanal</string>
     <string name="history_detail_action_add_to_scope">Host zum Scope hinzufügen</string>
     <string name="history_detail_reason_add_to_scope">dem Client fehlt noch ein Scope-Schreibkanal</string>
 
@@ -84,6 +84,15 @@
     <string name="history_detail_scope_conclusion_record_missing">Burp hat diesen Eintrag nicht mehr</string>
     <string name="history_detail_scope_conclusion_malformed">Burp lieferte Bytes, die dieser Client nicht lesen kann</string>
     <string name="history_detail_scope_conclusion_refused">Burp hat dieses Schreiben in den Scope abgelehnt</string>
+
+    <string name="history_detail_repeater_conclusion_sent">Die Anfrage ist jetzt im Repeater</string>
+    <string name="history_detail_repeater_conclusion_not_paired">Dieses Gerät ist nicht mit Burp gekoppelt</string>
+    <string name="history_detail_repeater_conclusion_unreachable">Burp ist derzeit nicht erreichbar</string>
+    <string name="history_detail_repeater_conclusion_not_supported">Diese Plug-in-Version hat keinen Repeater-Endpunkt</string>
+    <string name="history_detail_repeater_conclusion_writer_unavailable">Dieser Client hat keinen Repeater-Schreibkanal</string>
+    <string name="history_detail_repeater_conclusion_message_not_loaded">Der Nachrichtenkörper wurde noch nicht abgerufen</string>
+    <string name="history_detail_repeater_conclusion_malformed">Burp lieferte Bytes, die dieser Client nicht lesen kann</string>
+    <string name="history_detail_repeater_conclusion_refused">Burp hat diese Repeater-Übertragung abgelehnt</string>
 
     <string name="history_relative_just_now">gerade eben</string>
     <plurals name="history_relative_seconds">

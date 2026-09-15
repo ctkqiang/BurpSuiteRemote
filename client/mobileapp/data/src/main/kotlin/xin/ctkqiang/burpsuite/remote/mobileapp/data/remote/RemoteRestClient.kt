@@ -127,7 +127,18 @@ class RemoteRestClient(
         val path =
             RemoteCommandEndpoint.pathOf(command)
                 ?: return RemoteResult.Failed(RemoteFailure.ActionNotSupported)
-        return executeControlCommand(configuration, path, command.operationIdentifier)
+        return executeControlCommand(configuration, path, command.operationIdentifier, requestBody = null)
+    }
+
+    suspend fun dispatchWithBody(
+        configuration: RemoteConnectionConfiguration,
+        command: RemoteCommand,
+        requestBody: String,
+    ): RemoteResult<Unit> {
+        val path =
+            RemoteCommandEndpoint.pathOf(command)
+                ?: return RemoteResult.Failed(RemoteFailure.ActionNotSupported)
+        return executeControlCommand(configuration, path, command.operationIdentifier, requestBody = requestBody)
     }
 
     private suspend fun <Value> readQuery(
@@ -184,10 +195,12 @@ class RemoteRestClient(
     }
 
     // 命令类端点只多两样东西：操作标识请求头，以及「成功不带载荷」的结局判定。
+    // requestBody 非 null 时把它作为 HTTP 正文发出去——Repeater create 与 Intercept modify 需要。
     private suspend fun executeControlCommand(
         configuration: RemoteConnectionConfiguration,
         path: String,
         operationIdentifier: OperationIdentifier,
+        requestBody: String? = null,
     ): RemoteResult<Unit> =
         when (
             val envelopeResult =
@@ -198,6 +211,7 @@ class RemoteRestClient(
                     httpMethod = HttpMethod.Post,
                     path = path,
                     operationIdentifier = operationIdentifier,
+                    requestBody = requestBody,
                 )
         ) {
             is RemoteResult.Failed -> envelopeResult

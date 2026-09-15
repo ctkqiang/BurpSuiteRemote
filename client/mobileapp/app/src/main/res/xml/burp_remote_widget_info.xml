@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  桌面小部件元数据。
+
+  minWidth / minHeight 取 4x2 的下界（180dp x 140dp 起步，按 display 元素密度换算后大约两格高）：
+  小部件要塞下品牌标题、状态摘要与四个动作按钮，少一格在窄屏 launcher 上会被裁掉一行。
+  这里只声明 min 系列：android:initialWidth / initialHeight 是 API 31 起才允许的属性，
+  minSdk 26 用它会直接 link 失败；系统会拿 min 系列作为初始尺寸，足够让用户拖到桌面之后看到完整面板。
+  resizeMode 允许横向拉伸，纵向不拉伸：纵向加高只会让按钮之间空出一大段，没有更多信息可填。
+  updatePeriodMillis 取 0：不让系统每半小时把进程拉起来只为了刷一次状态，
+  状态刷新改由 AppContainer 进程级作用域内的连接状态观察器主动触发（rules.md §61）。
+  widgetCategory 用 home_screen + keyguard：锁屏也可见的小部件对一台代理工具最有用——
+  用户经常在锁屏上看一眼会话还在不在。
+  previewImage 用 ic_launcher_foreground：它在 Adaptive Icon 里就是前景层，单看也成立。
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="180dp"
+    android:minHeight="140dp"
+    android:resizeMode="horizontal"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen|keyguard"
+    android:previewImage="@drawable/ic_launcher_foreground"
+    android:initialLayout="@layout/widget_burp_remote" />

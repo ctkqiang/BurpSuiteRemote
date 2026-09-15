@@ -44,6 +44,9 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.foundation)
+    // 液态玻璃：底栏浮在内容之上，需要对下层做实时模糊。BurpRemoteScaffold 的公开签名里
+    // 用了 HazeState 类型，所以用 api 暴露出去让 app 模块也能看到。
+    api(libs.haze)
     // 底栏条目的 icon 是必填参数，核心图标集够用；扩展集太大，不进包。
     implementation(libs.compose.material.icons.core)
     implementation(libs.compose.ui.tooling.preview)

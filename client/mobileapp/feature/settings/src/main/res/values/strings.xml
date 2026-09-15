@@ -15,6 +15,20 @@
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_theme_dark_detail">Keeps the dark colours even when the system is light. Softer on the eyes at night.</string>
 
+    <string name="settings_flavor_heading">Colour flavour</string>
+    <string name="settings_flavor_headline">Eight palettes, same layout</string>
+    <string name="settings_flavor_detail">The accent colour and overall tint change, but the structure stays identical. Each flavour has both a light and a dark variant, so it follows the theme above.</string>
+    <string name="settings_flavor_selected">Selected</string>
+
+    <string name="settings_flavor_burp_classic">Burp Classic</string>
+    <string name="settings_flavor_cyber_cyan">Cyber Cyan</string>
+    <string name="settings_flavor_forest_emerald">Forest Emerald</string>
+    <string name="settings_flavor_royal_violet">Royal Violet</string>
+    <string name="settings_flavor_rose_gold">Rose Gold</string>
+    <string name="settings_flavor_ocean_blue">Ocean Blue</string>
+    <string name="settings_flavor_solar_amber">Solar Amber</string>
+    <string name="settings_flavor_monochrome">Monochrome</string>
+
     <string name="settings_language_title">Language</string>
     <string name="settings_language_subtitle">Language of every screen and message</string>
     <string name="settings_language_heading">Interface language</string>

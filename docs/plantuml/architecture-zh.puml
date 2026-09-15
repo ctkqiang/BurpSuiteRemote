@@ -1,0 +1,60 @@
+@startuml architecture-zh
+
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+skinparam roundCorner 10
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam packageStyle frame
+
+package "Burp Suite" {
+    [Burp 代理] as Proxy
+    [Montoya API] as API
+}
+
+package "插件 (burp-remote-extension)" {
+    [历史发布器] as HP
+    [拦截处理器] as IH
+    [Repeater API] as RA
+    [远程 HTTP 服务器] as HS
+    [内存事件流] as ES
+    [设备配对服务] as DPS
+    [控制命令闸门] as RCG
+    [已配对设备登记处] as PDR
+    [限流器] as RL
+    [审计日志] as AL
+}
+
+package "Android 应用 (mobileapp)" {
+    [Ktor 客户端] as KC
+    [事件摄入器] as EI
+    [Room 数据库] as DB
+    [日志投影] as JP
+    [MVI 视图模型] as VM
+    [Jetpack Compose 界面] as UI
+    [液态玻璃底栏] as GLB
+}
+
+Proxy --> API
+API --> HP : 历史事件
+API --> IH : 拦截决策
+HP --> ES : appendEvent
+IH --> ES : appendEvent
+RA --> ES : appendEvent
+
+HS --> ES : streamEvents
+HS --> RCG : 控制命令
+RCG --> DPS : 认证
+DPS --> PDR : 登记/查询
+RCG --> RL : tryAcquire
+RCG --> AL : 记录
+
+KC --> HS : WebSocket + REST
+KC --> EI : 事件
+EI --> DB : 日志写入
+DB --> JP : 投影
+JP --> VM : 状态
+VM --> UI : 渲染
+UI --> GLB
+
+@end

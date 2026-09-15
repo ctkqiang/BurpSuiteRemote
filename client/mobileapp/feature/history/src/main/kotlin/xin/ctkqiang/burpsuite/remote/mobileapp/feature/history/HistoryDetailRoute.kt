@@ -11,6 +11,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.HistoryRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryMessageReader
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryScopeWriter
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteRepeaterWriter
 
 /**
  * 装配层：把标识、投影仓库、本体读取端口、作用域写入端口与日志端口交给 ViewModel，
@@ -28,6 +29,7 @@ fun HistoryDetailRoute(
     modifier: Modifier = Modifier,
     remoteHistoryMessageReader: RemoteHistoryMessageReader? = null,
     remoteHistoryScopeWriter: RemoteHistoryScopeWriter? = null,
+    remoteRepeaterWriter: RemoteRepeaterWriter? = null,
     technicalLog: TechnicalLog = SilentTechnicalLog,
 ) {
     val viewModel: HistoryDetailViewModel =
@@ -37,6 +39,7 @@ fun HistoryDetailRoute(
                 historyRepository = historyRepository,
                 remoteHistoryMessageReader = remoteHistoryMessageReader,
                 remoteHistoryScopeWriter = remoteHistoryScopeWriter,
+                remoteRepeaterWriter = remoteRepeaterWriter,
                 technicalLog = technicalLog,
             )
         }

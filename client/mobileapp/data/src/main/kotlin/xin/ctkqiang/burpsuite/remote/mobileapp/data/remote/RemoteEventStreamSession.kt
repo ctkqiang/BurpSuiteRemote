@@ -9,8 +9,10 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
@@ -126,11 +128,15 @@ internal class RemoteEventStreamSession(
         return sessionEnd
     }
 
-    // 关闭帧只是礼节：协程已被取消时 close 会立刻抛，那就直接取消这条会话，别让收尾本身变成新的失败。
+    // 关闭帧必须发出去：协程被取消时直接调 close 会立刻抛 CancellationException，Close 帧根本发不出去，
+    // 对端只能靠 TCP 断开或 ping 超时才发现。包在 NonCancellable 里让这一帧无论如何都尝试发，
+    // 发失败了再退到硬取消。
     private suspend fun closeOrTerminate(session: DefaultClientWebSocketSession) {
         try {
-            session.close()
-        } catch (cancellation: CancellationException) {
+            withContext(NonCancellable) {
+                session.close()
+            }
+        } catch (closeFailed: Exception) {
             session.cancel()
         }
     }

@@ -13,7 +13,6 @@ import xin.ctkqiang.burpsuite.remote.protocol.RemoteEventEnvelope
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteProtocolVersion
 import xin.ctkqiang.burpsuite.remote.transport.InMemoryRemoteEventStream
 import java.time.Instant
-import java.util.concurrent.atomic.AtomicLong
 
 /**
  * 观察 Burp 代理历史，为每条真实产生的记录发布一条 `history.item.observed` 事件（plan §82、§83）。
@@ -34,8 +33,7 @@ class BurpHistoryEventPublisher(
 ) {
     private val publicationLock = Any()
 
-    // 序号只在这里产生：事件日志的单调性由它保证。
-    private val nextSequenceNumber = AtomicLong()
+    // 序号由 InMemoryRemoteEventStream 统一分配，这里不再维护计数器。
 
     // 已见过的 identifier 到"响应端字段摘要"的映射；摘要变了就重发 observed 事件。
     // 只放 Burp 当前历史里的 identifier，历史被清空时旧条目自然不在里面。
@@ -50,20 +48,22 @@ class BurpHistoryEventPublisher(
     /**
      * 订阅历史信号并启动兜底扫描。
      *
-     * 启动时先把水位对齐到现有历史：存量条目的响应端摘要都算一遍，但**不发事件**——
-     * 事件流只承担其后的变化，启动时就把 Burp 里已有的全量发一遍会让客户端被历史淹没。
+     * 启动时把 Burp 当前所有存量条目发 observed 事件：事件流只承担增量，但
+     * 客户端在 publisher 启动前不可能收到历史，所以必须在这里把全量存量推出去。
      */
     fun start() {
         synchronized(publicationLock) {
             if (isRunning) {
                 return
             }
-            nextSequenceNumber.set(eventStream.latestSequenceNumber())
-            // 把 Burp 当前所有条目记入 knownEntries，但不发事件：这些存量条目的事件客户端
-            // 应该从别的地方（比如 REST /v1/history）同步，事件流只负责增量。
+            // 启动时把 Burp 里所有存量历史条目发一遍 observed 事件，
+            // 同时记录 response fingerprint，避免之后 sweep 重复发。
+            // 之前这里只记 fingerprint 不发事件，导致 publisher 启动前就存在的条目
+            // 永远不会出现在手机端投影里——statusCode 全是 null（手机根本没收到 observed）。
             historyAdapter.readHistoryEntries().forEach { entry ->
                 val id = historyAdapter.toHistoryIdentifier(entry).value
                 knownEntries[id] = responseFingerprint(entry)
+                publishHistoryItemObserved(entry)
             }
             isRunning = true
             signalSubscription = historySignalSource.subscribeToHistorySignals(::reconcileWithBurpHistory)
@@ -124,12 +124,13 @@ class BurpHistoryEventPublisher(
 
     private fun publishHistoryItemObserved(entry: BurpProxyHistoryEntry) {
         val historyIdentifier = historyAdapter.toHistoryIdentifier(entry)
-        val sequenceNumber = nextSequenceNumber.incrementAndGet()
+        // sequenceNumber 与 eventIdentifier 由 InMemoryRemoteEventStream.appendEvent 统一分配，
+        // 这里传占位值即可——与 Intercept/Repeater 发布者共用同一把递增源，避免撞号。
         eventStream.appendEvent(
             RemoteEventEnvelope(
                 protocolVersion = RemoteProtocolVersion.CURRENT_PROTOCOL_VERSION,
-                eventIdentifier = EventIdentifier(EVENT_IDENTIFIER_PREFIX + sequenceNumber),
-                sequenceNumber = sequenceNumber,
+                eventIdentifier = EventIdentifier(""),
+                sequenceNumber = 0L,
                 // 事实发生时刻来自 Burp，而不是这里读到它的时刻（rules.md §4.5）。
                 occurredAt = Instant.ofEpochMilli(entry.occurredAtEpochMilliseconds),
                 eventType = HISTORY_ITEM_OBSERVED_EVENT_TYPE,
@@ -160,8 +161,6 @@ class BurpHistoryEventPublisher(
         private const val DEFAULT_SWEEP_INTERVAL_MILLISECONDS = 2_000L
 
         private const val HISTORY_ITEM_OBSERVED_EVENT_TYPE = "history.item.observed"
-
-        private const val EVENT_IDENTIFIER_PREFIX = "event_"
 
         private const val IDENTIFIER_FIELD_SEPARATOR = "\u0000"
     }

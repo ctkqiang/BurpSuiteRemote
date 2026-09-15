@@ -16,4 +16,46 @@
     <string name="connection_session_channel_description">Shown while a session with Burp is being kept alive.</string>
     <string name="connection_session_title">Keeping the session with Burp</string>
     <string name="connection_session_disconnect_action">Disconnect</string>
+
+    <!-- 静态快捷入口：short label 在启动器长按应用图标时显示，long label 在拖到桌面后的快捷标签下显示。 -->
+    <string name="shortcut_dashboard_short">Dashboard</string>
+    <string name="shortcut_dashboard_long">Open the dashboard</string>
+    <string name="shortcut_history_short">History</string>
+    <string name="shortcut_history_long">Open the live history</string>
+    <string name="shortcut_intercept_short">Intercept</string>
+    <string name="shortcut_intercept_long">Open the live intercept queue</string>
+    <string name="shortcut_repeater_short">Repeater</string>
+    <string name="shortcut_repeater_long">Open the live repeater</string>
+    <string name="shortcut_connection_short">Burp connection</string>
+    <string name="shortcut_connection_long">Open the Burp connection settings</string>
+
+    <!--
+      桌面小部件顶栏右侧的状态摘要：每种 ConnectionState 一段短语。
+      长不超过 12 字符，否则顶栏把它截掉；短语对用户而言「越短越好读」，
+      但要保留「连上 / 没连上」这一组最关键的二分状态。
+    -->
+    <string name="widget_status_unknown">Unknown</string>
+    <string name="widget_status_offline">Offline</string>
+    <string name="widget_status_discovering">Locating</string>
+    <string name="widget_status_connecting">Connecting</string>
+    <string name="widget_status_authenticating">Authenticating</string>
+    <string name="widget_status_synchronising">Syncing</string>
+    <string name="widget_status_live">Live</string>
+    <string name="widget_status_reconnecting">Reconnecting</string>
+    <string name="widget_status_resyncing">Resyncing</string>
+    <string name="widget_status_auth_failed">Auth failed</string>
+    <string name="widget_status_protocol_error">Protocol error</string>
+    <string name="widget_status_timed_out">Timed out</string>
+    <string name="widget_status_unreachable">Unreachable</string>
+
+    <!--
+      统计小部件：小部件选择器里显示的名字、目标主机缺省值、三行计数的标签与打开提示。
+      计数本身是数字，不需要翻译；标签要短，小部件空间有限。
+    -->
+    <string name="widget_stats_label">Burpsuite Remote · Stats</string>
+    <string name="widget_stats_no_target">No target</string>
+    <string name="widget_stats_live_label">Live</string>
+    <string name="widget_stats_intercepted_label">Intercepted</string>
+    <string name="widget_stats_saved_label">Saved</string>
+    <string name="widget_stats_open_hint">Tap to open</string>
 </resources>

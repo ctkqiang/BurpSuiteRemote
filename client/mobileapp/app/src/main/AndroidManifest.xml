@@ -38,6 +38,16 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!--
+              静态快捷入口与桌面小部件的额外参数由系统启动器（Launcher）代发，
+              Launcher 是受信任的发起方，因此 MainActivity 也直接对 ACTION_MAIN 开放。
+              intent-filter 只对动作与分类负责匹配；额外参数 EXTRA_START_ROUTE 在 MainActivity
+              里读，并按白名单校验后才采用，不暴露任意路由能力。
+            -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <!--
@@ -48,6 +58,39 @@
             android:name=".ConnectionSessionService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
+
+        <!--
+          桌面小部件提供者。exported 必须为 true：系统的 AppWidgetService 在另一个进程，
+          要拿到它的实例必须能跨进程调起。android:label 是小部件选择器里显示的名字，
+          与应用名一致即可——「桌面上多了一个 Burpsuite Remote」比「桌面上多了一个 Widget」更清楚。
+        -->
+        <receiver
+            android:name=".BurpRemoteAppWidgetProvider"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/burp_remote_widget_info" />
+        </receiver>
+
+        <!--
+          统计小部件提供者。与连接小部件对称：exported 必须为 true，label 用带「Stats」后缀
+          的名字，让用户在小部件选择器里能区分两个小部件。
+        -->
+        <receiver
+            android:name=".BurpRemoteStatsWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_stats_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/burp_remote_stats_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

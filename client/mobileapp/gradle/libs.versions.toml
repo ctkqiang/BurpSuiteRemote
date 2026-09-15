@@ -39,6 +39,11 @@ turbine = "1.2.0"
 mockk = "1.13.16"
 ktlintPlugin = "12.1.2"
 
+# dev.chrisbanes.haze 1.5.3：液态玻璃效果。RenderEffect 后端在 API 31+，
+# API 26-30 会自动 fallback 到 AndroidView + BlurView。2025-04-14 发布，
+# 早于 AGP 8.13.2，编译链路安全。
+haze = "1.5.3"
+
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -94,6 +99,9 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+
+# 液态玻璃：RenderEffect 模糊 + 半透明底色 + 高光，API 31 以上原生、26-30 自动 fallback。
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

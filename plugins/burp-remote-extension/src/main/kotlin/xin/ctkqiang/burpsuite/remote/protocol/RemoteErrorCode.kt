@@ -31,4 +31,8 @@ enum class RemoteErrorCode {
     /** 请求体超过允许的大小。 */
     @SerialName("request_payload_too_large")
     RequestPayloadTooLarge,
+
+    /** 请求引用的实体不存在（Repeater store 里找不到指定 identifier 的请求）。 */
+    @SerialName("entity_not_found")
+    EntityNotFound,
 }

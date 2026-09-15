@@ -38,5 +38,12 @@
     <string name="repeater_reason_request_list">the client has no repeater-projection port yet</string>
     <string name="repeater_reason_execute">the client has no repeater-command port yet</string>
     <string name="repeater_action_create">New repeater request</string>
+    <string name="repeater_card_tab_label">Tab</string>
+    <string name="repeater_card_method_label">Method</string>
+    <string name="repeater_card_status_label">Last status</string>
+    <string name="repeater_card_executing_label">Running</string>
+    <string name="repeater_card_status_failed">Failed</string>
+    <string name="repeater_card_status_never">Never executed</string>
+
     <string name="repeater_action_execute">Execute</string>
 </resources>

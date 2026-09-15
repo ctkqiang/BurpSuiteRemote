@@ -15,6 +15,20 @@
     <string name="settings_theme_dark">深色</string>
     <string name="settings_theme_dark_detail">即使系统是浅色也保持深色配色，夜里看着更舒服。</string>
 
+    <string name="settings_flavor_heading">配色口味</string>
+    <string name="settings_flavor_headline">八套调色，同一套布局</string>
+    <string name="settings_flavor_detail">只换强调色与整体色调，结构不变。每套口味都有浅色与深色两版，会跟着上面的主题走。</string>
+    <string name="settings_flavor_selected">当前选择</string>
+
+    <string name="settings_flavor_burp_classic">Burp 经典</string>
+    <string name="settings_flavor_cyber_cyan">赛博青</string>
+    <string name="settings_flavor_forest_emerald">森林翡翠</string>
+    <string name="settings_flavor_royal_violet">皇家紫罗兰</string>
+    <string name="settings_flavor_rose_gold">玫瑰金</string>
+    <string name="settings_flavor_ocean_blue">海洋蓝</string>
+    <string name="settings_flavor_solar_amber">落日琥珀</string>
+    <string name="settings_flavor_monochrome">无彩色</string>
+
     <string name="settings_language_title">语言</string>
     <string name="settings_language_subtitle">所有界面文字与提示的语言</string>
     <string name="settings_language_heading">界面语言</string>

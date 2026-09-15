@@ -6,6 +6,7 @@ package xin.ctkqiang.burpsuite.remote.adapter
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.advanceTimeBy
@@ -40,17 +41,20 @@ class BurpHistoryEventPublisherTest {
     }
 
     @Test
-    fun `an entry that existed before start is served by the rest endpoint and not replayed as an event`() {
+    fun `an entry that existed before start is published on start and not replayed later`() {
         runTest {
             val fixture = createFixture(backgroundScope)
             fixture.historySource.appendEntry(StubProxyHistoryEntry())
 
             fixture.publisher.start()
+            // start() 对存量条目发 observed
+            assertEquals(1L, fixture.eventStream.latestSequenceNumber())
+
             fixture.signalSource.fireSignal()
             advanceTimeBy(SWEEP_INTERVAL_MILLISECONDS * SWEEP_TICKS)
             runCurrent()
-
-            assertEquals(0L, fixture.eventStream.latestSequenceNumber())
+            // sweep 不重复发同一条
+            assertEquals(1L, fixture.eventStream.latestSequenceNumber())
             fixture.publisher.stop()
         }
     }
@@ -146,15 +150,19 @@ class BurpHistoryEventPublisherTest {
             val fixture = createFixture(backgroundScope)
             fixture.historySource.appendEntry(StubProxyHistoryEntry(path = "/api/before-clear"))
             fixture.publisher.start()
+            // start() 对 before-clear 发 observed，seq=1
+            assertEquals(1L, fixture.eventStream.latestSequenceNumber())
 
             fixture.historySource.clearEntries()
             fixture.signalSource.fireSignal()
-            assertEquals(0L, fixture.eventStream.latestSequenceNumber())
+            // clear 后 history 空了，knownEntries 移除 before-clear，不发新 observed
+            assertEquals(1L, fixture.eventStream.latestSequenceNumber())
 
             val entryAfterClear = StubProxyHistoryEntry(path = "/api/after-clear")
             fixture.historySource.appendEntry(entryAfterClear)
             fixture.signalSource.fireSignal()
-            val observedEvent = fixture.eventStream.observeEvents().take(1).toList().single()
+            // start() 已经发了 before-clear 的 observed，跳过它取最新的 after-clear
+            val observedEvent = fixture.eventStream.observeEvents().drop(1).take(1).toList().single()
 
             assertEquals(
                 fixture.historyAdapter.toHistoryIdentifier(entryAfterClear).value,

@@ -16,4 +16,39 @@
     <string name="connection_session_channel_description">Wird angezeigt, solange die Sitzung mit Burp gehalten wird.</string>
     <string name="connection_session_title">Sitzung mit Burp wird gehalten</string>
     <string name="connection_session_disconnect_action">Trennen</string>
+
+    <!-- Statische Verknüpfungen: short label beim Langdrücken auf das App-Icon, long label nach dem Ziehen auf den Desktop. -->
+    <string name="shortcut_dashboard_short">Übersicht</string>
+    <string name="shortcut_dashboard_long">Übersicht öffnen</string>
+    <string name="shortcut_history_short">Verlauf</string>
+    <string name="shortcut_history_long">Live-Verlauf öffnen</string>
+    <string name="shortcut_intercept_short">Intercept</string>
+    <string name="shortcut_intercept_long">Live-Intercept-Warteschlange öffnen</string>
+    <string name="shortcut_repeater_short">Repeater</string>
+    <string name="shortcut_repeater_long">Live-Repeater öffnen</string>
+    <string name="shortcut_connection_short">Burp-Verbindung</string>
+    <string name="shortcut_connection_long">Burp-Verbindungseinstellungen öffnen</string>
+
+    <!-- Statuszusammenfassung oben rechts im Widget; maximal 12 Zeichen. -->
+    <string name="widget_status_unknown">Unbekannt</string>
+    <string name="widget_status_offline">Offline</string>
+    <string name="widget_status_discovering">Lokalisiert</string>
+    <string name="widget_status_connecting">Verbindet</string>
+    <string name="widget_status_authenticating">Auth.</string>
+    <string name="widget_status_synchronising">Sync</string>
+    <string name="widget_status_live">Live</string>
+    <string name="widget_status_reconnecting">Verbinde</string>
+    <string name="widget_status_resyncing">Resync</string>
+    <string name="widget_status_auth_failed">Auth. fehl</string>
+    <string name="widget_status_protocol_error">Protokoll</string>
+    <string name="widget_status_timed_out">Zeit</string>
+    <string name="widget_status_unreachable">Unerreichbar</string>
+
+    <!-- Statistik-Widget: Auswahlname, Standardwert für Zielrechner, drei Zählzeilen und Öffnen-Hinweis. -->
+    <string name="widget_stats_label">Burpsuite Remote · Statistik</string>
+    <string name="widget_stats_no_target">Kein Ziel</string>
+    <string name="widget_stats_live_label">Live</string>
+    <string name="widget_stats_intercepted_label">Abgefangen</string>
+    <string name="widget_stats_saved_label">Gespeichert</string>
+    <string name="widget_stats_open_hint">Zum Öffnen tippen</string>
 </resources>

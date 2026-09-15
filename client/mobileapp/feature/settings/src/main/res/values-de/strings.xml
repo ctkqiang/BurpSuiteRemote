@@ -15,6 +15,20 @@
     <string name="settings_theme_dark">Dunkel</string>
     <string name="settings_theme_dark_detail">Behält die dunklen Farben auch bei hellem System. Nachts angenehmer für die Augen.</string>
 
+    <string name="settings_flavor_heading">Farbvariante</string>
+    <string name="settings_flavor_headline">Acht Paletten, gleiches Layout</string>
+    <string name="settings_flavor_detail">Nur Akzentfarbe und Gesamtton ändern sich, die Struktur bleibt identisch. Jede Variante gibt es in hell und dunkel und folgt dem Design oben.</string>
+    <string name="settings_flavor_selected">Ausgewählt</string>
+
+    <string name="settings_flavor_burp_classic">Burp Classic</string>
+    <string name="settings_flavor_cyber_cyan">Cyber Cyan</string>
+    <string name="settings_flavor_forest_emerald">Wald Smaragd</string>
+    <string name="settings_flavor_royal_violet">Königs Violett</string>
+    <string name="settings_flavor_rose_gold">Roségold</string>
+    <string name="settings_flavor_ocean_blue">Ozean Blau</string>
+    <string name="settings_flavor_solar_amber">Sonnen Bernstein</string>
+    <string name="settings_flavor_monochrome">Monochrom</string>
+
     <string name="settings_language_title">Sprache</string>
     <string name="settings_language_subtitle">Sprache aller Ansichten und Meldungen</string>
     <string name="settings_language_heading">Sprache der Oberfläche</string>

@@ -30,6 +30,8 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteHistoryMessag
  * @property messageFailure 本体读取失败的归类；成功或尚在读取时为空。
  * @property scopeConclusion 最近一次「加入作用域」的结论；还没点过时为空。
  * @property isScopeWriteAvailable 客户端有没有接上作用域写入端口；没接上时按钮停用。
+ * @property repeaterConclusion 最近一次「送往重放」的结论；还没点过时为空。
+ * @property isRepeaterWriteAvailable 客户端有没有接上 Repeater 写入端口；没接上时按钮停用。
  */
 data class HistoryDetailUserInterfaceState(
     val record: HistoryRecord? = null,
@@ -38,4 +40,6 @@ data class HistoryDetailUserInterfaceState(
     val messageFailure: HistoryMessageReadFailure? = null,
     val scopeConclusion: HistoryScopeWriteConclusion? = null,
     val isScopeWriteAvailable: Boolean = true,
+    val repeaterConclusion: HistoryRepeaterConclusion? = null,
+    val isRepeaterWriteAvailable: Boolean = true,
 )

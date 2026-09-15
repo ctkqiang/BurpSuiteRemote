@@ -1,0 +1,45 @@
+@startuml event-sync-en
+
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam activityBorderColor #4A90D9
+skinparam activityBackgroundColor #E8F0FE
+
+title Event Synchronization & Resync Flow
+
+start
+
+:Burp proxy observes\nnew request/response;
+
+:HistoryPublisher.appendEvent();
+note right
+  InMemoryRemoteEventStream
+  assigns global
+  monotonic sequence#
+end note
+
+:WebSocket push to\nconnected clients;
+
+if (Client online?) then (yes)
+  :Client receives event;
+  :JournalEventIngestor\nwrites to Room DB;
+  :Projection updates\nViewModel state;
+  :Compose UI re-renders;
+else (no)
+  :Event stays in memory\n(1024-event ring buffer);
+  if (Client reconnects\nwithin buffer window?) then (yes)
+    :Client sends resume\nfrom lastSequenceNumber;
+    :Server replays\nmissed events;
+    :Client ingests\nall gaps;
+  else (no, buffer scrolled past)
+    :Server responds\n"resync required";
+    :Client calls\nGET /v1/snapshot;
+    :Full snapshot written\nto Room DB;
+    :Client resumes from\nnew high-water mark;
+  endif
+endif
+
+stop
+
+@end

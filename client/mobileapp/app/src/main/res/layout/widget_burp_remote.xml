@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  桌面小部件布局。
+
+  限制：RemoteViews 只支持 LinearLayout / FrameLayout / RelativeLayout / GridLayout
+  以及一组受控控件（TextView / Button / ImageView / ImageButton / Chronometer / AnalogClock /
+  ViewFlipper / AdapterViewFlipper / GridView / ListView / StackView / ProgressBar）。Compose
+  在这里完全用不上，必须用 XML 写一套独立的版式，几何与 :ui 模块的设计令牌保持同一套语义。
+  普通 <View> 不在 RemoteViews 允许的控件列表里，因此分隔线用一个高度 1dp、空文本的
+  TextView 替代——它会被系统当作 TextView 渲染，但实际只画它的 background。
+
+  结构（自顶向下）：
+    1. 顶栏：左边是应用名（fixed string），右边是连接状态摘要（运行时由 provider 写入）。
+    2. 一条 1dp 的半透明白色分隔线，与按钮按下时填的白色同源，视觉上把两个分区连起来。
+    3. 四个动作按钮：主面板、历史、拦截、重放。每个按钮带一段长按可显示的 contentDescription，
+       无障碍读屏时这一段比 button 上的短文案更有用。
+
+  padding 取 12dp：Android launcher 的小部件网格自带 8dp 间距，再加 8dp 内边距会让按钮贴住边沿；
+  12dp 是 launcher 默认间距与内部留白之和的最小可见值，再小按钮文字就会被圆角切掉。
+
+  NestedWeights / ButtonStyle 两条 lint 警告在此处被 tools:ignore 收掉：
+  - 四个按钮要等宽，weight 是 RemoteViews 下唯一稳定的等宽手段，GridLayout 在某些启动器上
+    会被当成 AdapterView 渲染失败。
+  - 按钮的圆角描边背景是这套小部件的视觉标识，用 buttonBarButtonStyle 会回退到系统默认，
+    与品牌色不一致。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/app_name"
+            android:textColor="#FFFFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_connection_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/widget_status_unknown"
+            android:textColor="#FFFFFFFF"
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="0dp" />
+    </LinearLayout>
+
+    <!--
+      分隔线：RemoteViews 不支持普通 <View>，用一个高度 1dp、空文本的 TextView 顶替；
+      它在系统看来是合法的 TextView，但只画 background 这一档。
+    -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="#40FFFFFF" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        tools:ignore="NestedWeights">
+
+        <Button
+            android:id="@+id/widget_button_dashboard"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/shortcut_dashboard_short"
+            android:textColor="#FFFFFFFF"
+            android:textSize="11sp"
+            android:textAllCaps="false"
+            android:background="@drawable/widget_button_background"
+            android:contentDescription="@string/shortcut_dashboard_long"
+            android:layout_marginEnd="4dp"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/widget_button_history"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/shortcut_history_short"
+            android:textColor="#FFFFFFFF"
+            android:textSize="11sp"
+            android:textAllCaps="false"
+            android:background="@drawable/widget_button_background"
+            android:contentDescription="@string/shortcut_history_long"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/widget_button_intercept"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/shortcut_intercept_short"
+            android:textColor="#FFFFFFFF"
+            android:textSize="11sp"
+            android:textAllCaps="false"
+            android:background="@drawable/widget_button_background"
+            android:contentDescription="@string/shortcut_intercept_long"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/widget_button_repeater"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/shortcut_repeater_short"
+            android:textColor="#FFFFFFFF"
+            android:textSize="11sp"
+            android:textAllCaps="false"
+            android:background="@drawable/widget_button_background"
+            android:contentDescription="@string/shortcut_repeater_long"
+            android:layout_marginStart="4dp"
+            tools:ignore="ButtonStyle" />
+    </LinearLayout>
+</LinearLayout>

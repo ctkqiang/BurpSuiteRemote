@@ -18,5 +18,8 @@ value class ProjectionName(val value: String) {
 
         /** 截图投影。 */
         val SCREENSHOT: ProjectionName = ProjectionName("screenshot")
+
+        /** Repeater 请求投影。 */
+        val REPEATER: ProjectionName = ProjectionName("repeater")
     }
 }

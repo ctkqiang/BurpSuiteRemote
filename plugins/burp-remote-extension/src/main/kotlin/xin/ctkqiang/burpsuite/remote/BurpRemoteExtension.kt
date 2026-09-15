@@ -11,6 +11,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryAdapter
 import xin.ctkqiang.burpsuite.remote.adapter.BurpHistoryEventPublisher
+import xin.ctkqiang.burpsuite.remote.adapter.BurpInterceptProxyRequestHandler
+import xin.ctkqiang.burpsuite.remote.adapter.BurpInterceptQueue
+import xin.ctkqiang.burpsuite.remote.adapter.BurpRepeaterStore
 import xin.ctkqiang.burpsuite.remote.adapter.BurpScopeAdapter
 import xin.ctkqiang.burpsuite.remote.adapter.MontoyaProxyHistorySignalSource
 import xin.ctkqiang.burpsuite.remote.adapter.MontoyaProxyHistorySource
@@ -79,16 +82,53 @@ class BurpRemoteExtension : BurpExtension {
                 sweepScope = historySweepScope,
             )
 
+        // 拦截队列在 RemoteHttpServer 之前建好：handler 和 REST 端点要共享它。
+        val interceptQueue = BurpInterceptQueue()
+
+        // Remote Repeater 内存存储：手机推过来的请求存在这里，execute 时从这里取。
+        val repeaterStore = BurpRepeaterStore()
+
+        // 拦截 handler 的"是否有活跃设备"判定：已配对设备 ∩ 已连接设备，两边至少有一个交集。
+        val connectionRegistry = RemoteConnectionRegistry()
+        val hasActivePairedDevice = {
+            val connected = connectionRegistry.snapshot().toSet()
+            val paired = pairedDeviceRegistry.snapshot().map { it.deviceIdentifier }.toSet()
+            connected.intersect(paired).isNotEmpty()
+        }
+
+        val interceptHandler =
+            BurpInterceptProxyRequestHandler(
+                interceptQueue = interceptQueue,
+                eventStream = eventStream,
+                hasActivePairedDevice = hasActivePairedDevice,
+                clock = clock,
+            )
+
+        // 注册 handler 到 Montoya Proxy；返回的 Registration 要在卸载时 deregister。
+        val interceptHandlerRegistration = montoyaApi.proxy().registerRequestHandler(interceptHandler)
+
         val remoteHttpServer =
             RemoteHttpServer(
                 devicePairingService = devicePairingService,
                 pairedDeviceRegistry = pairedDeviceRegistry,
                 controlGate = createControlGate(pairedDeviceRegistry, clock, montoyaApi),
-                connectionRegistry = RemoteConnectionRegistry(),
+                connectionRegistry = connectionRegistry,
                 eventStream = eventStream,
                 historyAdapter = historyAdapter,
                 scopeAdapter = scopeAdapter,
                 logSink = montoyaApi.logging()::logToOutput,
+                clock = clock,
+                interceptQueue = interceptQueue,
+                repeaterStore = repeaterStore,
+                montoyaHttp = montoyaApi.http(),
+                sendToRepeater = { request, tabName ->
+                    // Burp Repeater 的 sendToRepeater：tabName 传 null 或具体标签名。
+                    if (tabName != null) {
+                        montoyaApi.repeater().sendToRepeater(request, tabName)
+                    } else {
+                        montoyaApi.repeater().sendToRepeater(request)
+                    }
+                },
             )
 
         // 先启动端点再建界面：界面要显示的是真实状态，晚一步启动会让它显示一瞬「未启动」。
@@ -124,6 +164,11 @@ class BurpRemoteExtension : BurpExtension {
             // 先停历史事件：卸载后任何残留回调再去读代理历史，就会在已卸下扩展的 Burp 上抛错。
             historyEventPublisher.stop()
             historySweepScope.cancel()
+            // 先清拦截队列：让所有挂起的 handler 解挂（默认 Forward），再 deregister handler，
+            // 避免 handler 还在执行时 queue 就被回收的竞态。
+            interceptQueue.clear()
+            repeaterStore.clear()
+            interceptHandlerRegistration.deregister()
             // 先停服务器：端口与线程不清干净时，重新加载扩展会因为端口仍被自己占用而启动失败。
             remoteHttpServer.stop()
             // 卸载时主动摘掉标签页：Burp 不替扩展回收组件，留着会残留界面，重载时还会叠出两个同名标签页。

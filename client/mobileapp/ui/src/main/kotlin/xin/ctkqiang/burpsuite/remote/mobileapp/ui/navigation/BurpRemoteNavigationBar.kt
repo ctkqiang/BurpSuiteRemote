@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import dev.chrisbanes.haze.HazeState
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteBottomBar
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteBottomBarItem
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
@@ -12,9 +13,12 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHapti
  * 一级分区的浮动底栏。无状态：当前分区与点击行为都由装配层给。
  *
  * 条目直接从 [TopLevelSection] 投影出来，因此底栏永远与导航模型一致，不额外维护一张条目表。
+ *
+ * @param hazeState Scaffold 里创建的 HazeState；用来给底栏套液态玻璃。
  */
 @Composable
 fun BurpRemoteNavigationBar(
+    hazeState: HazeState,
     selectedSection: TopLevelSection?,
     onSectionSelected: (TopLevelSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -31,6 +35,7 @@ fun BurpRemoteNavigationBar(
 
     Box(modifier = modifier.fillMaxWidth()) {
         BurpRemoteBottomBar(
+            hazeState = hazeState,
             items = items,
             selectedRoute = selectedSection?.landingRoute.orEmpty(),
             onSelect = { route ->

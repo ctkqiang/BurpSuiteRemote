@@ -16,4 +16,39 @@
     <string name="connection_session_channel_description">Burp-тай сесс хадгалагдаж байх үед л харагдана.</string>
     <string name="connection_session_title">Burp-тай сесс хадгалж байна</string>
     <string name="connection_session_disconnect_action">Салгах</string>
+
+    <!-- Статик товчлуурууд: short label нь апп дүрсэн дээр удаан дарах үед, long label нь дэлгэц рүү чирсний дараах бичвэр. -->
+    <string name="shortcut_dashboard_short">Хяналт</string>
+    <string name="shortcut_dashboard_long">Хяналтын самбарыг нээх</string>
+    <string name="shortcut_history_short">Түүх</string>
+    <string name="shortcut_history_long">Шууд түүхийг нээх</string>
+    <string name="shortcut_intercept_short">Барьц</string>
+    <string name="shortcut_intercept_long">Шууд барьцын дарааллыг нээх</string>
+    <string name="shortcut_repeater_short">Давтах</string>
+    <string name="shortcut_repeater_long">Шууд давахыг нээх</string>
+    <string name="shortcut_connection_short">Burp холболт</string>
+    <string name="shortcut_connection_long">Burp холболтын тохиргоог нээх</string>
+
+    <!-- Жижиг хэсгийн баруун дээд булангийн төлөвийн хураангуй; 12 тэмдэгтээс бага. -->
+    <string name="widget_status_unknown">Үл мэдэгдэх</string>
+    <string name="widget_status_offline">Оффлайн</string>
+    <string name="widget_status_discovering">Хайж байна</string>
+    <string name="widget_status_connecting">Холбож байна</string>
+    <string name="widget_status_authenticating">Нотлож байна</string>
+    <string name="widget_status_synchronising">Синк</string>
+    <string name="widget_status_live">Шууд</string>
+    <string name="widget_status_reconnecting">Дахин холбож</string>
+    <string name="widget_status_resyncing">Дахин синк</string>
+    <string name="widget_status_auth_failed">Нотлох бүтэлгүй</string>
+    <string name="widget_status_protocol_error">Протокол</string>
+    <string name="widget_status_timed_out">Хугацаа</string>
+    <string name="widget_status_unreachable">Хүрэхгүй</string>
+
+    <!-- Статистикийн виджет: сонголтын нэр, зориулалттай хостын анхны утга, 3 мөрний тоолуурын шошго ба нээх заавар. -->
+    <string name="widget_stats_label">Burpsuite Remote · Статистик</string>
+    <string name="widget_stats_no_target">Зорилгоо алга</string>
+    <string name="widget_stats_live_label">Шууд</string>
+    <string name="widget_stats_intercepted_label">Нэвтрүүлсэн</string>
+    <string name="widget_stats_saved_label">Хадгалсан</string>
+    <string name="widget_stats_open_hint">Нээхийн тулд товчлно уу</string>
 </resources>

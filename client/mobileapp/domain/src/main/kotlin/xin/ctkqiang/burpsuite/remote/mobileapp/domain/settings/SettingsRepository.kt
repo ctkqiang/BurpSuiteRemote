@@ -9,11 +9,17 @@ import kotlinx.coroutines.flow.Flow
  * 也不知道设备身份是不是被加密过（rules.md §6.1）。
  */
 interface SettingsRepository {
-    /** 外观主题。 */
+    /** 外观主题（明暗）。 */
     fun observeThemeMode(): Flow<ThemeMode>
 
-    /** 写外观主题。 */
+    /** 写外观主题（明暗）。 */
     suspend fun setThemeMode(themeMode: ThemeMode)
+
+    /** 主题口味（配色身份）。 */
+    fun observeThemeFlavor(): Flow<ThemeFlavor>
+
+    /** 写主题口味。 */
+    suspend fun setThemeFlavor(themeFlavor: ThemeFlavor)
 
     /** 插件端点的地址与端口；从未配置过时为 null，界面据此写「尚未配置」。 */
     fun observeServerEndpoint(): Flow<RemoteServerEndpoint?>

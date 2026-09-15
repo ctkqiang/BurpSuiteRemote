@@ -24,6 +24,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteResult
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.HistoryRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryMessageReader
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryScopeWriter
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteRepeaterWriter
 
 /**
  * 历史详情的状态持有者。
@@ -42,6 +43,7 @@ class HistoryDetailViewModel(
     historyRepository: HistoryRepository,
     private val remoteHistoryMessageReader: RemoteHistoryMessageReader? = null,
     private val remoteHistoryScopeWriter: RemoteHistoryScopeWriter? = null,
+    private val remoteRepeaterWriter: RemoteRepeaterWriter? = null,
     private val technicalLog: TechnicalLog = SilentTechnicalLog,
 ) : ViewModel() {
     private val effectChannel = Channel<HistoryDetailUserInterfaceEffect>(Channel.BUFFERED)
@@ -60,6 +62,15 @@ class HistoryDetailViewModel(
     private val scopeWriteConclusionState: MutableStateFlow<HistoryScopeWriteConclusion?> =
         MutableStateFlow(null)
 
+    /**
+     * 最近一次「送往重放」的结论；为空就是还没点过。
+     *
+     * 与 [scopeWriteConclusionState] 同一套写法：一次本机 REST 写入短到来不及画任何中间态，
+     * 多出来的「正在写」布尔量只会多一处需要跟着同步的真相。
+     */
+    private val repeaterConclusionState: MutableStateFlow<HistoryRepeaterConclusion?> =
+        MutableStateFlow(null)
+
     val uiState: StateFlow<HistoryDetailUserInterfaceState> =
         combine(
             historyRepository
@@ -67,12 +78,15 @@ class HistoryDetailViewModel(
                 .onEach { record -> reportRecord(observedRecord = record) },
             messageReadState,
             scopeWriteConclusionState,
-        ) { record, messageRead, scopeWriteConclusion ->
+            repeaterConclusionState,
+        ) { record, messageRead, scopeWriteConclusion, repeaterConclusion ->
             mergeState(
                 observedRecord = record,
                 observedMessageRead = messageRead,
                 observedScopeConclusion = scopeWriteConclusion,
                 isScopeWriteAvailable = remoteHistoryScopeWriter != null,
+                observedRepeaterConclusion = repeaterConclusion,
+                isRepeaterWriteAvailable = remoteRepeaterWriter != null,
             )
         }
             .stateIn(
@@ -95,6 +109,8 @@ class HistoryDetailViewModel(
             is HistoryDetailUserInterfaceIntent.ReloadHistoryMessage -> loadMessage()
 
             is HistoryDetailUserInterfaceIntent.AddHistoryHostToScope -> addHostToScope()
+
+            is HistoryDetailUserInterfaceIntent.SendToRepeater -> sendToRepeater()
         }
     }
 
@@ -189,11 +205,80 @@ class HistoryDetailViewModel(
         }
     }
 
+    /**
+     * 把这条记录的原始请求推送到 Repeater。
+     *
+     * 与 [addHostToScope] 同理：不先清空上一轮结论——一次本机 REST 写入短到来不及画中间态，
+     * 清空只会让上次的结论闪一下白。推送 Repeater 需要 requestText，因此先检查本体是否已取回；
+     * 本体尚未取回时结论是 [HistoryRepeaterConclusion.MessageNotLoaded]，下一步是先取回本体或重试。
+     */
+    private fun sendToRepeater() {
+        viewModelScope.launch {
+            val writer = remoteRepeaterWriter
+            if (writer == null) {
+                record(
+                    category = TechnicalLogCategory.Failure,
+                    message = "客户端没有接上 Repeater 写入端口，无法推送到 Repeater",
+                )
+                repeaterConclusionState.value = HistoryRepeaterConclusion.WriterUnavailable
+                return@launch
+            }
+
+            val message = messageReadState.value.message
+            val requestHeaders = message?.requestHeaders
+            if (requestHeaders == null) {
+                record(
+                    category = TechnicalLogCategory.Failure,
+                    message = "报文本体尚未取回，无法拼出 requestText",
+                    severity = TechnicalLogSeverity.Warning,
+                )
+                repeaterConclusionState.value = HistoryRepeaterConclusion.MessageNotLoaded
+                return@launch
+            }
+
+            val requestBody = message.requestBody
+            val requestText = buildString {
+                append(requestHeaders)
+                if (!requestBody.isNullOrBlank()) {
+                    if (!requestHeaders.endsWith("\n")) {
+                        append("\r\n")
+                    }
+                    append("\r\n")
+                    append(requestBody)
+                }
+            }
+
+            repeaterConclusionState.value =
+                when (val result = writer.sendToRepeater(requestText, tabName = REPEATER_TAB_NAME)) {
+                    is RemoteResult.Succeeded -> {
+                        record(
+                            category = TechnicalLogCategory.UserInterface,
+                            message = "请求已推送到 Repeater",
+                            attributes = mapOf("historyIdentifier" to historyIdentifier),
+                        )
+                        HistoryRepeaterConclusion.Sent
+                    }
+
+                    is RemoteResult.Failed -> {
+                        record(
+                            category = TechnicalLogCategory.Failure,
+                            message = "推送到 Repeater 失败",
+                            severity = TechnicalLogSeverity.Warning,
+                            attributes = mapOf("failure" to result.failure.toString()),
+                        )
+                        HistoryRepeaterConclusion.of(result.failure)
+                    }
+                }
+        }
+    }
+
     private fun mergeState(
         observedRecord: HistoryRecord?,
         observedMessageRead: MessageReadState,
         observedScopeConclusion: HistoryScopeWriteConclusion?,
         isScopeWriteAvailable: Boolean,
+        observedRepeaterConclusion: HistoryRepeaterConclusion?,
+        isRepeaterWriteAvailable: Boolean,
     ): HistoryDetailUserInterfaceState =
         HistoryDetailUserInterfaceState(
             record = observedRecord,
@@ -202,6 +287,8 @@ class HistoryDetailViewModel(
             messageFailure = observedMessageRead.failure,
             scopeConclusion = observedScopeConclusion,
             isScopeWriteAvailable = isScopeWriteAvailable,
+            repeaterConclusion = observedRepeaterConclusion,
+            isRepeaterWriteAvailable = isRepeaterWriteAvailable,
         )
 
     private fun reportRecord(observedRecord: HistoryRecord?) {
@@ -242,5 +329,8 @@ class HistoryDetailViewModel(
     private companion object {
         // 界面转屏或短暂离开时别急着停掉上游，回来时就不用重新读一次盘。
         const val STOP_TIMEOUT_MILLISECONDS = 5_000L
+
+        // 推送到 Repeater 时给 tab 起的名字；不绑记录标识，因为 Repeater tab 名字是给人看的。
+        const val REPEATER_TAB_NAME = "Mobile"
     }
 }

@@ -21,22 +21,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.haze
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 
 /**
- * 应用外壳：顶栏、内容、浮在内容之上的底栏。
+ * 应用外壳：顶栏、内容、浮在内容之上的液态玻璃底栏。
  *
- * 内容铺到系统栏下面，留白由 [WindowInsets] 算出来（edge-to-edge）；底栏浮在内容之上，
- * 因此内容必须知道底栏占了多高，否则最后一行永远被压在底栏底下——底栏高度在这里量出来再传给内容。
+ * 内容铺到系统栏下面，留白由 [WindowInsets] 算出来（edge-to-edge）。整个内容 Column 标记为 Haze
+ * 采集域（Modifier.haze），底栏的容器标记为 Haze 玻璃消费者（Modifier.hazeChild）—— Haze 会在
+ * 底栏那块区域把内容实时模糊再叠上半透明底色与高光，形成液态玻璃的漂浮感。
  *
- * 底栏那一条区域只填页面底色，不画渐变：渐变在深色下会在手势条上方留出一条比底栏浅的色带，
- * 而底栏本身是玻璃质感，两者对不上。整块区域填底色之后，手势条那一段与底栏视觉上就是连续的。
+ * 内容必须知道底栏占了多高，否则最后一行永远被压在底栏底下——底栏高度在这里量出来再传给内容。
+ *
+ * [hazeState] 传给底栏容器用 hazeChild(hazeState) 消费；Scaffold 自己创建，不用外部管。
  */
 @Composable
 fun BurpRemoteScaffold(
     topBar: @Composable () -> Unit,
-    bottomBar: @Composable () -> Unit,
+    bottomBar: @Composable (HazeState) -> Unit,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val tokens = LocalBurpRemoteDesignTokens.current
@@ -44,6 +48,7 @@ fun BurpRemoteScaffold(
     var bottomBarHeightPixels by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
     val bottomBarHeight: Dp = with(density) { bottomBarHeightPixels.toDp() }
+    val hazeState = remember { HazeState() }
 
     Box(
         modifier =
@@ -51,7 +56,13 @@ fun BurpRemoteScaffold(
                 .fillMaxSize()
                 .background(tokens.colourScheme.background),
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        // 内容 Column 是 Haze 的采集域：里面所有东西（顶栏 + NavHost）都能被底栏那块玻璃模糊。
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .haze(hazeState),
+        ) {
             Box(
                 modifier =
                     Modifier
@@ -71,8 +82,7 @@ fun BurpRemoteScaffold(
             modifier =
                 Modifier
                     .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .background(tokens.colourScheme.background),
+                    .fillMaxWidth(),
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(bottom = navigationBarInset)) {
                 Box(
@@ -81,7 +91,7 @@ fun BurpRemoteScaffold(
                             .fillMaxWidth()
                             .onSizeChanged { measuredSize -> bottomBarHeightPixels = measuredSize.height },
                 ) {
-                    bottomBar()
+                    bottomBar(hazeState)
                 }
             }
         }

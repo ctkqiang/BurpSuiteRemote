@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  统计小部件元数据。
+
+  minWidth / minHeight 取 2x2 的下界（110dp x 110dp）：统计小部件只需要三行计数，比连接小部件
+  矮一档，用户可以放在桌面角落。系统会拿 min 系列作为初始尺寸。
+  resizeMode 允许横向与纵向拉伸：统计行数固定，但用户可能想把它拉宽一点让主机名显示更多。
+  updatePeriodMillis 取 0：不让系统每半小时把进程拉起来只为了刷一次统计，统计刷新改由
+  AppContainer 进程级作用域内的主面板汇总观察器主动触发（rules.md §61）。
+  widgetCategory 用 home_screen + keyguard：锁屏也能看一眼拦截队列积压了多少。
+  previewImage 用 ic_launcher_foreground。
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="110dp"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen|keyguard"
+    android:previewImage="@drawable/ic_launcher_foreground"
+    android:initialLayout="@layout/widget_burp_remote_stats" />

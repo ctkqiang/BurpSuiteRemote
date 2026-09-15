@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  静态快捷入口（plan §43 与系统 API：<meta-data android:name="android.app.shortcuts" />）。
+
+  每条快捷入口把目标屏路由放进 Intent 额外参数 EXTRA_START_ROUTE；MainActivity 读它，
+  按白名单校验后落到对应屏。白名单只含无参数路由，因此「外部 Intent 把应用指到任意一屏」
+  这件事的杀伤面只有「跳到本应用的某个一级屏」，没有更深的副作用。
+
+  静态快捷入口由系统启动器（Launcher）代发，应用自身不可触发；Launcher 是受信任的发起方，
+  发布版因此也接受 EXTRA_START_ROUTE（不再像调试入口那样按 isDebuggable 门禁）。
+  这与「调试入口」是两件事：调试入口允许在调试包里递一张配对票据进来，这里只递路由。
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 主面板：连接状态、最近历史与拦截汇总。 -->
+    <shortcut
+        android:shortcutId="dashboard"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_dashboard"
+        android:shortcutShortLabel="@string/shortcut_dashboard_short"
+        android:shortcutLongLabel="@string/shortcut_dashboard_long">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="xin.ctkqiang.burpsuite.remote.mobileapp"
+            android:targetClass="xin.ctkqiang.burpsuite.remote.mobileapp.MainActivity">
+            <extra android:name="startRoute" android:value="dashboard" />
+        </intent>
+    </shortcut>
+
+    <!-- 历史：插件转发的全部请求，新的排最前。 -->
+    <shortcut
+        android:shortcutId="live_history"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_history"
+        android:shortcutShortLabel="@string/shortcut_history_short"
+        android:shortcutLongLabel="@string/shortcut_history_long">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="xin.ctkqiang.burpsuite.remote.mobileapp"
+            android:targetClass="xin.ctkqiang.burpsuite.remote.mobileapp.MainActivity">
+            <extra android:name="startRoute" android:value="live/history" />
+        </intent>
+    </shortcut>
+
+    <!-- 拦截：你判定之前由插件代为挂起的请求。 -->
+    <shortcut
+        android:shortcutId="live_intercept"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_intercept"
+        android:shortcutShortLabel="@string/shortcut_intercept_short"
+        android:shortcutLongLabel="@string/shortcut_intercept_long">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="xin.ctkqiang.burpsuite.remote.mobileapp"
+            android:targetClass="xin.ctkqiang.burpsuite.remote.mobileapp.MainActivity">
+            <extra android:name="startRoute" android:value="live/intercept" />
+        </intent>
+    </shortcut>
+
+    <!-- 重放：保存的请求重发与对比。 -->
+    <shortcut
+        android:shortcutId="live_repeater"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_repeater"
+        android:shortcutShortLabel="@string/shortcut_repeater_short"
+        android:shortcutLongLabel="@string/shortcut_repeater_long">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="xin.ctkqiang.burpsuite.remote.mobileapp"
+            android:targetClass="xin.ctkqiang.burpsuite.remote.mobileapp.MainActivity">
+            <extra android:name="startRoute" android:value="live/repeater" />
+        </intent>
+    </shortcut>
+
+    <!-- Burp 连接：地址、端口、配对票据与连接状态。 -->
+    <shortcut
+        android:shortcutId="settings_burp_connection"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_connection"
+        android:shortcutShortLabel="@string/shortcut_connection_short"
+        android:shortcutLongLabel="@string/shortcut_connection_long">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="xin.ctkqiang.burpsuite.remote.mobileapp"
+            android:targetClass="xin.ctkqiang.burpsuite.remote.mobileapp.MainActivity">
+            <extra android:name="startRoute" android:value="settings/burp-connection" />
+        </intent>
+    </shortcut>
+</shortcuts>

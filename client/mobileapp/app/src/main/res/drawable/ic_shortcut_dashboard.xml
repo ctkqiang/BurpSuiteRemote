@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  快捷入口「主面板」的图标：取主面板的轮廓——一个方框里横着一条分隔线，
+  上半代表连接状态摘要，下半代表历史与拦截汇总。线宽 2dp、单色，
+  Android 8 起的 Adaptive Icon 渲染时会自动套上前景色 tint。
+  画布 24dp，安全区取 1dp 内缩，几何与 ui 模块的设计令牌同源。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FF6633">
+
+    <path
+        android:pathData="M3,5 L21,5 L21,19 L3,19 Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round" />
+
+    <path
+        android:pathData="M3,12 L21,12"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+</vector>

@@ -25,6 +25,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.data.projection.ProjectionRebuild
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.projection.ProjectionStore
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.projection.RoomHistoryProjectionStore
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.projection.RoomInterceptProjectionStore
+import xin.ctkqiang.burpsuite.remote.mobileapp.data.projection.RoomRepeaterProjectionStore
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.remote.KtorRemoteControlClient
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.remote.PersistingRemoteControlClient
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.remote.RemoteHttpClientFactory
@@ -34,6 +35,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.data.remote.StoredDeviceIdentifie
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.repository.ProjectionDashboardRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.repository.RoomHistoryRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.repository.RoomInterceptRepository
+import xin.ctkqiang.burpsuite.remote.mobileapp.data.repository.RoomRepeaterRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.settings.AndroidKeystoreSecretCipher
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.settings.DataStoreRemoteConnectionSettingsStore
 import xin.ctkqiang.burpsuite.remote.mobileapp.data.settings.DataStoreSettingsRepository
@@ -47,6 +49,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.remote.RemoteTimeouts
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.DashboardRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.HistoryRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.InterceptRepository
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.RepeaterRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.SettingsRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.sync.EventSynchronisationCoordinator
 import xin.ctkqiang.burpsuite.remote.mobileapp.domain.time.TimeProvider
@@ -54,6 +57,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.NavigationDependenc
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryMessageReader
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteHistoryScopeWriter
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemotePairingCoordinator
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemoteRepeaterWriter
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -87,7 +91,9 @@ class AppContainer(context: Context) {
 
     // 库里放的是事件日志与投影，属于敏感数据，留在应用私有目录（plan §58）。
     private val database: BurpRemoteDatabase =
-        Room.databaseBuilder(applicationContext, BurpRemoteDatabase::class.java, DATABASE_FILE_NAME).build()
+        Room.databaseBuilder(applicationContext, BurpRemoteDatabase::class.java, DATABASE_FILE_NAME)
+            .fallbackToDestructiveMigration()
+            .build()
 
     private val connectionSettingsStore: RemoteConnectionSettingsStore =
         DataStoreRemoteConnectionSettingsStore(applicationContext, AndroidKeystoreSecretCipher())
@@ -112,6 +118,7 @@ class AppContainer(context: Context) {
         listOf(
             RoomHistoryProjectionStore(database.historyRecordTable()),
             RoomInterceptProjectionStore(database.interceptRecordTable()),
+            RoomRepeaterProjectionStore(database.repeaterRecordTable()),
         )
 
     private val atomicUnitOfWork = RoomAtomicUnitOfWork(database)
@@ -192,6 +199,9 @@ class AppContainer(context: Context) {
     /** 拦截项的读端口。 */
     val interceptRepository: InterceptRepository = RoomInterceptRepository(database.interceptRecordTable())
 
+    /** Repeater 请求的读端口。 */
+    val repeaterRepository: RepeaterRepository = RoomRepeaterRepository(database.repeaterRecordTable())
+
     /** 主面板汇总：由历史投影、拦截投影与连接状态三路合并而来。 */
     val dashboardRepository: DashboardRepository =
         ProjectionDashboardRepository(
@@ -234,12 +244,93 @@ class AppContainer(context: Context) {
             technicalLog = technicalLog,
         )
 
+    /**
+     * Repeater 写入端口。
+     *
+     * 同 [remoteHistoryScopeWriter]：地址端口就在 [connectionSettingsStore] 里，它对本模块之外不可见，
+     * 因此「把请求文本推到哪台机器的 Repeater」只能在这里定。
+     */
+    val remoteRepeaterWriter: RemoteRepeaterWriter =
+        RestRemoteRepeaterWriter(
+            remoteControlClient = remoteControlClient,
+            connectionSettingsStore = connectionSettingsStore,
+            technicalLog = technicalLog,
+        )
+
+    /**
+     * 桌面小部件读取连接状态的共享偏好桥。
+     *
+     * 主进程把 [connectionState] 收下来写到这里，小部件进程与未起主进程时的小部件都从这里读最近一次值。
+     * 不暴露给外部模块：状态写入口由 [AppContainer] 唯一持有，避免多个写入方互相覆盖。
+     */
+    private val widgetConnectionStateStore: WidgetConnectionStateStore =
+        WidgetConnectionStateStore(applicationContext)
+
+    // 桌面小部件状态同步任务：进程级作用域里挂一个收集器，新值落盘 + 触发系统刷新。
+    // 单独留个引用是为了在 stop() 时只取消这条而不动其他链路（虽然 stop() 也整批取消，这个引用更多是为可读性）。
+    private var widgetStateSyncJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * 桌面小部件读取主面板统计的共享偏好桥。
+     *
+     * 主进程把 [dashboardRepository] 的汇总收下来写到这里，统计小部件从这里读最近一次快照。
+     * 与 [widgetConnectionStateStore] 同一份写入唯一策略：写入口由 [AppContainer] 唯一持有。
+     */
+    private val widgetDashboardStore: WidgetDashboardStore =
+        WidgetDashboardStore(applicationContext)
+
+    // 统计小部件同步任务：与连接状态同步任务对称，各自独立引用便于可读性。
+    private var widgetDashboardSyncJob: kotlinx.coroutines.Job? = null
+
     private val hasStarted = AtomicBoolean(false)
 
     /** 启动后台链路：按本地日志校准续传基准，若已配对则直接建连。进程启动时调用一次。 */
     fun start() {
         if (!hasStarted.compareAndSet(false, true)) return
         processScope.launch { restoreSynchronisationBaselineAndConnect() }
+        observeConnectionStateForWidget()
+        observeDashboardSummaryForWidget()
+    }
+
+    /**
+     * 把 [connectionState] 同步到 [widgetConnectionStateStore]，再让 [BurpRemoteAppWidgetProvider] 刷一次。
+     *
+     * 这里挂在 [processScope] 上：进程活着就跟着刷，进程被收掉那段时间里小部件显示最近一次写入的值，
+     * 等下次系统调度或用户点开应用时再续上。同步策略是「每值都写」，不去重——状态机取值有限，
+     * 重复写同一个值在磁盘上是幂等的，多写一次远比漏写最后一次断开态更安全。
+     */
+    private fun observeConnectionStateForWidget() {
+        if (widgetStateSyncJob?.isActive == true) return
+        widgetStateSyncJob =
+            processScope.launch {
+                connectionState.collect { state ->
+                    widgetConnectionStateStore.write(state)
+                    // 刷新放在 IO 调度器：AppWidgetManager.updateAppWidget 走跨进程 IPC，
+                    // 在 Default 上排队会拖慢事件摄入那条更重要的链路。
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        BurpRemoteAppWidgetProvider.refresh(applicationContext)
+                    }
+                }
+            }
+    }
+
+    /**
+     * 把 [dashboardRepository] 的汇总同步到 [widgetDashboardStore]，再让 [BurpRemoteStatsWidgetProvider] 刷一次。
+     *
+     * 与连接状态同步对称：每值都写，不去重——三个计数里任何一个变了都该让小部件知道，
+     * 去重反而可能漏掉最后一次计数变化。刷新同样走 IO 调度器，避免占着 Default 拖慢事件摄入。
+     */
+    private fun observeDashboardSummaryForWidget() {
+        if (widgetDashboardSyncJob?.isActive == true) return
+        widgetDashboardSyncJob =
+            processScope.launch {
+                dashboardRepository.observeDashboardSummary().collect { summary ->
+                    widgetDashboardStore.write(summary)
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        BurpRemoteStatsWidgetProvider.refresh(applicationContext)
+                    }
+                }
+            }
     }
 
     /**
@@ -266,11 +357,13 @@ class AppContainer(context: Context) {
             dashboardRepository = dashboardRepository,
             historyRepository = historyRepository,
             interceptRepository = interceptRepository,
+            repeaterRepository = repeaterRepository,
             settingsRepository = settingsRepository,
             remoteControlClient = remoteControlClient,
             remotePairingCoordinator = remotePairingCoordinator,
             remoteHistoryMessageReader = remoteHistoryMessageReader,
             remoteHistoryScopeWriter = remoteHistoryScopeWriter,
+            remoteRepeaterWriter = remoteRepeaterWriter,
             // 日志端口由壳分给各屏，各屏不再各自去拿全局日志。
             technicalLog = technicalLog,
         )

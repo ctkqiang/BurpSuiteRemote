@@ -15,6 +15,20 @@
     <string name="settings_theme_dark">Бараан</string>
     <string name="settings_theme_dark_detail">Систем цайвар ч бараан өнгийг хадгална. Шөнө нүдэнд зөөлөн.</string>
 
+    <string name="settings_flavor_heading">Өнгөний амт</string>
+    <string name="settings_flavor_headline">8 палитр, иж бүрдэл адил</string>
+    <string name="settings_flavor_detail">Дүрслэл өнгө нийтлэл өнгө л өөрчлөгдөж, бүтэц өөрчлөгдөхгүй. Амт бүр цайвар, бараан хоёр хувилбартай бөгөөд дээрх сэдвийг дагана.</string>
+    <string name="settings_flavor_selected">Сонгогдсон</string>
+
+    <string name="settings_flavor_burp_classic">Burp Классик</string>
+    <string name="settings_flavor_cyber_cyan">Кибер Цайх</string>
+    <string name="settings_flavor_forest_emerald">Ойн Нүүдэл</string>
+    <string name="settings_flavor_royal_violet">Ханны Ягаан</string>
+    <string name="settings_flavor_rose_gold">Улаан Алт</string>
+    <string name="settings_flavor_ocean_blue">Тэнгэрийн Цэнхэр</string>
+    <string name="settings_flavor_solar_amber">Нарны Шар</string>
+    <string name="settings_flavor_monochrome">Монохром</string>
+
     <string name="settings_language_title">Хэл</string>
     <string name="settings_language_subtitle">Дэлгэц болон мессеж бүрийн хэл</string>
     <string name="settings_language_heading">Интерфейсийн хэл</string>

@@ -1,0 +1,50 @@
+@startuml connection-en
+
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipant underline
+skinparam sequenceLifeLineBorderColor #4A90D9
+
+title Connection Lifecycle (Resume + Disconnect)
+
+participant "Android App" as App
+participant "Remote WebSocket\nServer" as WS
+participant "InMemoryRemote\nEventStream" as ES
+participant "PairedDevice\nRegistry" as PDR
+
+== CONNECT ==
+App -> WS: open WebSocket\nws://host:9000/v1/events
+WS -> PDR: verify deviceIdentifier
+PDR --> WS: registered
+
+== AUTHENTICATE ==
+WS --> App: auth challenge
+
+== RESUME ==
+App -> WS: resume from\nlastSequenceNumber
+WS -> ES: observeEvents(from = N)
+ES --> WS: event stream
+
+== EVENT STREAM ==
+loop real-time
+    ES -> WS: event (N+1)
+    WS -> App: push event
+    App -> App: journal write\n+ projection
+end
+
+== DISCONNECT (mobile closed) ==
+App -> WS: WebSocket Close frame\n(NonCancellable)
+par concurrent read
+    WS -> WS: detect Close frame\nfrom incoming
+else
+    ES -> WS: (stream ends)
+end
+WS -> PDR: disassociateDevice()
+WS -> WS: closeConnection()
+WS -> WS: release connection slot
+
+note over WS, PDR: teardown is immediate\nno 30s ping timeout wait
+
+@end

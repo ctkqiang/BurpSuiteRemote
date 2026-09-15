@@ -15,6 +15,20 @@
     <string name="settings_theme_dark">ダーク</string>
     <string name="settings_theme_dark_detail">システムがライトでもダーク配色を維持します。夜は目にやさしくなります。</string>
 
+    <string name="settings_flavor_heading">カラーフレーバー</string>
+    <string name="settings_flavor_headline">8種類のパレット、同じレイアウト</string>
+    <string name="settings_flavor_detail">アクセントカラーと全体の色合いだけが変わり、構造は同じです。各フレーバーにライト版とダーク版があり、上のテーマに従います。</string>
+    <string name="settings_flavor_selected">選択中</string>
+
+    <string name="settings_flavor_burp_classic">Burp クラシック</string>
+    <string name="settings_flavor_cyber_cyan">サイバーシアン</string>
+    <string name="settings_flavor_forest_emerald">フォレストエメラルド</string>
+    <string name="settings_flavor_royal_violet">ロイヤルバイオレット</string>
+    <string name="settings_flavor_rose_gold">ローズゴールド</string>
+    <string name="settings_flavor_ocean_blue">オーシャンブルー</string>
+    <string name="settings_flavor_solar_amber">ソーラーアンバー</string>
+    <string name="settings_flavor_monochrome">モノクローム</string>
+
     <string name="settings_language_title">言語</string>
     <string name="settings_language_subtitle">すべての画面とメッセージの言語</string>
     <string name="settings_language_heading">インターフェース言語</string>

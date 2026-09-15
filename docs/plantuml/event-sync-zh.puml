@@ -1,0 +1,45 @@
+@startuml event-sync-zh
+
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Helvetica
+skinparam shadowing false
+skinparam activityBorderColor #4A90D9
+skinparam activityBackgroundColor #E8F0FE
+
+title 事件同步与续传流程
+
+start
+
+:Burp 代理观测到\n新请求/响应;
+
+:HistoryPublisher.appendEvent();
+note right
+  InMemoryRemoteEventStream
+  分配全局
+  单调递增序号
+end note
+
+:WebSocket 推送给\n已连接的客户端;
+
+if (客户端在线?) then (是)
+  :客户端收到事件;
+  :JournalEventIngestor\n写入 Room 数据库;
+  :投影更新\nViewModel 状态;
+  :Compose 界面重渲染;
+else (否)
+  :事件留在内存中\n(1024 条环形缓冲区);
+  if (客户端在缓冲区内\n重连?) then (是)
+    :客户端发送从\nlastSequenceNumber 续传;
+    :服务器重放\n缺失的事件;
+    :客户端摄入\n所有间隙;
+  else (否, 缓冲区已滚过)
+    :服务器返回\n「需要重新同步」;
+    :客户端调用\nGET /v1/snapshot;
+    :全量快照写入\nRoom 数据库;
+    :客户端从新的\n高水位续传;
+  endif
+endif
+
+stop
+
+@end

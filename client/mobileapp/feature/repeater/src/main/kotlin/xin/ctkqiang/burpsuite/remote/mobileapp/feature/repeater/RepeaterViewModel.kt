@@ -1,3 +1,5 @@
+// Repeater 屏的状态持有者。
+
 package xin.ctkqiang.burpsuite.remote.mobileapp.feature.repeater
 
 import androidx.lifecycle.ViewModel
@@ -18,17 +20,17 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.SilentTechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLog
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogCategory
 import xin.ctkqiang.burpsuite.remote.mobileapp.core.logging.TechnicalLogEvent
-import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.ConnectionState
-import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.DashboardRepository
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.model.RepeaterRecord
+import xin.ctkqiang.burpsuite.remote.mobileapp.domain.repository.RepeaterRepository
 
 /**
- * 重放屏的状态持有者。
+ * Repeater 请求列表的状态持有者。
  *
- * 这一屏唯一能读的事实是连接状态，它来自主面板汇总里的同一路来源——重放本来就要有实时会话，
- * 因此在状态可用之前，界面只能如实说明缺什么，不能摆出可点的执行按钮。
+ * 仓库只读；执行命令走独立命令通路（plan §43 的 execute），不从这里绕过去（rules.md §5.1）。
+ * 下拉刷新是一次真正的重读：重建订阅，盘上最新的那份重新发一遍。
  */
 class RepeaterViewModel(
-    private val dashboardRepository: DashboardRepository,
+    private val repeaterRepository: RepeaterRepository,
     private val technicalLog: TechnicalLog = SilentTechnicalLog,
 ) : ViewModel() {
     private val refreshRequest = MutableStateFlow(REFRESH_GENERATION_INITIAL)
@@ -57,15 +59,15 @@ class RepeaterViewModel(
     }
 
     private fun requestRefresh() {
-        record(category = TechnicalLogCategory.UserInterface, message = "下拉刷新触发：重新读取连接状态")
+        record(category = TechnicalLogCategory.UserInterface, message = "下拉刷新触发：重新读取 Repeater 投影")
         isRefreshing.value = true
         refreshRequest.update { generation -> generation + 1 }
     }
 
     private fun observeSources(): Flow<RepeaterLoad> {
         val loaded: Flow<RepeaterLoad> =
-            dashboardRepository.observeDashboardSummary().map { summary ->
-                RepeaterLoad.Loaded(connectionState = summary.connectionState)
+            repeaterRepository.observeRepeaterRecords().map { records ->
+                RepeaterLoad.Loaded(records = records)
             }
         return loaded.catch { throwable -> emit(RepeaterLoad.Failed(throwable = throwable)) }
     }
@@ -78,14 +80,14 @@ class RepeaterViewModel(
             is RepeaterLoad.Loaded ->
                 record(
                     category = TechnicalLogCategory.UserInterface,
-                    message = "连接状态读取完成",
-                    attributes = mapOf("connectionState" to load.connectionState.toString()),
+                    message = "Repeater 读取完成",
+                    attributes = mapOf("recordCount" to load.records.size.toString()),
                 )
 
             is RepeaterLoad.Failed ->
                 record(
                     category = TechnicalLogCategory.Failure,
-                    message = "连接状态读取失败",
+                    message = "Repeater 读取失败",
                     attributes = mapOf("failure" to load.throwable::class.java.simpleName),
                 )
         }
@@ -100,9 +102,9 @@ class RepeaterViewModel(
 
             is RepeaterLoad.Loaded ->
                 RepeaterUserInterfaceState(
-                    connectionState = load.connectionState,
                     hasLoaded = true,
                     isRefreshing = isRefreshing,
+                    records = load.records,
                 )
 
             is RepeaterLoad.Failed ->
@@ -129,7 +131,7 @@ class RepeaterViewModel(
         data object Loading : RepeaterLoad
 
         /** 读到了。 */
-        data class Loaded(val connectionState: ConnectionState) : RepeaterLoad
+        data class Loaded(val records: List<RepeaterRecord>) : RepeaterLoad
 
         /** 读不动了；异常只用于本地日志摘要。 */
         data class Failed(val throwable: Throwable) : RepeaterLoad

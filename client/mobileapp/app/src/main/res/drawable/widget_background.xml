@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  桌面小部件的背景：品牌橙的圆角面板。取值与 colors.xml 里的 ic_launcher_background 一致，
+  保证「桌面上小部件」与「启动器里的图标」是同一套品牌色，不闪两种橙。
+
+  圆角半径 16dp，与 :ui 模块 BurpRemoteSpacing.Large 在小尺寸下落在同一档视觉重量；
+  过小的半径让小部件看起来像贴纸，过大的半径会让按钮看起来被吃掉四角。
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FFFF6633" />
+    <corners android:radius="16dp" />
+</shape>

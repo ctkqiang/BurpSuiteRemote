@@ -72,7 +72,7 @@
     <string name="history_detail_reason_headline">Why this is missing</string>
     <string name="history_detail_action_share">Share or export</string>
     <string name="history_detail_action_send_to_repeater">Send to Repeater</string>
-    <string name="history_detail_reason_send_to_repeater">the client has no repeater-command port yet</string>
+    <string name="history_detail_reason_send_to_repeater">This client has no repeater-write port</string>
     <string name="history_detail_action_add_to_scope">Add host to scope</string>
     <string name="history_detail_reason_add_to_scope">the client has no scope-write port yet</string>
 
@@ -84,6 +84,15 @@
     <string name="history_detail_scope_conclusion_record_missing">Burp no longer holds this record</string>
     <string name="history_detail_scope_conclusion_malformed">Burp returned bytes this client cannot read</string>
     <string name="history_detail_scope_conclusion_refused">Burp declined this scope write</string>
+
+    <string name="history_detail_repeater_conclusion_sent">The request is now in Repeater</string>
+    <string name="history_detail_repeater_conclusion_not_paired">This device is not paired with Burp</string>
+    <string name="history_detail_repeater_conclusion_unreachable">Burp is unreachable right now</string>
+    <string name="history_detail_repeater_conclusion_not_supported">This plug-in build has no repeater endpoint</string>
+    <string name="history_detail_repeater_conclusion_writer_unavailable">This client has no repeater-write port</string>
+    <string name="history_detail_repeater_conclusion_message_not_loaded">The message body has not been fetched yet</string>
+    <string name="history_detail_repeater_conclusion_malformed">Burp returned bytes this client cannot read</string>
+    <string name="history_detail_repeater_conclusion_refused">Burp declined this repeater push</string>
 
     <string name="history_relative_just_now">just now</string>
     <plurals name="history_relative_seconds">

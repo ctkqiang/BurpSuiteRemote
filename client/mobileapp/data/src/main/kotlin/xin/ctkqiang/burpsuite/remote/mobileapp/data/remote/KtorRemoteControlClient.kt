@@ -158,6 +158,12 @@ class KtorRemoteControlClient(
         command: RemoteCommand,
     ): RemoteResult<Unit> = restClient.dispatch(configuration, command)
 
+    override suspend fun dispatchWithBody(
+        configuration: RemoteConnectionConfiguration,
+        command: RemoteCommand,
+        requestBody: String,
+    ): RemoteResult<Unit> = restClient.dispatchWithBody(configuration, command, requestBody)
+
     private suspend fun runReconnectionLoop(configuration: RemoteConnectionConfiguration) {
         var attemptNumber = 0
         while (true) {

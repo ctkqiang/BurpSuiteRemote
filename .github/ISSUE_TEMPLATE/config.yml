@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions / 讨论
+    url: https://github.com/ctkqiang/BurpsuiteRemote/discussions
+    about: General questions and ideas — head here before opening an issue. / 一般问题和想法先来这聊，别急着开 issue。
