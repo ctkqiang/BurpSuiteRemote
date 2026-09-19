@@ -1,200 +1,261 @@
 # Burp Remote
 
-用手机控制 Burp Suite。一个 Burp 扩展加一个 Android 应用，通过局域网把代理历史、拦截决策、Repeater 条目实时推到手机上。
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin)](https://kotlinlang.org) [![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?style=flat-square&logo=android)](https://developer.android.com) [![Burp Suite](https://img.shields.io/badge/Burp%20Suite-2025.x-FF6633?style=flat-square)](https://portswigger.net/burp) [![Version](https://img.shields.io/badge/Version-0.1.0-red?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/releases) [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) [![Made in China](https://img.shields.io/badge/Made%20in%20China-red?style=flat-square)]()
 
-![扩展已加载](docs/images/plugins_screenshot/1.png)
+**红队远程控制平台 | Red Team Remote Control Framework**
 
-![选择 JAR 加载](docs/images/plugins_screenshot/2.png)
-
-![配对二维码界面](docs/images/plugins_screenshot/3.png)
-
-![手机端主面板](docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg)
-
-![手机端连接界面](docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg)
+_一个 Burp Suite 扩展 + Android 应用，把代理历史、拦截决策、Repeater 条目实时搬到你的手机屏幕_
 
 [English](README.en.md)
 
-## 这是什么
+<table cellspacing="16">
+  <tr>
+    <td align="center"><img src="docs/images/plugins_screenshot/1.png" alt="扩展已加载" width="300"/><br/><b>扩展已加载</b></td>
+    <td align="center"><img src="docs/images/plugins_screenshot/2.png" alt="选择 JAR 加载" width="300"/><br/><b>选择 JAR 加载</b></td>
+    <td align="center"><img src="docs/images/plugins_screenshot/3.png" alt="配对二维码界面" width="300"/><br/><b>配对二维码界面</b></td>
+  </tr>
+  <tr>
+    <td colspan="3" align="center">
+      <span><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="手机端主面板" width="220"/><br/><b>手机端主面板</b></span>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="手机端连接界面" width="220"/><br/><b>手机端连接界面</b></span>
+    </td>
+  </tr>
+</table>
 
-Burp Remote 让你不用坐在电脑前就能操作 Burp。扩展在你的机器上开一个 WebSocket 事件流和 REST API，手机连上来之后可以浏览代理历史、放行或丢弃拦截到的请求、跑 Repeater 条目——全程不用碰笔记本。
+---
 
-举个场景：你在做渗透测试，Burp 开在笔记本上跑着代理。你想起身倒杯水，这时候拦截到了一个请求——手机上弹出来，你看了一眼，点「放行」，回来再看 Burp 里已经继续了。或者你在 Repeater 里调好了一个请求，在地铁上掏出手机看上一眼的执行结果。
+## 法律声明
 
-仓库里两部分：
+> **本工具仅供安全研究人员在获得书面授权的情况下进行安全评估、红蓝对抗、CTF 竞赛使用。** **未经授权对他人系统进行扫描/攻击/拦截测试属违法行为，使用者需自行承担一切法律责任。** **开发者在任何情况下不对使用者的违法行为负责。**
 
-- **`plugins/burp-remote-extension`** —— Burp Suite 的 Java 扩展（Kotlin 写的）。通过内存事件流发布事件，通过 HTTP REST API 接受控制命令。加载后在 Burp 里加一个 "Burp Remote" 标签页，里面有配对二维码和运行参数。
-- **`client/mobileapp`** —— Android 应用（Jetpack Compose，MVI 架构，Clean Architecture 分层）。连上扩展后把事件写入本地 Room 数据库，再通过状态驱动的界面渲染出来。支持离线浏览已同步的数据，重连后自动续传。
+---
 
-## 环境要求
+## 项目定位
 
-- JDK 17（Burp Suite 2025.x 跑在 17 上，更高版本的字节码加载时会被拒）
+Burp Remote 是一款面向红队/安全研究人员的 Burp Suite 远程扩展。它把 Burp 的代理历史、拦截队列、Repeater 三条工作流完整搬到 Android 手机上，让你不用坐在电脑前也能推进测试进度。
+
+```
+Burp 代理 → 事件溯源 → WebSocket 推送 → 手机端投影 → Compose 渲染
+```
+
+### 与其他方案的区别
+
+| 能力 | Burp Remote | 远程桌面 (RDP/VNC) | 桌面 Burp |
+|------|------------|-------------------|----------|
+| 原生手机体验 | 是 | 否（缩放卡顿） | 否 |
+| 代理历史实时推送 | 是 | 需手动刷新 | 是 |
+| 拦截放行/丢弃 | 是（一键） | 操作困难 | 是 |
+| Repeater 远程执行 | 是 | 操作困难 | 是 |
+| 离线浏览已同步数据 | 是 | 否 | 否 |
+| 桌面小部件 | 是 | 否 | 否 |
+| 8 套主题 + 液态玻璃 | 是 | 否 | 否 |
+| 多语言（5 种） | 是 | 部分 | 否 |
+
+---
+
+## 核心功能
+
+### 代理历史实时推送
+
+- WebSocket 事件流，历史条目毫秒级到达手机
+- 每条记录含方法、URL、状态码、时间戳
+- 点进详情看完整请求体 + 响应体
+
+### 拦截队列远程决策
+
+- Burp 拦截到的请求弹到手机上
+- 一键放行（Forward）/ 丢弃（Drop）/ 修改后放行
+- 决策回传 Burp 实际执行
+
+### Repeater 远程执行
+
+- 历史条目一键发到 Repeater
+- 手机端查看、编辑请求体
+- 执行结果（状态码、耗时、响应体）双向同步
+
+### 桌面小部件
+
+- 显示目标主机、实时请求数、拦截数、保存数
+- 点一下跳回主面板
+- 从 SharedPreferences 读快照，不依赖后台服务常驻
+
+### 8 套主题 + 液态玻璃
+
+- 明暗 3 档（跟随系统/浅色/深色）× 8 套口味，正交组合
+- 底部导航栏用 Haze 实时模糊 + 高光渐变 + 内阴影 + 浮起投影
+- 深浅色分别调参，见下文「主题系统」
+
+---
+
+## 快速开始
+
+### 环境要求
+
+- JDK 17（Burp 2025.x 跑在 17，更高字节码加载被拒）
 - Burp Suite 社区版或专业版（2025.x 及以上）
-- Android 手机，API 26（Android 8.0）及以上
-- 电脑和手机在同一个局域网里（扩展默认监听 `0.0.0.0:9000`）
+- Android 手机 API 26（Android 8.0）及以上
+- 电脑与手机同一局域网（扩展默认监听 `0.0.0.0:9000`）
 
-## 构建
-
-两个脚本搞定一切——找 JDK 17、跑质量闸门（ktlint + detekt + 单元测试）、打印产物路径。
-
-### 扩展 JAR
+### 构建插件 JAR
 
 ```bash
 scripts/build-burp-extension.sh
+# 产物：build/plugins/burp-remote-extension/libs/burp-remote-extension-0.1.0.jar
 ```
 
-产物：`build/plugins/burp-remote-extension/libs/burp-remote-extension-0.1.0.jar`
+在 Burp 加载：**Extensions → Installed → Add → Java → 选这个 JAR**。
 
-在 Burp 里加载：**Extensions → Installed → Add → Java → 选这个 JAR**。
-
-脚本会用 `packageExtension` 任务，它把 ktlint、detekt、单元测试和 shadowJar 绑成一个不可分割的动作——闸门红了就产不出 JAR，不会把不合格的构件交到你手上。
-
-### Android APK
+### 构建 Android APK
 
 ```bash
 scripts/build-mobile-app.sh
+# 产物：build/mobileapp/app/outputs/apk/debug/app-debug.apk
+adb install -r build/mobileapp/app/outputs/apk/debug/app-debug.apk
 ```
 
-产物：`build/mobileapp/app/outputs/apk/debug/app-debug.apk`
+两个脚本都接受 `JAVA_HOME_FOR_BUILD` 指定 JDK 17，附加参数透传 Gradle。
 
-安装：`adb install -r <路径>`
+### 配对
 
-两个脚本都接受 `JAVA_HOME_FOR_BUILD` 环境变量指定 JDK 17 路径，附加参数透传给 Gradle。
+1. 加载插件 JAR，它监听 `0.0.0.0:9000`
+2. 打开 Burp 的 "Burp Remote" 标签页，看到二维码 + 配对码
+3. 手机装 APK，扫码或手动输配对码
+4. 连接成功，事件开始同步
 
-## 用法
+配对码 8 位、5 分钟有效、去混淆字符集（无 I/O/0/1/L/U）。扫一次即登记设备身份，重连不用再扫。
 
-1. 在 Burp Suite 里加载扩展 JAR，它会在 `0.0.0.0:9000` 开始监听。
-2. 在 Burp 里打开 "Burp Remote" 标签页，看到配对二维码和配对码。
-3. 在手机上安装 APK，打开应用，扫二维码或手动输入配对码。
-4. 应用连上之后开始同步事件，完事。
+---
 
-配对码有效期 5 分钟，8 位字母数字（去掉了容易混淆的 I/O/0/1/L/U）。扫一次配对码后设备身份就登记在插件端了，以后重连不用再扫——除非你把配对登记清掉了。
+## REST API 详解
 
-连上之后能看到的东西：
+扩展在 `http://<你的IP>:9000` 暴露一组 REST 端点，WebSocket 事件流在 `ws://<你的IP>:9000/v1/events`。
 
-- **代理历史**：实时推送，每一条都有方法、URL、状态码、时间戳。点进去看请求体和响应体。
-- **拦截队列**：Burp 拦截到的请求会弹到手机上，你可以放行（Forward）或丢弃（Drop）。决策回传到 Burp 执行。
-- **Repeater**：从历史条目发到 Repeater，在手机上查看、编辑请求体、执行。执行结果（状态码、耗时、响应体）同步回来。
-
-## REST API
-
-扩展在 `http://<你的IP>:9000` 上开了一组 REST 端点，手机端用的就是这些：
+### 端点一览
 
 | 方法 | 路径 | 用途 |
 |------|------|------|
-| GET | `/v1/status` | 读取运行状态（协议版本、监听端口、已配对设备） |
+| GET | `/v1/status` | 运行状态（协议版本、端口、已配对设备） |
 | POST | `/v1/pair` | 提交配对码，换取设备身份 |
-| GET | `/v1/capabilities` | 读取服务端能力声明 |
-| GET | `/v1/snapshot` | 取全量快照（续传失败时用） |
-| GET | `/v1/history` | 读取代理历史列表 |
-| GET | `/v1/history/{id}` | 读取单条历史详情（请求体 + 响应体） |
-| POST | `/v1/scope/{id}` | 把历史条目发到 Repeater |
-| GET | `/v1/intercepts` | 读取拦截队列 |
-| GET | `/v1/intercepts/{id}` | 读取单条拦截详情 |
-| POST | `/v1/intercepts/{id}/forward` | 放行拦截 |
-| POST | `/v1/intercepts/{id}/drop` | 丢弃拦截 |
+| GET | `/v1/capabilities` | 服务端能力声明 |
+| GET | `/v1/snapshot` | 全量快照（续传失败时兜底） |
+| GET | `/v1/history` | 代理历史列表 |
+| GET | `/v1/history/{id}` | 单条历史（请求体 + 响应体） |
+| POST | `/v1/scope/{id}` | 历史条目发到 Repeater |
+| GET | `/v1/intercepts` | 拦截队列 |
+| GET | `/v1/intercepts/{id}` | 单条拦截详情 |
+| POST | `/v1/intercepts/{id}/forward` | 放行 |
+| POST | `/v1/intercepts/{id}/drop` | 丢弃 |
 | POST | `/v1/intercepts/{id}/modify` | 修改并放行 |
 | POST | `/v1/repeater` | 创建 Repeater 条目 |
-| GET | `/v1/repeaters` | 读取 Repeater 列表 |
-| GET | `/v1/repeaters/{id}` | 读取单条 Repeater 详情 |
+| GET | `/v1/repeaters` | Repeater 列表 |
+| GET | `/v1/repeaters/{id}` | 单条 Repeater 详情 |
 | POST | `/v1/repeaters/{id}/execute` | 执行 Repeater 请求 |
 
-WebSocket 事件流在 `ws://<你的IP>:9000/v1/events`。
-
-## 事件类型
-
-扩展通过 WebSocket 推送的事件：
+### 事件类型
 
 | 事件类型 | 来源 | 含义 |
 |---------|------|------|
-| `history.item.observed` | 代理历史发布器 | Burp 代理历史里新增或更新了一条记录 |
-| `intercept.created` | 拦截代理处理器 | 拦截到了一个新请求 |
+| `history.item.observed` | 代理历史发布器 | 历史新增/更新 |
+| `intercept.created` | 拦截代理处理器 | 拦截到新请求 |
 | `intercept.forwarded` | 拦截代理处理器 | 请求被放行 |
 | `intercept.dropped` | 拦截代理处理器 | 请求被丢弃 |
-| `repeater.created` | REST API | 新建了一个 Repeater 条目 |
-| `repeater.execution.started` | REST API | Repeater 请求开始执行 |
-| `repeater.execution.completed` | REST API | Repeater 请求执行完成 |
+| `repeater.created` | REST API | 新建 Repeater 条目 |
+| `repeater.execution.started` | REST API | 执行开始 |
+| `repeater.execution.completed` | REST API | 执行完成 |
 
-每条事件带一个全局单调递增的序号，手机端用它做断点续传。
+每条事件带全局单调递增序号，供手机端断点续传。
 
-## 架构
+### WebSocket 握手
+
+握手顺序固定：
+
+```
+CONNECT → AUTHENTICATE → RESUME → 事件流
+```
+
+连接数有上限，超限回 `TRY_AGAIN_LATER`。
+
+---
+
+## 技术架构
 
 ### 事件溯源
 
-扩展用事件溯源模型。每一条代理观测、拦截决策、Repeater 操作都会打上一个单调递增的序号，通过 WebSocket 推给已连接的客户端。序号由 `InMemoryRemoteEventStream` 集中分配——历史、拦截、Repeater 三个发布者共用一把 AtomicLong。以前各自维护计数器，会撞号，导致事件在手机端的同步协调器里被判成重复投递而静默丢弃。
+扩展采用事件溯源模型：代理观测、拦截决策、Repeater 操作都打上单调递增序号，经 WebSocket 推给客户端。序号由 `InMemoryRemoteEventStream` 集中分配——历史、拦截、Repeater 三个发布者共用一把 `AtomicLong`。此前各自维护计数器会撞号，导致事件在手机端同步协调器被判重复投递而静默丢弃。
 
-事件流在内存里保留最近 1024 条，超出这个窗口的旧事件会被挤掉。手机短暂掉线（几秒到几十秒）再连上来，直接从断点的序号续传就行。如果掉线太久、窗口已经滚过去了，插件会要求手机取一次全量快照（`/v1/snapshot`），然后重新续传。
+事件流在内存保留最近 1024 条（环形缓冲）。短暂掉线直接按序号续传；掉线过久缓冲滚过，服务端要求客户端取 `/v1/snapshot` 全量快照再续传。
 
 ### 连接生命周期
 
-握手顺序固定为 CONNECT → AUTHENTICATE → RESUME → 事件流。
+断开是对称的：手机端发 WebSocket Close 帧（包 `NonCancellable` 确保发出），插件端并发读 `incoming` 帧即时感知，立刻拆会话、释放连接名额、撤销设备关联——不等 30 秒 ping 超时。
 
-认证靠设备身份：配对成功后插件颁发一个 `DeviceIdentifier`，以后每次连上来都要带上这个身份。不在已配对登记处里的设备一律拒绝。
+### 目录结构
 
-连接断开是对称的：手机端发 WebSocket Close 帧（包在 `NonCancellable` 里确保发出），插件端并发读 `incoming` 帧来及时感知，立刻拆会话、释放连接名额、撤销设备关联。不用等 ping 超时（最多 30 秒）才清理。
+```
+BurpsuiteRemote/
+├── plugins/burp-remote-extension/      # Burp 扩展（Kotlin，JDK 17）
+│   ├── src/main/                       # 生产代码
+│   │   ├── adapter/                    # 历史/拦截/Repeater 适配器
+│   │   ├── transport/                  # HTTP 服务器、WS 服务器、事件流、限流
+│   │   ├── security/                   # 配对服务、设备登记处
+│   │   └── protocol/                   # 协议契约（端口、消息类型）
+│   ├── src/test/                       # 单元测试
+│   └── src/harness/                    # 端到端夹具（不依赖 Burp）
+├── client/mobileapp/                   # Android 应用（Compose，MVI）
+│   ├── app/                            # 入口、导航、DI、小部件
+│   ├── data/                           # 仓储实现、Room、Ktor 客户端
+│   ├── domain/                         # 用例、实体、设置、连接状态
+│   ├── ui/                             # 主题（8 口味 × 2 明暗）、设计系统
+│   ├── core/                           # 共享 model / protocol / common
+│   └── feature/                        # 9 个功能模块
+│       ├── connection/                 # 扫码配对
+│       ├── dashboard/                  # 主面板
+│       ├── history/                    # 代理历史
+│       ├── intercept/                  # 拦截队列
+│       ├── repeater/                   # Repeater
+│       ├── settings/                   # 主题与配置
+│       ├── sharing/                    # 分享
+│       ├── screenshot/                 # 截图
+│       └── archive/                    # 归档
+├── scripts/                            # 构建脚本（需 JDK 17）
+├── .github/                            # 发版工作流 + 双语 issue 模板
+└── docs/                               # 截图 + PlantUML 图表
+```
 
-### 安全措施
+### 架构图
 
-| 措施 | 做了什么 |
-|------|---------|
+<table cellspacing="16">
+  <tr>
+    <td align="center"><img src="docs/images/diagrams/architecture-zh.png" alt="架构总览" width="420"/><br/><b>架构总览</b></td>
+    <td align="center"><img src="docs/images/diagrams/pairing-zh.png" alt="配对流程" width="420"/><br/><b>配对流程</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/images/diagrams/connection-zh.png" alt="连接生命周期" width="420"/><br/><b>连接生命周期</b></td>
+    <td align="center"><img src="docs/images/diagrams/event-sync-zh.png" alt="事件同步与续传" width="420"/><br/><b>事件同步与续传</b></td>
+  </tr>
+</table>
+
+---
+
+## 安全设计
+
+| 措施 | 实现 |
+|------|------|
 | 设备配对 | 一次性配对码，5 分钟过期，去混淆字符集（无 I/O/0/1/L/U） |
-| 身份认证 | 每次连接都要带设备身份，不在登记处里就拒 |
-| 限流 | 按设备令牌桶，突发 20 条，稳态每秒 5 条 |
-| 幂等 | 操作 ID 去重，重试拿回首次结果而不是重复执行 |
-| 审计日志 | 每条命令的设备、类型、操作 ID、结果都记 |
-| 局域网 | 不做 TLS（插件端只提供明文端点），默认不暴露到公网 |
+| 身份认证 | 每次连接携带 `DeviceIdentifier`，未登记设备一律拒绝 |
+| 限流 | 按设备令牌桶：突发 20 条，稳态 5 条/秒 |
+| 幂等 | 操作 ID 去重，重试返回首次结果而非重复执行 |
+| 审计日志 | 每条命令记录设备、类型、操作 ID、结果 |
+| 局域网 | 明文 HTTP（无 TLS），默认不暴露公网 |
 
-### 手机端分层
-
-手机端按 Clean Architecture 分四层：
-
-- **app** —— 入口、导航、依赖注入容器、前台服务、桌面小部件
-- **data** —— 仓储实现、Room 数据库、Ktor 客户端、事件摄入器
-- **domain** —— 用例、实体、设置、连接状态枚举
-- **ui** —— 主题系统、设计系统、共享组件
-
-功能按屏幕拆成独立模块（`feature/` 下），每个模块只依赖 domain 和 ui，不直接碰 data。
-
-## 技术图表
-
-以下图表的 PlantUML 源文件在 `docs/plantuml/`，渲染输出在 `docs/images/diagrams/`。
-
-### 架构总览
-
-![架构总览](docs/images/diagrams/architecture-zh.png)
-
-### 配对流程
-
-![配对流程](docs/images/diagrams/pairing-zh.png)
-
-### 连接生命周期
-
-![连接生命周期](docs/images/diagrams/connection-zh.png)
-
-### 事件同步与续传
-
-![事件同步与续传](docs/images/diagrams/event-sync-zh.png)
-
-## 功能模块
-
-| 模块 | 干什么 |
-|------|--------|
-| `feature/connection` | 扫码配对、连接状态显示 |
-| `feature/dashboard` | 主面板：连接状态、统计摘要、导航入口 |
-| `feature/history` | 代理历史列表 + 详情（请求体、响应体） |
-| `feature/intercept` | 拦截队列：查看、放行、丢弃、修改 |
-| `feature/repeater` | Repeater 列表 + 详情 + 创建 + 执行 |
-| `feature/settings` | 主题（明暗 + 8 套口味）、连接配置 |
-| `feature/sharing` | 分享请求/响应 |
-| `feature/screenshot` | 截图 |
-| `feature/archive` | 归档 |
+---
 
 ## 主题系统
 
-明暗和口味是两件正交的事：明暗决定底色深浅，口味决定强调色和整体色调。
+明暗与口味正交：明暗定底色深浅，口味定强调色与整体色调。
 
-明暗三档：跟随系统、浅色、深色。
-
-八套口味：
+明暗三档：跟随系统 / 浅色 / 深色。
 
 | 口味 | 强调色 | 调性 |
 |------|--------|------|
@@ -207,19 +268,31 @@ WebSocket 事件流在 `ws://<你的IP>:9000/v1/events`。
 | Solar Amber | 琥珀 `#FBBF24` | 落日暖调 |
 | Monochrome | 无彩色 | 最克制 |
 
-每套口味都有浅色和深色两份配色，语义色（成功=绿、警告=黄、危险=红、信息=蓝）跨口味保持一致，代码高亮色也跨口味统一。
+语义色（成功=绿、警告=黄、危险=红、信息=蓝）跨口味统一；代码高亮色跨口味统一。
 
-底部导航栏用液态玻璃效果（Haze 实时模糊 + 半透明表面 + 顶部高光渐变 + 底部内阴影 + 浮起投影），深色和浅色下参数分别调过。
+底部导航栏液态玻璃：Haze 实时模糊 + 半透明表面 + 顶部高光渐变 + 底部内阴影 + 浮起投影，深浅色分别调参。
 
-## 桌面小部件
+---
 
-手机上有个 Android 桌面小部件，显示目标主机、实时请求数、拦截数、保存数。点一下跳进主面板。小部件从 SharedPreferences 读快照，不依赖后台服务常驻。
+## 开发指南
 
-## 多语言
+### 技术栈
 
-支持五种语言：英语（默认）、中文、德语、日语、蒙古语。所有功能模块的 strings.xml 都有对应翻译。
+**扩展**：Kotlin、Ktor 3.1.3（CIO 服务器 + WebSocket + 内容协商）、kotlinx.serialization 1.8.1、ZXing（二维码）、Montoya Burp API。构建用 Gradle + Shadow 打 fat JAR，质量闸门 ktlint + detekt。
 
-## 发版
+**Android 应用**：Kotlin 2.2.0、Jetpack Compose（BOM 2025.11.00）、Haze 1.5.3（液态玻璃）、Room 2.8.4、Ktor 3.1.3 客户端、DataStore 1.1.7、CameraX 1.6.2 + MLKit 17.3.0（扫码）、MVI 单向数据流。minSdk 26 / targetSdk 36。
+
+### 编译与测试
+
+```bash
+# 插件（含质量闸门）
+scripts/build-burp-extension.sh
+
+# 手机端
+scripts/build-mobile-app.sh
+```
+
+### 发版
 
 打 tag 触发 GitHub Actions：
 
@@ -228,54 +301,48 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-CI 会用 JDK 17 编插件 JAR（带质量闸门）和 APK，挂到 GitHub Release 上。
+CI 用 JDK 17 编 JAR（带闸门）+ APK，挂 GitHub Release。
 
-## 项目结构
+---
 
-```
-.
-├── plugins/
-│   └── burp-remote-extension/     # Burp 扩展（Kotlin，JDK 17）
-│       ├── src/main/              # 生产代码
-│       ├── src/test/              # 单元测试
-│       └── src/harness/           # 端到端夹具（不依赖 Burp）
-├── client/
-│   └── mobileapp/                 # Android 应用（Compose，MVI）
-│       ├── app/                   # 入口、导航、依赖注入容器、小部件
-│       ├── data/                  # 仓储实现、Room、Ktor 客户端
-│       ├── domain/                # 用例、实体、设置、连接状态
-│       ├── ui/                    # 主题（8 口味 × 2 明暗）、设计系统
-│       ├── core/                  # 共享：model、protocol、common
-│       └── feature/              # 功能模块（9 个屏幕）
-│           ├── connection/        # 扫码配对
-│           ├── dashboard/         # 主面板
-│           ├── history/          # 代理历史
-│           ├── intercept/        # 拦截队列
-│           ├── repeater/         # Repeater
-│           ├── settings/         # 主题与配置
-│           ├── sharing/          # 分享
-│           ├── screenshot/       # 截图
-│           └── archive/          # 归档
-├── scripts/                       # 构建脚本（需要 JDK 17）
-│   ├── build-burp-extension.sh
-│   ├── build-mobile-app.sh
-│   └── lib/                      # 脚本共用库（JDK 解析）
-├── .github/
-│   ├── workflows/release.yml     # tag 触发发版
-│   └── ISSUE_TEMPLATE/           # 双语 issue 模板
-└── docs/                          # 截图
-```
+## 实战场景
 
-## 技术栈
+### 场景 1：离机拦截决策
 
-**扩展**：Kotlin、Ktor（CIO 服务器 + WebSocket + 内容协商）、kotlinx.serialization（JSON）、ZXing（二维码）、Montoya Burp API。构建用 Gradle + Shadow 插件打 fat JAR，质量闸门 ktlint + detekt。
+Burp 在笔记本跑代理，起身离开时拦截到请求——手机弹出，看一眼点「放行」，Burp 继续。
 
-**Android 应用**：Kotlin、Jetpack Compose、Haze（液态玻璃模糊效果）、Room（本地数据库）、Ktor 客户端（WebSocket + REST）、DataStore（偏好持久化）、CameraX + MLKit（二维码扫描）、MVI 模式单向数据流。构建用 Gradle，minSdk 26，targetSdk 36。
+### 场景 2：地铁上复核 Repeater
 
-## 许可证
+在 Repeater 调好的请求，出门后掏出手机看最新执行结果（状态码、耗时、响应体）。
 
-MIT
+### 场景 3：离线浏览历史
 
-## 作者
+网络断开时仍能浏览已同步的代理历史，重连后自动续传补齐。
 
-钟智强 (Johnmelodyme)
+---
+
+## 常见问题
+
+**Q: 手机连不上？** A: 确认两端同一局域网，插件监听 `0.0.0.0:9000`，检查防火墙放行 9000 端口。
+
+**Q: 配对码过期？** A: 配对码 5 分钟有效，重新生成即可。
+
+**Q: 历史条目没同步到 Repeater？** A: 确认用的是修复序号撞号后的构建；旧版本三个发布器独立计数会静默丢事件。
+
+**Q: 支持 IPv6 吗？** A: 默认 IPv4，局域网内 `0.0.0.0` 监听即可覆盖。
+
+---
+
+**如果这个工具帮到了你，请给它一个星标！**
+
+**红队利器，为国护网**
+
+---
+
+## 支持
+
+如果您觉得本项目对您有帮助，欢迎 Star / Fork，您的支持是我持续维护和改进的动力。
+
+---
+
+基于 Kotlin 构建 · Compose 液态玻璃 UI · 事件溯源设计 · ctkqiang

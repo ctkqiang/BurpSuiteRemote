@@ -44,7 +44,10 @@ class MontoyaInterceptedRequest(
             put(LISTENER_PORT_FIELD, listenerPortOf(interceptedRequest.listenerInterface()))
             put(OCCURRED_AT_EPOCH_MILLISECONDS_FIELD, occurredAtEpochMilliseconds)
             putAbsentableText(SOURCE_IP_ADDRESS_FIELD, safeHostAddressOf(interceptedRequest.sourceIpAddress()))
-            putAbsentableText(DESTINATION_IP_ADDRESS_FIELD, safeHostAddressOf(interceptedRequest.destinationIpAddress()))
+            putAbsentableText(
+                DESTINATION_IP_ADDRESS_FIELD,
+                safeHostAddressOf(interceptedRequest.destinationIpAddress()),
+            )
             put(IS_IN_SCOPE_FIELD, interceptedRequest.isInScope())
         }
 

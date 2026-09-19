@@ -57,8 +57,9 @@ object RepeaterProjectionReducer : ProjectionReducer<RepeaterProjectionState> {
                     updatedAt = event.occurredAt,
                     requestText = attributes.text(REQUEST_TEXT_FIELD) ?: record.requestText,
                     tabName = attributes.text(TAB_NAME_FIELD) ?: record.tabName,
-                    createdAt = attributes.long(CREATED_AT_FIELD)?.let { Instant.ofEpochMilli(it) }
-                        ?: record.createdAt,
+                    createdAt =
+                        attributes.long(CREATED_AT_FIELD)?.let { Instant.ofEpochMilli(it) }
+                            ?: record.createdAt,
                 )
             EventType.REPEATER_EXECUTION_STARTED ->
                 record.copy(
@@ -71,8 +72,9 @@ object RepeaterProjectionReducer : ProjectionReducer<RepeaterProjectionState> {
                     sequenceNumber = event.sequenceNumber,
                     updatedAt = event.occurredAt,
                     isExecuting = false,
-                    lastExecutedAt = attributes.long(LAST_EXECUTED_AT_FIELD)?.let { Instant.ofEpochMilli(it) }
-                        ?: event.occurredAt,
+                    lastExecutedAt =
+                        attributes.long(LAST_EXECUTED_AT_FIELD)?.let { Instant.ofEpochMilli(it) }
+                            ?: event.occurredAt,
                     lastStatusCode = attributes.integer(LAST_STATUS_CODE_FIELD) ?: record.lastStatusCode,
                     lastDurationMilliseconds = attributes.long(LAST_DURATION_FIELD) ?: record.lastDurationMilliseconds,
                     lastExecutionFailed = attributes.boolean(EXECUTION_FAILED_FIELD) ?: record.lastExecutionFailed,

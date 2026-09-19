@@ -55,7 +55,10 @@ class BurpInterceptQueue {
     }
 
     /** Montoya handler 在 runBlocking 里调用：挂起直到手机命令到达或超时。 */
-    suspend fun awaitDecision(messageId: Int, timeout: Long): InterceptDecision? {
+    suspend fun awaitDecision(
+        messageId: Int,
+        timeout: Long,
+    ): InterceptDecision? {
         val deferred =
             synchronized(lock) {
                 pendingDecisions[messageId] ?: return null

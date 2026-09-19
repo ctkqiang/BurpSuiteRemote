@@ -22,5 +22,8 @@ fun interface RemoteRepeaterWriter {
      *
      * 结局由 [RemoteResult] 原样带出，界面据此把「没配对」「连不上」「插件还没做」分开说。
      */
-    suspend fun sendToRepeater(requestText: String, tabName: String?): RemoteResult<Unit>
+    suspend fun sendToRepeater(
+        requestText: String,
+        tabName: String?,
+    ): RemoteResult<Unit>
 }

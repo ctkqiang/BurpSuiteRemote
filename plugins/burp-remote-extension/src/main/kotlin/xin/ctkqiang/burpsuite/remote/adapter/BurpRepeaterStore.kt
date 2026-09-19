@@ -14,6 +14,7 @@ import java.time.Instant
  * 用 `montoyaApi.http().sendRequest()` 真发出去。
  */
 data class StoredRepeaterRequest(
+    /** 唯一标识；格式 `repeater_<epochMillis>`，由 [BurpRepeaterStore.create] 分配。 */
     val identifier: RepeaterRequestIdentifier,
     /** 完整 HTTP 请求文本（请求行 + 头部 + 空行 + 可选 body）；供 `HttpRequest.httpRequest()` 重新解析。 */
     val requestText: String,
@@ -68,8 +69,7 @@ class BurpRepeaterStore {
         synchronized(lock) { requests[identifier.value] }
 
     /** 所有条目（按创建顺序）；REST GET /v1/repeaters 用。 */
-    fun snapshot(): List<StoredRepeaterRequest> =
-        synchronized(lock) { requests.values.toList() }
+    fun snapshot(): List<StoredRepeaterRequest> = synchronized(lock) { requests.values.toList() }
 
     /** 更新最近一次执行结果；execute 完成后由调用方传入实际 response。 */
     fun updateWithResult(

@@ -16,7 +16,6 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeFlavor
  * - 代码高亮色跨口味统一，避免换口味时代码阅读节奏被打乱。
  */
 object BurpRemoteFlavourPalettes {
-
     /** 浅色基底：纯白背景，极浅灰表面，细描边。 */
     private val lightBase =
         LightBase(
@@ -45,7 +44,10 @@ object BurpRemoteFlavourPalettes {
      * @param flavor 用户选的口味。
      * @param isDark 取浅色还是深色那一份。
      */
-    fun schemeFor(flavor: ThemeFlavor, isDark: Boolean): BurpRemoteColourScheme =
+    fun schemeFor(
+        flavor: ThemeFlavor,
+        isDark: Boolean,
+    ): BurpRemoteColourScheme =
         when (flavor) {
             ThemeFlavor.BurpClassic -> if (isDark) burpClassicDark else burpClassicLight
             ThemeFlavor.CyberCyan -> if (isDark) cyberCyanDark else cyberCyanLight

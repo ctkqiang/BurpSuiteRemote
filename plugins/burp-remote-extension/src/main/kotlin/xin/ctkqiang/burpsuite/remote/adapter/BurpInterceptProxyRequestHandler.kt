@@ -19,7 +19,6 @@ import xin.ctkqiang.burpsuite.remote.protocol.RemoteEventEnvelope
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteProtocolVersion
 import xin.ctkqiang.burpsuite.remote.transport.InMemoryRemoteEventStream
 import java.time.Clock
-import java.time.Instant
 
 /**
  * Montoya ProxyRequestHandler 实现——拦截 HTTP 请求、挂起等待手机命令、按决策返回 Burp Action。
@@ -42,7 +41,6 @@ class BurpInterceptProxyRequestHandler(
     private val clock: Clock,
     private val awaitTimeoutSeconds: Long = DEFAULT_AWAIT_TIMEOUT_SECONDS,
 ) : ProxyRequestHandler {
-
     // 序号由 InMemoryRemoteEventStream 统一分配，这里不再维护计数器。
 
     override fun handleRequestReceived(request: InterceptedRequest): ProxyRequestReceivedAction {
@@ -119,10 +117,11 @@ class BurpInterceptProxyRequestHandler(
                 is InterceptDecision.Forward -> INTERCEPT_FORWARDED_EVENT_TYPE
                 is InterceptDecision.Drop -> INTERCEPT_DROPPED_EVENT_TYPE
             }
-        val decisionText = when (decision) {
-            is InterceptDecision.Forward -> DECISION_FORWARD
-            is InterceptDecision.Drop -> DECISION_DROP
-        }
+        val decisionText =
+            when (decision) {
+                is InterceptDecision.Forward -> DECISION_FORWARD
+                is InterceptDecision.Drop -> DECISION_DROP
+            }
         val payload =
             kotlinx.serialization.json.buildJsonObject {
                 put(INTERCEPT_IDENTIFIER_FIELD, JsonPrimitive(interceptIdentifier.value))

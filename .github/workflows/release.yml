@@ -1,7 +1,11 @@
 name: Release
 
 # 打 tag（v0.1.0 这种）就触发：编插件 JAR 和手机 APK，挂到 GitHub Release 上。
-# 不跑测试——CI 平时已经在跑，发版只是打包；万一闸门红了就不该打 tag。
+#
+# 插件走 packageExtension（ktlint + detekt + 单元测试 + shadowJar 绑成一个动作），
+# 保证「有产物」与「产物合格」同义；APK 走 assembleDebug。
+# 产物目录被 plugins/build.gradle.kts 与 client/mobileapp/build.gradle.kts 重定向到
+# 仓库根的 build/ 下，收集步骤的 find 路径跟着这个约定走。
 
 on:
   push:
@@ -23,7 +27,7 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Gradle
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build extension JAR
@@ -37,13 +41,12 @@ jobs:
       - name: Gather artifacts
         run: |
           mkdir -p artifacts
-          cp build/plugins/burp-remote-extension/libs/burp-remote-extension-*.jar \
-             $(ls build/plugins/burp-remote-extension/libs/*.jar | grep -v plain) \
-             artifacts/ 2>/dev/null || true
-          # 只留 fat JAR，plain 的扔掉
-          find build/plugins/burp-remote-extension/libs -name '*.jar' ! -name '*-plain.jar' \
-             -exec cp {} artifacts/ \;
-          cp build/mobileapp/app/outputs/apk/debug/*.apk artifacts/
+          # 只取 fat JAR，跳过不带依赖的 -plain 瘦 JAR
+          find build/plugins/burp-remote-extension/libs -maxdepth 1 \
+            -name '*.jar' ! -name '*-plain.jar' -exec cp {} artifacts/ \;
+          find build/mobileapp/app/outputs/apk/debug -maxdepth 1 \
+            -name '*.apk' -exec cp {} artifacts/ \;
+          ls -la artifacts/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

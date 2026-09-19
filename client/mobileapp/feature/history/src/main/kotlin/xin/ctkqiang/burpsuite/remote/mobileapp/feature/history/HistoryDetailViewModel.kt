@@ -237,16 +237,17 @@ class HistoryDetailViewModel(
             }
 
             val requestBody = message.requestBody
-            val requestText = buildString {
-                append(requestHeaders)
-                if (!requestBody.isNullOrBlank()) {
-                    if (!requestHeaders.endsWith("\n")) {
+            val requestText =
+                buildString {
+                    append(requestHeaders)
+                    if (!requestBody.isNullOrBlank()) {
+                        if (!requestHeaders.endsWith("\n")) {
+                            append("\r\n")
+                        }
                         append("\r\n")
+                        append(requestBody)
                     }
-                    append("\r\n")
-                    append(requestBody)
                 }
-            }
 
             repeaterConclusionState.value =
                 when (val result = writer.sendToRepeater(requestText, tabName = REPEATER_TAB_NAME)) {

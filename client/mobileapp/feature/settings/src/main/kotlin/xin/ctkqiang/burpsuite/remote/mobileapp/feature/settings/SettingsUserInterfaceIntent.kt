@@ -11,5 +11,6 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
  */
 sealed interface SettingsUserInterfaceIntent {
     data class SelectThemeMode(val themeMode: ThemeMode) : SettingsUserInterfaceIntent
+
     data class SelectThemeFlavor(val themeFlavor: ThemeFlavor) : SettingsUserInterfaceIntent
 }

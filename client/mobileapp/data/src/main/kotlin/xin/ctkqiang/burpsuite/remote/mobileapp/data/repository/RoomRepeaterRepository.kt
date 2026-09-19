@@ -17,9 +17,7 @@ class RoomRepeaterRepository(
     override fun observeRepeaterRecords(): Flow<List<RepeaterRecord>> =
         repeaterRecordTable.observeAll().map { entities -> entities.map { entity -> entity.toDomain() } }
 
-    override fun observeRepeaterRecord(
-        repeaterRequestIdentifier: RepeaterRequestIdentifier,
-    ): Flow<RepeaterRecord?> =
+    override fun observeRepeaterRecord(repeaterRequestIdentifier: RepeaterRequestIdentifier): Flow<RepeaterRecord?> =
         repeaterRecordTable
             .observeByIdentifier(repeaterRequestIdentifier.value)
             .map { entity -> entity?.toDomain() }

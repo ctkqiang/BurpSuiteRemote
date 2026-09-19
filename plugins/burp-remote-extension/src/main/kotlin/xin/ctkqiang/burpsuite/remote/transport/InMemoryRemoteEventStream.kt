@@ -2,13 +2,13 @@
 
 package xin.ctkqiang.burpsuite.remote.transport
 
-import java.util.concurrent.atomic.AtomicLong
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import xin.ctkqiang.burpsuite.remote.protocol.EventIdentifier
 import xin.ctkqiang.burpsuite.remote.protocol.RemoteEventEnvelope
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * 事件流的内存实现。

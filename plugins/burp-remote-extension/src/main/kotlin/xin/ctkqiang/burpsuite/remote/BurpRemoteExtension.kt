@@ -5,6 +5,7 @@ package xin.ctkqiang.burpsuite.remote
 import burp.api.montoya.BurpExtension
 import burp.api.montoya.MontoyaApi
 import burp.api.montoya.core.Registration
+import burp.api.montoya.http.message.requests.HttpRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -121,14 +122,7 @@ class BurpRemoteExtension : BurpExtension {
                 interceptQueue = interceptQueue,
                 repeaterStore = repeaterStore,
                 montoyaHttp = montoyaApi.http(),
-                sendToRepeater = { request, tabName ->
-                    // Burp Repeater 的 sendToRepeater：tabName 传 null 或具体标签名。
-                    if (tabName != null) {
-                        montoyaApi.repeater().sendToRepeater(request, tabName)
-                    } else {
-                        montoyaApi.repeater().sendToRepeater(request)
-                    }
-                },
+                sendToRepeater = { request, tabName -> sendToRepeater(montoyaApi, request, tabName) },
             )
 
         // 先启动端点再建界面：界面要显示的是真实状态，晚一步启动会让它显示一瞬「未启动」。
@@ -138,42 +132,29 @@ class BurpRemoteExtension : BurpExtension {
         historyEventPublisher.start()
 
         val statusPanel =
-            RemoteStatusPanel(
-                extensionName = EXTENSION_NAME,
+            createStatusPanel(
                 clock = clock,
-                // 语言在这里解析一次再注入，控件内部不读环境，于是它成了可替换的输入而不是隐式依赖。
-                locale = Locale.getDefault(),
-                // 界面每次刷新都现读，服务真被端口占用而没起来时，界面不会替它说谎。
-                isRemoteServerRunning = remoteHttpServer::isRunning,
-                pairingTicketSupplier = devicePairingService::openPairingSession,
-                pairedDeviceSupplier = pairedDeviceRegistry::snapshot,
-                // 用 lambda 而不是方法引用：移除方法返回是否命中，而面板只关心请求已发出、随后重读列表。
-                pairedDeviceRevoker = { deviceIdentifier ->
-                    pairedDeviceRegistry.removePairedDevice(deviceIdentifier)
-                },
+                devicePairingService = devicePairingService,
+                pairedDeviceRegistry = pairedDeviceRegistry,
+                remoteHttpServer = remoteHttpServer,
             )
 
         // 标签页继承 Burp 当前主题，否则在深色模式下会是一块刺眼的浅色区域。
         montoyaApi.userInterface().applyThemeToComponent(statusPanel)
 
         // 只加载 JAR 不会产生任何界面，标签页必须在此显式注册。
-        val suiteTabRegistration: Registration =
-            montoyaApi.userInterface().registerSuiteTab(EXTENSION_NAME, statusPanel)
+        val suiteTabRegistration = montoyaApi.userInterface().registerSuiteTab(EXTENSION_NAME, statusPanel)
 
         montoyaApi.extension().registerUnloadingHandler {
-            // 先停历史事件：卸载后任何残留回调再去读代理历史，就会在已卸下扩展的 Burp 上抛错。
-            historyEventPublisher.stop()
-            historySweepScope.cancel()
-            // 先清拦截队列：让所有挂起的 handler 解挂（默认 Forward），再 deregister handler，
-            // 避免 handler 还在执行时 queue 就被回收的竞态。
-            interceptQueue.clear()
-            repeaterStore.clear()
-            interceptHandlerRegistration.deregister()
-            // 先停服务器：端口与线程不清干净时，重新加载扩展会因为端口仍被自己占用而启动失败。
-            remoteHttpServer.stop()
-            // 卸载时主动摘掉标签页：Burp 不替扩展回收组件，留着会残留界面，重载时还会叠出两个同名标签页。
-            suiteTabRegistration.deregister()
-
+            unloadResources(
+                historyEventPublisher = historyEventPublisher,
+                historySweepScope = historySweepScope,
+                interceptQueue = interceptQueue,
+                repeaterStore = repeaterStore,
+                interceptHandlerRegistration = interceptHandlerRegistration,
+                remoteHttpServer = remoteHttpServer,
+                suiteTabRegistration = suiteTabRegistration,
+            )
             montoyaApi.logging().logToOutput("Burp Remote 正在卸载：$EXTENSION_NAME")
         }
     }
@@ -190,6 +171,65 @@ class BurpRemoteExtension : BurpExtension {
             rateLimiter = RemoteDeviceRateLimiter(clock),
             auditLogger = RemoteAuditLogger(montoyaApi.logging()::logToOutput),
         )
+
+    // 状态面板装配独立成方法：语言、服务状态、配对票据这些输入都由 initialize 显式传入。
+    private fun createStatusPanel(
+        clock: Clock,
+        devicePairingService: DevicePairingService,
+        pairedDeviceRegistry: PairedDeviceRegistry,
+        remoteHttpServer: RemoteHttpServer,
+    ): RemoteStatusPanel =
+        RemoteStatusPanel(
+            extensionName = EXTENSION_NAME,
+            clock = clock,
+            // 语言在这里解析一次再注入，控件内部不读环境，于是它成了可替换的输入而不是隐式依赖。
+            locale = Locale.getDefault(),
+            // 界面每次刷新都现读，服务真被端口占用而没起来时，界面不会替它说谎。
+            isRemoteServerRunning = remoteHttpServer::isRunning,
+            pairingTicketSupplier = devicePairingService::openPairingSession,
+            pairedDeviceSupplier = pairedDeviceRegistry::snapshot,
+            // 用 lambda 而不是方法引用：移除方法返回是否命中，而面板只关心请求已发出、随后重读列表。
+            pairedDeviceRevoker = { deviceIdentifier ->
+                pairedDeviceRegistry.removePairedDevice(deviceIdentifier)
+            },
+        )
+
+    // 卸载清理单独成方法：拆卸顺序与装配顺序相反，注释跟着逻辑走而不是堆在 initialize 里。
+    private fun unloadResources(
+        historyEventPublisher: BurpHistoryEventPublisher,
+        historySweepScope: CoroutineScope,
+        interceptQueue: BurpInterceptQueue,
+        repeaterStore: BurpRepeaterStore,
+        interceptHandlerRegistration: Registration,
+        remoteHttpServer: RemoteHttpServer,
+        suiteTabRegistration: Registration,
+    ) {
+        // 先停历史事件：卸载后任何残留回调再去读代理历史，就会在已卸下扩展的 Burp 上抛错。
+        historyEventPublisher.stop()
+        historySweepScope.cancel()
+        // 先清拦截队列：让所有挂起的 handler 解挂（默认 Forward），再 deregister handler，
+        // 避免 handler 还在执行时 queue 就被回收的竞态。
+        interceptQueue.clear()
+        repeaterStore.clear()
+        interceptHandlerRegistration.deregister()
+        // 先停服务器：端口与线程不清干净时，重新加载扩展会因为端口仍被自己占用而启动失败。
+        remoteHttpServer.stop()
+        // 卸载时主动摘掉标签页：Burp 不替扩展回收组件，留着会残留界面，重载时还会叠出两个同名标签页。
+        suiteTabRegistration.deregister()
+    }
+
+    // Burp Repeater 的 sendToRepeater：tabName 传 null 或具体标签名。
+    private fun sendToRepeater(
+        montoyaApi: MontoyaApi,
+        request: HttpRequest,
+        tabName: String?,
+    ) {
+        if (tabName != null) {
+            montoyaApi.repeater().sendToRepeater(request, tabName)
+        } else {
+            montoyaApi.repeater().sendToRepeater(request)
+        }
+    }
 
     private companion object {
         // 产品名不参与本地化，Burp 的扩展列表只有英文，改名会和支持工单里记的扩展名对不上。
