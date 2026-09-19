@@ -15,11 +15,9 @@ _一个 Burp Suite 扩展 + Android 应用，把代理历史、拦截决策、Re
     <td align="center"><img src="docs/images/plugins_screenshot/3.png" alt="配对二维码界面" width="300"/><br/><b>配对二维码界面</b></td>
   </tr>
   <tr>
-    <td colspan="3" align="center">
-      <span><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="手机端主面板" width="220"/><br/><b>手机端主面板</b></span>
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <span><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="手机端连接界面" width="220"/><br/><b>手机端连接界面</b></span>
-    </td>
+    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="手机端主面板" width="220"/><br/><b>手机端主面板</b></td>
+    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="手机端连接界面" width="220"/><br/><b>手机端连接界面</b></td>
+    <td></td>
   </tr>
 </table>
 

@@ -15,11 +15,9 @@ _A Burp Suite extension + Android app that streams proxy history, intercept deci
     <td align="center"><img src="docs/images/plugins_screenshot/3.png" alt="Pairing screen" width="300"/><br/><b>Pairing screen</b></td>
   </tr>
   <tr>
-    <td colspan="3" align="center">
-      <span><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Mobile dashboard" width="220"/><br/><b>Mobile dashboard</b></span>
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <span><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Connection screen" width="220"/><br/><b>Connection screen</b></span>
-    </td>
+    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Mobile dashboard" width="220"/><br/><b>Mobile dashboard</b></td>
+    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Connection screen" width="220"/><br/><b>Connection screen</b></td>
+    <td></td>
   </tr>
 </table>
 
