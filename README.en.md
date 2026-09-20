@@ -1,12 +1,14 @@
 # Burp Remote
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin)](https://kotlinlang.org) [![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?style=flat-square&logo=android)](https://developer.android.com) [![Burp Suite](https://img.shields.io/badge/Burp%20Suite-2025.x-FF6633?style=flat-square)](https://portswigger.net/burp) [![Version](https://img.shields.io/badge/Version-0.1.0-red?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/releases) [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) [![Made in China](https://img.shields.io/badge/Made%20in%20China-red?style=flat-square)]()
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin)](https://kotlinlang.org) [![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?style=flat-square&logo=android)](https://developer.android.com) [![Burp Suite](https://img.shields.io/badge/Burp%20Suite-2025.x-FF6633?style=flat-square)](https://portswigger.net/burp) [![Version](https://img.shields.io/badge/Version-0.1.0-red?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/releases) [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) [![Made in China](https://img.shields.io/badge/Made%20in%20China-red?style=flat-square)]() [![Docs site](https://img.shields.io/badge/docs-online-FF6633?style=flat-square)](https://www.ctkqiang.xin/BurpsuiteRemote/) [![Last commit](https://img.shields.io/github/last-commit/ctkqiang/BurpsuiteRemote?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/commits/main) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/pulls)
 
 **Red Team Remote Control Framework | 红队远程控制平台**
 
 _A Burp Suite extension + Android app that streams proxy history, intercept decisions, and repeater entries to your phone in real time_
 
 [中文](README.md)
+
+**Docs site** · [online](https://www.ctkqiang.xin/BurpsuiteRemote/) · or just open `docs/index.html` in a browser — zero dependencies, no build step
 
 <table cellspacing="16">
   <tr>
@@ -20,6 +22,30 @@ _A Burp Suite extension + Android app that streams proxy history, intercept deci
     <td></td>
   </tr>
 </table>
+
+---
+
+## Contents
+
+- [Legal Notice](#legal-notice)
+- [Positioning](#positioning)
+- [Core Features](#core-features)
+- [Quick Start](#quick-start)
+  - [Requirements](#requirements)
+  - [Build the extension JAR](#build-the-extension-jar)
+  - [Build the Android APK](#build-the-android-apk)
+  - [Pairing](#pairing)
+- [REST API Reference](#rest-api-reference)
+- [Technical Architecture](#technical-architecture)
+- [Security Design](#security-design)
+- [Theme System](#theme-system)
+- [Developer Guide](#developer-guide)
+- [Real-world Scenarios](#real-world-scenarios)
+- [FAQ](#faq)
+- [Contributing](#contributing)
+- [Security Policy](#security-policy)
+- [License](#license)
+- [Support](#support)
 
 ---
 
@@ -340,6 +366,59 @@ With the network down, you can still browse already-synced history; reconnect an
 ## Support
 
 If you find this project useful, Star / Fork welcome — your support keeps it maintained and improving.
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome. Two files to read before you start:
+
+- [`.trae/rules.md`](.trae/rules.md) — the repository's binding rules: naming, comments, event
+  sourcing and layering. Where it conflicts with personal preference, it wins.
+- [`.trae/plan.md`](.trae/plan.md) — module responsibilities and design intent.
+
+Conventions:
+
+| Item | Requirement |
+|------|-------------|
+| Toolchain | JDK 17. Burp 2025.x rejects higher bytecode, so an extension built with any other JDK fails to load |
+| Static checks | `ktlint` + `detekt` are wired into the build: formatting is a build gate, not a review comment. Run `./gradlew ktlintCheck detekt` locally first |
+| Commit messages | Conventional Commits; scopes limited to `plugins` / `client` / `protocol` / `docs` / `build` |
+| Commit granularity | One logical change per commit; never mix formatting churn with behaviour changes |
+| Dependencies | Check `libs.versions.toml` for something reusable before adding a new one |
+| Never commit | Build output, keystores, `keystore.properties` or any local configuration |
+
+Please use the existing issue templates ([bug](.github/ISSUE_TEMPLATE/bug_report.md) ·
+[feature](.github/ISSUE_TEMPLATE/feature_request.md) ·
+[question](.github/ISSUE_TEMPLATE/question.md)) and include both the extension and mobile versions.
+
+---
+
+## Security Policy
+
+This tool remotely controls Burp Suite, and it assumes **the local network is trustworthy**:
+
+- Transport is plain HTTP with no TLS, and it is deliberately **not meant to be exposed to the
+  public internet**. Do not port-forward 9000, and do not use it on untrusted networks.
+- Pairing codes are single-use and expire after 5 minutes; every connection carries a device
+  identity and unregistered devices are rejected; control commands are rate-limited and
+  deduplicated by operation ID.
+- Archived originals stay byte-exact; redaction applies to exported copies only.
+
+To report a security issue, please **do not open a public issue**. Email
+`johnmelodymel@qq.com`, or use Security → Report a vulnerability on GitHub. Include reproduction
+steps and impact.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE) for the full text. Free to use, modify and redistribute, including
+commercially, provided the copyright and permission notice are retained.
+
+This project is for **authorised** security testing only. Scanning, attacking or intercepting
+systems without authorisation is illegal and the user bears full legal responsibility — see the
+[Legal Notice](#legal-notice) at the top.
 
 ---
 

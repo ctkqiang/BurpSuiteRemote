@@ -1,12 +1,14 @@
 # Burp Remote
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin)](https://kotlinlang.org) [![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?style=flat-square&logo=android)](https://developer.android.com) [![Burp Suite](https://img.shields.io/badge/Burp%20Suite-2025.x-FF6633?style=flat-square)](https://portswigger.net/burp) [![Version](https://img.shields.io/badge/Version-0.1.0-red?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/releases) [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) [![Made in China](https://img.shields.io/badge/Made%20in%20China-red?style=flat-square)]()
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin)](https://kotlinlang.org) [![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?style=flat-square&logo=android)](https://developer.android.com) [![Burp Suite](https://img.shields.io/badge/Burp%20Suite-2025.x-FF6633?style=flat-square)](https://portswigger.net/burp) [![Version](https://img.shields.io/badge/Version-0.1.0-red?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/releases) [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) [![Made in China](https://img.shields.io/badge/Made%20in%20China-red?style=flat-square)]() [![文档站](https://img.shields.io/badge/%E6%96%87%E6%A1%A3%E7%AB%99-%E5%9C%A8%E7%BA%BF%E7%89%88-FF6633?style=flat-square)](https://www.ctkqiang.xin/BurpsuiteRemote/) [![Last commit](https://img.shields.io/github/last-commit/ctkqiang/BurpsuiteRemote?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/commits/main) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/pulls)
 
 **红队远程控制平台 | Red Team Remote Control Framework**
 
 _一个 Burp Suite 扩展 + Android 应用，把代理历史、拦截决策、Repeater 条目实时搬到你的手机屏幕_
 
 [English](README.en.md)
+
+**文档站** · [在线版](https://www.ctkqiang.xin/BurpsuiteRemote/) · 或直接用浏览器打开 `docs/index.html`（零依赖、零构建）
 
 <table cellspacing="16">
   <tr>
@@ -20,6 +22,30 @@ _一个 Burp Suite 扩展 + Android 应用，把代理历史、拦截决策、Re
     <td></td>
   </tr>
 </table>
+
+---
+
+## 目录
+
+- [法律声明](#法律声明)
+- [项目定位](#项目定位)
+- [核心功能](#核心功能)
+- [快速开始](#快速开始)
+  - [环境要求](#环境要求)
+  - [构建插件 JAR](#构建插件-jar)
+  - [构建 Android APK](#构建-android-apk)
+  - [配对](#配对)
+- [REST API 详解](#rest-api-详解)
+- [技术架构](#技术架构)
+- [安全设计](#安全设计)
+- [主题系统](#主题系统)
+- [开发指南](#开发指南)
+- [实战场景](#实战场景)
+- [常见问题](#常见问题)
+- [贡献](#贡献)
+- [安全策略](#安全策略)
+- [许可证](#许可证)
+- [支持](#支持)
 
 ---
 
@@ -340,6 +366,54 @@ Burp 在笔记本跑代理，起身离开时拦截到请求——手机弹出，
 ## 支持
 
 如果您觉得本项目对您有帮助，欢迎 Star / Fork，您的支持是我持续维护和改进的动力。
+
+---
+
+## 贡献
+
+欢迎提交 Issue 与 Pull Request。动手之前请先读两份文件：
+
+- [`.trae/rules.md`](.trae/rules.md) —— 本仓库的绑定规则。命名、注释、事件溯源、分层依赖都在里面，
+  它与个人偏好冲突时以它为准
+- [`.trae/plan.md`](.trae/plan.md) —— 各模块的职责划分与设计意图
+
+约定：
+
+| 项目 | 要求 |
+|------|------|
+| 环境 | JDK 17。Burp 2025.x 拒绝更高版本的字节码，用其他 JDK 编出来的插件加载会失败 |
+| 静态检查 | `ktlint` + `detekt` 已接进构建：格式不是评审意见，而是构建闸门。本地先跑 `./gradlew ktlintCheck detekt` |
+| 提交信息 | Conventional Commits；scope 限 `plugins` / `client` / `protocol` / `docs` / `build` |
+| 提交粒度 | 一个逻辑改动一个提交，不要把格式化改动和行为改动混在一起 |
+| 依赖 | 新增依赖前先看版本目录 `libs.versions.toml` 里有没有可复用的 |
+| 禁止 | 不要提交构建产物、密钥库、`keystore.properties` 或任何本地配置 |
+
+提 Issue 请用现成模板（[缺陷](.github/ISSUE_TEMPLATE/bug_report.md) ·
+[需求](.github/ISSUE_TEMPLATE/feature_request.md) ·
+[提问](.github/ISSUE_TEMPLATE/question.md)），并附上插件与手机端的版本号。
+
+---
+
+## 安全策略
+
+本工具会远程控制 Burp Suite，它成立的**前提是局域网可信**：
+
+- 传输是明文 HTTP，没有 TLS，设计上也**不打算暴露到公网**。请不要把 9000 端口映射到公网，也不要
+  在不可信网络里使用。
+- 配对码一次性有效、5 分钟过期；每个连接都携带设备身份，未登记设备一律拒绝；控制类操作带限流与幂等去重。
+- 归档的原始数据保持字节精确，脱敏只作用于导出副本。
+
+发现安全问题请**不要开公开 Issue**，直接邮件联系 `johnmelodymel@qq.com`，或在 GitHub 的
+Security → Report a vulnerability 私下提交。请附复现步骤与影响范围。
+
+---
+
+## 许可证
+
+MIT，全文见 [LICENSE](LICENSE)。可自由使用、修改、分发（含商用），需保留版权与许可声明。
+
+本项目仅供**获得授权**的安全测试使用。未经授权对他人系统进行扫描、攻击或拦截测试属违法行为，
+使用者自行承担全部法律责任——见文首[法律声明](#法律声明)。
 
 ---
 
