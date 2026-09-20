@@ -1,24 +1,31 @@
 # Burp Remote
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin)](https://kotlinlang.org) [![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?style=flat-square&logo=android)](https://developer.android.com) [![Burp Suite](https://img.shields.io/badge/Burp%20Suite-2025.x-FF6633?style=flat-square)](https://portswigger.net/burp) [![Version](https://img.shields.io/badge/Version-0.1.0-red?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/releases) [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) [![Made in China](https://img.shields.io/badge/Made%20in%20China-red?style=flat-square)]() [![文档站](https://img.shields.io/badge/%E6%96%87%E6%A1%A3%E7%AB%99-%E5%9C%A8%E7%BA%BF%E7%89%88-FF6633?style=flat-square)](https://www.ctkqiang.xin/BurpsuiteRemote/) [![Last commit](https://img.shields.io/github/last-commit/ctkqiang/BurpsuiteRemote?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/commits/main) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/pulls)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin)](https://kotlinlang.org) [![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?style=flat-square&logo=android)](https://developer.android.com) [![Burp Suite](https://img.shields.io/badge/Burp%20Suite-2025.x-FF6633?style=flat-square)](https://portswigger.net/burp) [![Version](https://img.shields.io/badge/Version-0.1.0-red?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/releases) [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) [![Made in China](https://img.shields.io/badge/Made%20in%20China-red?style=flat-square)]() [![文档站](https://img.shields.io/badge/%E6%96%87%E6%A1%A3%E7%AB%99-%E5%9C%A8%E7%BA%BF%E7%89%88-FF6633?style=flat-square)](https://www.ctkqiang.xin/BurpSuiteRemote/) [![Last commit](https://img.shields.io/github/last-commit/ctkqiang/BurpsuiteRemote?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/commits/main) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/pulls)
 
 **红队远程控制平台 | Red Team Remote Control Framework**
 
 _一个 Burp Suite 扩展 + Android 应用，把代理历史、拦截决策、Repeater 条目实时搬到你的手机屏幕_
 
+**Burp Remote** 由两部分组成：跑在 Burp Suite 里的扩展（引擎）与 Android 客户端（遥控器）。
+Burp 负责全部计算，手机只发指令、看结果——代理历史毫秒级推到手机，拦截队列可一键放行、丢弃
+或改包后放行，Repeater 条目可随时执行并回看响应。
+
+适用于 Web 与移动端渗透测试、SRC 漏洞挖掘、CTF 等需要长时间挂代理抓包、又不想一直被绑在
+电脑前的场景。插件与客户端只在局域网内通信，不经过任何第三方服务。
+
 [English](README.en.md)
 
-**文档站** · [在线版](https://www.ctkqiang.xin/BurpsuiteRemote/) · 或直接用浏览器打开 `docs/index.html`（零依赖、零构建）
+**文档站** · [在线版](https://www.ctkqiang.xin/BurpSuiteRemote/) · 或直接用浏览器打开 `docs/index.html`（零依赖、零构建）
 
 <table cellspacing="16">
   <tr>
-    <td align="center"><img src="docs/images/plugins_screenshot/1.png" alt="扩展已加载" width="300"/><br/><b>扩展已加载</b></td>
-    <td align="center"><img src="docs/images/plugins_screenshot/2.png" alt="选择 JAR 加载" width="300"/><br/><b>选择 JAR 加载</b></td>
-    <td align="center"><img src="docs/images/plugins_screenshot/3.png" alt="配对二维码界面" width="300"/><br/><b>配对二维码界面</b></td>
+    <td align="center"><img src="docs/images/plugins_screenshot/1.png" alt="Burp Remote 扩展已在 Burp Suite 中加载完成，标签页显示运行状态" width="300"/><br/><b>扩展已加载</b></td>
+    <td align="center"><img src="docs/images/plugins_screenshot/2.png" alt="在 Burp Suite 的扩展加载界面里选择 Burp Remote 插件 JAR 文件" width="300"/><br/><b>选择 JAR 加载</b></td>
+    <td align="center"><img src="docs/images/plugins_screenshot/3.png" alt="Burp Remote 显示配对二维码，Android 客户端扫码完成设备配对" width="300"/><br/><b>配对二维码界面</b></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="手机端主面板" width="220"/><br/><b>手机端主面板</b></td>
-    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="手机端连接界面" width="220"/><br/><b>手机端连接界面</b></td>
+    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Burp Remote Android 客户端主面板：目标主机、实时请求数、拦截数与保存数" width="220"/><br/><b>手机端主面板</b></td>
+    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Burp Remote Android 客户端连接界面：填写插件地址并扫描二维码配对" width="220"/><br/><b>手机端连接界面</b></td>
     <td></td>
   </tr>
 </table>
@@ -217,7 +224,7 @@ CONNECT → AUTHENTICATE → RESUME → 事件流
 ### 目录结构
 
 ```
-BurpsuiteRemote/
+BurpSuiteRemote/
 ├── plugins/burp-remote-extension/      # Burp 扩展（Kotlin，JDK 17）
 │   ├── src/main/                       # 生产代码
 │   │   ├── adapter/                    # 历史/拦截/Repeater 适配器

@@ -541,7 +541,7 @@
 
   var STRUCTURE_TREE = {
     en: dedent(`
-      BurpsuiteRemote/
+      BurpSuiteRemote/
       ├── plugins/burp-remote-extension/      # Burp extension (Kotlin, JDK 17)
       │   ├── src/main/                       # production code
       │   │   ├── adapter/                    # history/intercept/repeater adapters
@@ -571,7 +571,7 @@
       └── docs/                               # screenshots + PlantUML diagrams
     `),
     zh: dedent(`
-      BurpsuiteRemote/
+      BurpSuiteRemote/
       ├── plugins/burp-remote-extension/      # Burp 扩展（Kotlin，JDK 17）
       │   ├── src/main/                       # 生产代码
       │   │   ├── adapter/                    # 历史/拦截/Repeater 适配器

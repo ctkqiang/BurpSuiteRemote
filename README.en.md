@@ -1,24 +1,34 @@
 # Burp Remote
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin)](https://kotlinlang.org) [![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?style=flat-square&logo=android)](https://developer.android.com) [![Burp Suite](https://img.shields.io/badge/Burp%20Suite-2025.x-FF6633?style=flat-square)](https://portswigger.net/burp) [![Version](https://img.shields.io/badge/Version-0.1.0-red?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/releases) [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) [![Made in China](https://img.shields.io/badge/Made%20in%20China-red?style=flat-square)]() [![Docs site](https://img.shields.io/badge/docs-online-FF6633?style=flat-square)](https://www.ctkqiang.xin/BurpsuiteRemote/) [![Last commit](https://img.shields.io/github/last-commit/ctkqiang/BurpsuiteRemote?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/commits/main) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/pulls)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-7F52FF?style=flat-square&logo=kotlin)](https://kotlinlang.org) [![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?style=flat-square&logo=android)](https://developer.android.com) [![Burp Suite](https://img.shields.io/badge/Burp%20Suite-2025.x-FF6633?style=flat-square)](https://portswigger.net/burp) [![Version](https://img.shields.io/badge/Version-0.1.0-red?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/releases) [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE) [![Made in China](https://img.shields.io/badge/Made%20in%20China-red?style=flat-square)]() [![Docs site](https://img.shields.io/badge/docs-online-FF6633?style=flat-square)](https://www.ctkqiang.xin/BurpSuiteRemote/) [![Last commit](https://img.shields.io/github/last-commit/ctkqiang/BurpsuiteRemote?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/commits/main) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/ctkqiang/BurpsuiteRemote/pulls)
 
 **Red Team Remote Control Framework | 红队远程控制平台**
 
 _A Burp Suite extension + Android app that streams proxy history, intercept decisions, and repeater entries to your phone in real time_
 
+**Burp Remote** is two pieces: an extension running inside Burp Suite (the engine) and an Android
+client (the remote). Burp does all the computation; the phone only sends commands and renders
+results — proxy history reaches your phone in milliseconds, intercepted requests can be forwarded,
+dropped or edited-and-forwarded with one tap, and Repeater entries can be executed and reviewed at
+any time.
+
+Built for web and mobile penetration testing, bug bounty hunting and CTF work where you keep the
+proxy running for hours and would rather not stay tied to your desk. The extension and client talk
+only to each other over your local network — no third-party service involved.
+
 [中文](README.md)
 
-**Docs site** · [online](https://www.ctkqiang.xin/BurpsuiteRemote/) · or just open `docs/index.html` in a browser — zero dependencies, no build step
+**Docs site** · [online](https://www.ctkqiang.xin/BurpSuiteRemote/) · or just open `docs/index.html` in a browser — zero dependencies, no build step
 
 <table cellspacing="16">
   <tr>
-    <td align="center"><img src="docs/images/plugins_screenshot/1.png" alt="Extension loaded" width="300"/><br/><b>Extension loaded</b></td>
-    <td align="center"><img src="docs/images/plugins_screenshot/2.png" alt="Selecting the JAR" width="300"/><br/><b>Selecting the JAR</b></td>
-    <td align="center"><img src="docs/images/plugins_screenshot/3.png" alt="Pairing screen" width="300"/><br/><b>Pairing screen</b></td>
+    <td align="center"><img src="docs/images/plugins_screenshot/1.png" alt="The Burp Remote extension loaded inside Burp Suite, showing its status tab" width="300"/><br/><b>Extension loaded</b></td>
+    <td align="center"><img src="docs/images/plugins_screenshot/2.png" alt="Selecting the Burp Remote plugin JAR in Burp Suite's extension loader" width="300"/><br/><b>Selecting the JAR</b></td>
+    <td align="center"><img src="docs/images/plugins_screenshot/3.png" alt="Burp Remote showing a pairing QR code to be scanned by the Android client" width="300"/><br/><b>Pairing screen</b></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Mobile dashboard" width="220"/><br/><b>Mobile dashboard</b></td>
-    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Connection screen" width="220"/><br/><b>Connection screen</b></td>
+    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Burp Remote Android client dashboard: target host, live request count, intercept count and saved count" width="220"/><br/><b>Mobile dashboard</b></td>
+    <td align="center"><img src="docs/images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg" alt="Burp Remote Android client connection screen: plugin address and QR pairing" width="220"/><br/><b>Connection screen</b></td>
     <td></td>
   </tr>
 </table>
@@ -217,7 +227,7 @@ Disconnection is symmetric: the mobile app sends a WebSocket Close frame (wrappe
 ### Directory Structure
 
 ```
-BurpsuiteRemote/
+BurpSuiteRemote/
 ├── plugins/burp-remote-extension/      # Burp extension (Kotlin, JDK 17)
 │   ├── src/main/                       # production code
 │   │   ├── adapter/                    # history/intercept/repeater adapters

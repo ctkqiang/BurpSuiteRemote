@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.ctkqiang.xin/BurpsuiteRemote/sitemap.xml
+Sitemap: https://www.ctkqiang.xin/BurpSuiteRemote/sitemap.xml

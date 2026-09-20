@@ -8,9 +8,10 @@
   <title>Burp Remote — Burp Suite remote control for Android</title>
 
   <!-- 站点根地址：canonical / og:url / og:image / twitter:image 四处都指向本仓库的 GitHub Pages。
-       该账号配了自定义域名，github.io 会 301 到 ctkqiang.xin，因此这里写自定义域名这一份。
-       若启用 Pages 后实际地址与此不同，只改这四处即可，其余元数据不用动。 -->
-  <link rel="canonical" href="https://www.ctkqiang.xin/BurpsuiteRemote/">
+       仓库名是 BurpSuiteRemote（大写 S），而 Pages 的项目路径区分大小写——实测大写返回 200、
+       小写返回 404，写错一个字母整站就不可达。该账号配了自定义域名，github.io 会跳转到
+       ctkqiang.xin，因此这里写自定义域名这一份。若上线地址变化，只改这四处即可。 -->
+  <link rel="canonical" href="https://www.ctkqiang.xin/BurpSuiteRemote/">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="author" content="钟智强">
   <meta name="theme-color" content="#0a0b0d" media="(prefers-color-scheme: dark)">
@@ -18,10 +19,10 @@
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Burp Remote">
-  <meta property="og:url" content="https://www.ctkqiang.xin/BurpsuiteRemote/">
+  <meta property="og:url" content="https://www.ctkqiang.xin/BurpSuiteRemote/">
   <meta property="og:title" content="Burp Remote — Burp Suite remote control for Android">
   <meta property="og:description" content="A Burp Suite extension and Android client that streams proxy history, intercept decisions and Repeater entries to your phone in real time.">
-  <meta property="og:image" content="https://www.ctkqiang.xin/BurpsuiteRemote/images/plugins_screenshot/1.png">
+  <meta property="og:image" content="https://www.ctkqiang.xin/BurpSuiteRemote/images/plugins_screenshot/1.png">
   <meta property="og:image:width" content="3360">
   <meta property="og:image:height" content="2100">
   <meta property="og:image:alt" content="The Burp Remote extension running inside Burp Suite">
@@ -31,7 +32,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Burp Remote — Burp Suite remote control for Android">
   <meta name="twitter:description" content="A Burp Suite extension and Android client that streams proxy history, intercept decisions and Repeater entries to your phone in real time.">
-  <meta name="twitter:image" content="https://www.ctkqiang.xin/BurpsuiteRemote/images/plugins_screenshot/1.png">
+  <meta name="twitter:image" content="https://www.ctkqiang.xin/BurpSuiteRemote/images/plugins_screenshot/1.png">
   <meta name="twitter:image:alt" content="The Burp Remote extension running inside Burp Suite">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0b0d'/%3E%3Cpath d='M8 22V10h6.4c2.6 0 4.2 1.3 4.2 3.5 0 1.7-.9 2.8-2.4 3.2 1.8.3 2.9 1.5 2.9 3.4 0 2.4-1.8 3.9-4.7 3.9H8Zm3-7.2h2.9c1 0 1.6-.5 1.6-1.3 0-.9-.6-1.3-1.6-1.3H11v2.6Zm0 5.1h3.1c1.1 0 1.7-.5 1.7-1.4 0-1-.6-1.5-1.7-1.5H11v2.9Z' fill='%23ff6b35'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,9 +52,9 @@
       "applicationCategory": "SecurityApplication",
       "operatingSystem": "Android 8.0+, Burp Suite 2025.x",
       "description": "A Burp Suite extension and Android client that streams proxy history, intercept decisions and Repeater entries to your phone in real time.",
-      "url": "https://github.com/ctkqiang/BurpsuiteRemote",
-      "codeRepository": "https://github.com/ctkqiang/BurpsuiteRemote",
-      "downloadUrl": "https://github.com/ctkqiang/BurpsuiteRemote/releases",
+      "url": "https://github.com/ctkqiang/BurpSuiteRemote",
+      "codeRepository": "https://github.com/ctkqiang/BurpSuiteRemote",
+      "downloadUrl": "https://github.com/ctkqiang/BurpSuiteRemote/releases",
       "license": "https://opensource.org/license/mit",
       "isAccessibleForFree": true,
       "inLanguage": ["en", "zh-CN", "de", "ja", "mn"],
@@ -112,7 +113,7 @@
       <ol class="toc-list" id="toc-list"></ol>
       <div class="toc-foot">
         <a class="toc-link" href="../README.md" data-i18n="toc.readme">Full README</a>
-        <a class="toc-link" href="https://github.com/ctkqiang/BurpsuiteRemote" target="_blank" rel="noopener">GitHub</a>
+        <a class="toc-link" href="https://github.com/ctkqiang/BurpSuiteRemote" target="_blank" rel="noopener">GitHub</a>
       </div>
     </aside>
 
@@ -125,7 +126,7 @@
           <p class="lede" data-i18n="hero.lede">A Burp Suite extension and an Android app that stream proxy history, intercept decisions and Repeater entries to your phone in real time — so the engagement keeps moving while you are away from the desk.</p>
           <div class="cta-row">
             <a class="btn btn-primary" href="../README.md" data-i18n="hero.ctaReadme">Read the README</a>
-            <a class="btn btn-ghost" href="https://github.com/ctkqiang/BurpsuiteRemote" target="_blank" rel="noopener" data-i18n="hero.ctaGithub">View on GitHub</a>
+            <a class="btn btn-ghost" href="https://github.com/ctkqiang/BurpSuiteRemote" target="_blank" rel="noopener" data-i18n="hero.ctaGithub">View on GitHub</a>
           </div>
           <ul class="chips">
             <li>Kotlin 2.2.0</li>
@@ -423,7 +424,7 @@ git push origin v0.1.0</code></pre>
         <p class="footer-links">
           <a href="../README.md">README</a>
           <a href="../README.en.md">README (English)</a>
-          <a href="https://github.com/ctkqiang/BurpsuiteRemote" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/ctkqiang/BurpSuiteRemote" target="_blank" rel="noopener">GitHub</a>
         </p>
       </footer>
     </main>
