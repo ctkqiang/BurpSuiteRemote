@@ -16,7 +16,11 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
-// group 与 version 一起决定产物文件名，也决定诊断信息里出现的那串坐标。
+// 发布产物的命名契约：{项目名}{版本号}.{扩展名}。
+// 手机端的 APK 与 AAB 沿用同一个项目名，于是发布页上三种产物一眼就能看出属于同一版本。
+val productName = "BurpRemote"
+
+// group 与 version 决定诊断信息里出现的那串坐标，也是上面产物名里版本号的唯一来源。
 group = "xin.ctkqiang.burpsuite.remote"
 version = "0.1.0"
 
@@ -161,8 +165,10 @@ tasks.named<Jar>("jar") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-    // 产物名不带任何后缀杂质：Burp 的扩展列表里显示的就是它。
-    archiveClassifier.set("")
+    // 文件名按「项目名紧接版本号」写死，而不是交给 archiveBaseName / archiveVersion / classifier
+    // 去拼接：默认拼接会插入连字符（BurpRemote-0.1.0.jar），与上面的命名契约不一致。
+    // 显式赋整名之后 classifier 已无作用，因此不必再额外清空它。
+    archiveFileName.set("$productName${project.version}.jar")
 
     // Ktor 通过 META-INF/services 查找引擎实现，多个依赖各自携带同名服务文件。
     // 不合并就会丢失其中一份，表现为引擎在运行期找不到，而编译期毫无征兆。
