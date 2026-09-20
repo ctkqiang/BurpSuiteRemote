@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<!--
+  Burpsuite Remote 隐私政策。
+
+  这份文件的用途不只是"有个页面可点"：Google Play 要求所有新应用在商店资料里填一个
+  可公开访问的隐私政策 URL，且描述、数据安全表与政策三处的说法必须互相一致，对不上
+  会在审核阶段被驳回。因此本页里的每一句都对应到代码里可核对的事实，尤其是：
+    · 权限清单   —— 取自 app 与 feature/connection 两个 AndroidManifest.xml
+    · 无统计/广告/崩溃上报 —— 取自 libs.versions.toml 的依赖表
+    · 相机仅用于扫码、无相机可手输配对码 —— 取自 uses-feature required="false"
+    · 数据存在设备本地、卸载即清除 —— 取自 Room 投影库与私有的 SharedPreferences
+  改动代码里这些事实时，必须同步改本页，否则就是三处说法不一致。
+
+  页面刻意不依赖 JavaScript 渲染正文：法律文本要能被爬虫和审核工具直接读到。
+  仅有的那段脚本只做一件事——沿用主站已保存的明暗主题偏好，避免从主站点进来时闪一下。
+-->
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Privacy policy for Burpsuite Remote, the Android client for the Burp Remote extension. The app collects no data: no analytics, no advertising, no crash reporting.">
+  <title>Privacy Policy — Burp Remote</title>
+  <link rel="canonical" href="https://www.ctkqiang.xin/BurpSuiteRemote/privacy.html">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0b0d'/%3E%3Cpath d='M8 22V10h6.4c2.6 0 4.2 1.3 4.2 3.5 0 1.7-.9 2.8-2.4 3.2 1.8.3 2.9 1.5 2.9 3.4 0 2.4-1.8 3.9-4.7 3.9H8Zm3-7.2h2.9c1 0 1.6-.5 1.6-1.3 0-.9-.6-1.3-1.6-1.3H11v2.6Zm0 5.1h3.1c1.1 0 1.7-.5 1.7-1.4 0-1-.6-1.5-1.7-1.5H11v2.9Z' fill='%23ff6b35'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+
+  <style>
+    /* 只补本页需要的长文排版；其余（配色变量、顶栏、页脚）全部复用 index.css */
+    .doc {
+      max-width: 80ch;
+      margin: 0 auto;
+      padding: calc(var(--bar-h) + 52px) clamp(20px, 5vw, 40px) 0;
+    }
+    .doc h1 {
+      margin: 10px 0 0;
+      font-family: var(--font-display);
+      font-size: clamp(30px, 4.6vw, 44px);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+    }
+    .doc h2 {
+      margin: 46px 0 12px;
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .doc h3 {
+      margin: 26px 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .doc p,
+    .doc li {
+      font-size: 15.5px;
+      line-height: 1.72;
+      color: var(--fg-dim);
+    }
+    .doc p { margin: 0 0 14px; }
+    .doc strong { color: var(--fg); font-weight: 600; }
+    .doc a { color: var(--accent); }
+    .doc ul { margin: 0 0 16px; padding-left: 22px; }
+    .doc li { margin-bottom: 8px; }
+    .doc code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--code-bg);
+      color: var(--code-fg);
+    }
+    .doc .meta {
+      margin-top: 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: var(--fg-faint);
+    }
+    .doc hr {
+      margin: 64px 0 0;
+      border: 0;
+      border-top: 1px solid var(--line);
+    }
+    .lang-nav {
+      display: flex;
+      gap: 14px;
+      margin-top: 26px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    .lang-nav a { color: var(--fg-faint); }
+    .lang-nav a:hover { color: var(--accent); }
+    .back { margin-left: auto; }
+  </style>
+
+  <script>
+    // 沿用主站的明暗偏好。读取失败（file:// 或隐私模式）就保持默认的深色，不报错、不闪烁。
+    try {
+      var saved = window.localStorage.getItem('burp-remote-docs:theme');
+      if (saved === 'light' || saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    } catch (error) { /* 存储不可用时保持默认主题 */ }
+  </script>
+</head>
+<body>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <svg class="brand-mark" viewBox="18 18 72 72" width="26" height="26" aria-hidden="true">
+        <rect x="18" y="18" width="72" height="72" rx="10" fill="#FF6633"/>
+        <g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M76,47 L76,40 L68,32 L40,32 L32,40 L32,68 L40,76 L68,76 L76,68 L76,61"/>
+          <path d="M43,54 L78,54"/>
+          <path d="M68,44 L78,54 L68,64"/>
+        </g>
+      </svg>
+      <span class="brand-text"><strong>Burp Remote</strong><em>Privacy</em></span>
+    </a>
+    <a class="back" href="index.html">← Documentation</a>
+  </header>
+
+  <main class="doc">
+
+    <p class="eyebrow">Legal</p>
+    <h1>Privacy Policy</h1>
+    <p class="meta">Effective 21 September 2026 · Applies to the Android app “Burpsuite Remote”</p>
+
+    <nav class="lang-nav">
+      <a href="#english">English</a>
+      <a href="#chinese">中文</a>
+      <a href="https://github.com/ctkqiang/BurpSuiteRemote" target="_blank" rel="noopener">Source code</a>
+    </nav>
+
+    <h2 id="english">Summary</h2>
+    <p><strong>The app collects no data about you.</strong> There is no account, no sign-up, no email address, no analytics, no advertising and no crash reporting. Nothing is sent to the developer or to any third party.</p>
+    <p>The app is a client for a Burp Suite extension that runs on your own computer. Everything it sends goes to that computer, over your own local network. Everything it stores stays in the app's private storage on your phone.</p>
+
+    <h2>Who we are</h2>
+    <p>Burpsuite Remote is an independent open-source project maintained by 钟智强 (ctkqiang). For any question about this policy or about data handling, write to <strong>johnmelodymel@qq.com</strong>.</p>
+    <p>This app is not affiliated with, endorsed by or sponsored by PortSwigger, the vendor of Burp Suite.</p>
+
+    <h2>What the app is</h2>
+    <p>Burpsuite Remote is the phone-side client of a two-part tool. The other part is an extension you load into Burp Suite on your computer. The extension does all the work — it reads proxy history, holds intercepted requests, and runs Repeater requests. The phone sends commands to the extension and displays the results. Without the extension, the app has nothing to talk to and does nothing on its own.</p>
+
+    <h2>Data the developer collects</h2>
+    <p><strong>None.</strong> The app makes no request to any server operated by the developer, and the developer has no way to see your traffic, your configuration or your device. Concretely, the app contains:</p>
+    <ul>
+      <li>no analytics or telemetry SDK;</li>
+      <li>no advertising SDK and no advertising identifier;</li>
+      <li>no crash-reporting service;</li>
+      <li>no account system, so there is nothing to sign in to and no personal details to hand over;</li>
+      <li>no user identifier, device identifier or advertising ID sent anywhere.</li>
+    </ul>
+
+    <h2>Data stored on your device</h2>
+    <p>The app keeps the following in its own private storage, which other apps cannot read:</p>
+    <ul>
+      <li><strong>Pairing state</strong> — a device identity created during pairing, and the network address of the Burp instance you paired with.</li>
+      <li><strong>Synced copies of proxy data</strong> — the proxy history entries, intercepted requests and Repeater entries that the extension has pushed to your phone, cached in a local database so you can browse them offline.</li>
+      <li><strong>Preferences</strong> — your theme, colour flavour and language choices.</li>
+      <li><strong>Widget snapshot</strong> — the small set of numbers the home screen and lock screen widgets display.</li>
+    </ul>
+    <p>Because proxy traffic can contain cookies, session tokens, credentials and personal data belonging to the systems you are testing, treat this local data with the same care as the traffic itself.</p>
+
+    <h2>Data the app sends off your device</h2>
+    <p>The app communicates only with the address you configure — your own Burp instance. That traffic is: commands you issue (forward, drop, modify, execute), requests for history details, and a WebSocket event stream carrying the changes Burp publishes.</p>
+    <p><strong>It does not go through any relay, cloud service or developer-operated server.</strong> Both devices must be on the same local network for the app to work at all.</p>
+    <p>Be aware that this connection is <strong>plain HTTP and WebSocket with no TLS</strong>, by design: it is meant for a trusted local network, and it is not encrypted on the wire. Anyone who can observe that local network can read the traffic. Do not use the app on a network you do not trust, and do not expose the extension's port to the internet.</p>
+
+    <h2>Camera</h2>
+    <p>The camera permission is requested for one purpose only: scanning the pairing QR code shown by the Burp extension.</p>
+    <ul>
+      <li>Camera frames are processed <strong>on the device</strong> by Google ML Kit's bundled barcode-scanning model. That model is shipped inside the app; it does not require Google Play services and it does not upload images.</li>
+      <li><strong>No photo, video or frame is ever stored or transmitted</strong> by the app.</li>
+      <li>The camera is not used while the app is in the background, and never without your action.</li>
+      <li>Devices without a camera can still install the app: the camera is declared as an optional feature, and you can pair by typing the code instead of scanning it.</li>
+    </ul>
+
+    <h2>Permissions and why they exist</h2>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Permission</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">INTERNET</td>
+            <td>Talk to your Burp instance over the local network. Without it the app cannot connect to anything.</td>
+          </tr>
+          <tr>
+            <td class="mono">CAMERA</td>
+            <td>Scan the pairing QR code. Optional — the code can be typed by hand.</td>
+          </tr>
+          <tr>
+            <td class="mono">FOREGROUND_SERVICE<br>FOREGROUND_SERVICE_CONNECTED_DEVICE</td>
+            <td>Keep the session with Burp alive while you use other apps, and show a notification explaining that this is happening.</td>
+          </tr>
+          <tr>
+            <td class="mono">POST_NOTIFICATIONS</td>
+            <td>Display that session notification on Android 13 and later. If you deny it, the session still works — you just will not see the notification.</td>
+          </tr>
+          <tr>
+            <td class="mono">CHANGE_NETWORK_STATE</td>
+            <td>Required by Android as a precondition for the connected-device foreground service type. The app does not modify your network configuration.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The app requests no access to your files, photos, contacts, calendar, location, microphone, call logs or SMS, and it contains no third-party advertising or tracking libraries.</p>
+
+    <h2>Retention and deletion</h2>
+    <p>There is nothing held by the developer to retain or delete. Data on your phone is kept only so the app can show you your own proxy data offline, and it disappears when you remove it:</p>
+    <ul>
+      <li><strong>Uninstalling the app</strong> removes all of it — database, preferences and pairing state. Nothing is left behind.</li>
+      <li><strong>Clearing storage</strong> in Android Settings → Apps → Burpsuite Remote → Storage has the same effect without uninstalling.</li>
+      <li><strong>Disconnecting or re-pairing</strong> in the app removes the pairing state and the cached data for that session.</li>
+    </ul>
+    <p>The app currently has no single in-app “delete everything” button; if you want one, ask and it will be added. Because the developer never receives your data, there is no server-side copy to request, export or erase.</p>
+
+    <h2>Children</h2>
+    <p>The app is a professional security-testing tool. It is not directed at children, it has no social features, and it collects no personal information from anyone, including children under 13.</p>
+
+    <h2>Security measures</h2>
+    <p>The design assumes the local network is trustworthy, and it does not pretend otherwise:</p>
+    <ul>
+      <li>Pairing codes are single-use and expire after five minutes.</li>
+      <li>Every connection carries a device identity; unregistered devices are rejected.</li>
+      <li>Commands are rate-limited per device and deduplicated by operation ID, so a retry cannot execute an action twice.</li>
+      <li>Every command is written to an audit log recording the device, command type, operation ID and result.</li>
+      <li>Archived traffic is never rewritten in place — redaction applies to exported copies only, so an export cannot silently alter the original evidence.</li>
+    </ul>
+
+    <h2>Your choices</h2>
+    <p>You control the data entirely. You choose which computer to connect to, you can revoke the camera and notification permissions at any time in Android settings, and you can erase everything by uninstalling or clearing storage. If you believe the app has somehow handled data in a way this policy does not describe, contact the address above and it will be investigated and corrected.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>If the app's data handling changes, this page is updated and its effective date is changed. Because the project is open source, every change is visible in the public commit history, and material changes are noted in the release notes.</p>
+
+    <h2>Contact</h2>
+    <p>Questions, corrections or concerns: <strong>johnmelodymel@qq.com</strong>. Source code and issue tracker: <a href="https://github.com/ctkqiang/BurpSuiteRemote" target="_blank" rel="noopener">github.com/ctkqiang/BurpSuiteRemote</a>.</p>
+
+    <hr>
+
+    <!-- ============================ 中文版 ============================ -->
+
+    <p class="eyebrow" id="chinese" style="margin-top:64px;">法律</p>
+    <h1>隐私政策</h1>
+    <p class="meta">生效日期 2026 年 9 月 21 日 · 适用于 Android 应用「Burpsuite Remote」</p>
+
+    <h2>摘要</h2>
+    <p><strong>本应用不收集你的任何数据。</strong>没有账号、无需注册、不索取邮箱，没有统计分析、没有广告、没有崩溃上报。任何数据都不会被发送给开发者或第三方。</p>
+    <p>本应用是运行在你自己电脑上的 Burp Suite 扩展的客户端。它发出的所有内容都只去往那台电脑，走你自己的局域网；它保存的所有内容都留在手机的私有存储里。</p>
+
+    <h2>关于我们</h2>
+    <p>Burpsuite Remote 是由钟智强（ctkqiang）维护的独立开源项目。对本政策或数据处理有任何疑问，请联系 <strong>johnmelodymel@qq.com</strong>。</p>
+    <p>本应用与 Burp Suite 的厂商 PortSwigger 无任何关联，未获其授权或赞助。</p>
+
+    <h2>这个应用是什么</h2>
+    <p>Burpsuite Remote 是一套两件式工具的手机端。另一半是加载在电脑上 Burp Suite 里的扩展。全部计算都由扩展完成——读取代理历史、暂存拦截请求、执行 Repeater 请求；手机只负责下发指令和展示结果。没有扩展，这个应用没有可通信的对象，单独运行什么也不做。</p>
+
+    <h2>开发者收集的数据</h2>
+    <p><strong>没有。</strong>本应用不向开发者运营的任何服务器发起请求，开发者也无从看到你的流量、配置或设备。具体而言，应用中不包含：</p>
+    <ul>
+      <li>统计分析或埋点 SDK；</li>
+      <li>广告 SDK，也不使用广告标识符；</li>
+      <li>崩溃上报服务；</li>
+      <li>账号体系——没有可登录之处，也就没有个人信息可提交；</li>
+      <li>任何被外发的用户标识、设备标识或广告 ID。</li>
+    </ul>
+
+    <h2>存放在你设备上的数据</h2>
+    <p>应用把以下内容存在自己的私有存储中，其他应用无法读取：</p>
+    <ul>
+      <li><strong>配对状态</strong>——配对时生成的设备身份，以及你所连接的那台 Burp 的网络地址。</li>
+      <li><strong>代理数据的同步副本</strong>——扩展推送到手机的历史条目、拦截请求与 Repeater 条目，缓存在本地数据库中，供你离线浏览。</li>
+      <li><strong>偏好设置</strong>——你选择的主题、配色口味与语言。</li>
+      <li><strong>小部件快照</strong>——桌面与锁屏小部件显示的那几个数字。</li>
+    </ul>
+    <p>代理流量里可能含有 Cookie、会话令牌、凭据，以及被测系统所属用户的个人信息。请像对待这些流量本身一样谨慎对待这份本地数据。</p>
+
+    <h2>应用外发的数据</h2>
+    <p>本应用只与你配置的那个地址通信，也就是你自己的 Burp。这些通信包括：你下达的指令（放行、丢弃、改包、执行）、你请求的历史详情，以及一条承载 Burp 变更事件的 WebSocket 事件流。</p>
+    <p><strong>它不经过任何中转、云服务或开发者运营的服务器。</strong>两台设备处于同一局域网，是这个应用能工作的前提。</p>
+    <p>需要明确的是：这条连接是<strong>明文 HTTP 与 WebSocket，没有 TLS</strong>，这是刻意如此——它的适用场景是可信局域网，链路上不加加密。能观察到该局域网的人可以读到这些流量。请不要在你不信任的网络中使用本应用，也不要把扩展的端口暴露到公网。</p>
+
+    <h2>相机</h2>
+    <p>申请相机权限只为一件事：扫描 Burp 扩展显示的配对二维码。</p>
+    <ul>
+      <li>相机画面<strong>在设备本地</strong>由 Google ML Kit 的内置条码识别模型处理；该模型随应用一同分发，不需要 Google Play 服务，也不会上传图像。</li>
+      <li>本应用<strong>不保存、不传输</strong>任何照片、视频或画面帧。</li>
+      <li>应用在后台不会使用相机，任何时刻都必须由你主动触发。</li>
+      <li>没有相机的设备同样可以安装：相机被声明为可选功能，你可以改为手动输入配对码。</li>
+    </ul>
+
+    <h2>权限与用途</h2>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>权限</th><th>用途</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">INTERNET</td>
+            <td>通过局域网与你的 Burp 通信。没有它，应用无法连接任何东西。</td>
+          </tr>
+          <tr>
+            <td class="mono">CAMERA</td>
+            <td>扫描配对二维码。可选——配对码可以手动输入。</td>
+          </tr>
+          <tr>
+            <td class="mono">FOREGROUND_SERVICE<br>FOREGROUND_SERVICE_CONNECTED_DEVICE</td>
+            <td>在你使用其他应用时保持与 Burp 的会话存活，并显示一条说明此事的通知。</td>
+          </tr>
+          <tr>
+            <td class="mono">POST_NOTIFICATIONS</td>
+            <td>在 Android 13 及以上显示上述会话通知。若你拒绝，会话照常工作，只是看不到那条通知。</td>
+          </tr>
+          <tr>
+            <td class="mono">CHANGE_NETWORK_STATE</td>
+            <td>Android 要求它作为「已连接设备」类前台服务的前置条件。本应用不修改你的网络配置。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>本应用不申请访问你的文件、相册、联系人、日历、位置、麦克风、通话记录或短信，也不含任何第三方广告或追踪库。</p>
+
+    <h2>留存与删除</h2>
+    <p>开发者这边没有任何需要留存或删除的东西。手机上的数据只为了让应用能离线展示你自己的代理数据，删除方式如下：</p>
+    <ul>
+      <li><strong>卸载应用</strong>即全部清除——数据库、偏好与配对状态，不留残余。</li>
+      <li>在 Android 的「设置 → 应用 → Burpsuite Remote → 存储」中<strong>清除存储</strong>，效果相同，无需卸载。</li>
+      <li>在应用内<strong>断开或重新配对</strong>会清除该会话的配对状态与缓存数据。</li>
+    </ul>
+    <p>应用目前没有一键「清空全部数据」的按钮；需要的话提出即可加上。由于开发者从不接收你的数据，也就不存在服务端的副本可供查询、导出或删除。</p>
+
+    <h2>未成年人</h2>
+    <p>本应用是专业的安全测试工具，不面向儿童，不含社交功能，也不向任何人（包括 13 岁以下儿童）收集个人信息。</p>
+
+    <h2>安全措施</h2>
+    <p>本设计假定局域网可信，并且不做超出这一假定的承诺：</p>
+    <ul>
+      <li>配对码一次有效，5 分钟后过期。</li>
+      <li>每个连接都携带设备身份，未登记的设备一律拒绝。</li>
+      <li>指令按设备限流，并按操作 ID 去重，因此重试不会把同一个动作执行两次。</li>
+      <li>每条指令都会写入审计日志，记录设备、类型、操作 ID 与结果。</li>
+      <li>归档流量永远不会被就地改写——脱敏只作用于导出的副本，因此导出不会悄悄改动原始证据。</li>
+    </ul>
+
+    <h2>你的选择</h2>
+    <p>数据的控制权完全在你手上：连接哪台电脑由你决定；相机与通知权限随时可在 Android 设置中撤销；卸载或清除存储即可抹除全部数据。如果你认为本应用以本政策未描述的方式处理了数据，请联系上面的邮箱，我们会查清并更正。</p>
+
+    <h2>政策变更</h2>
+    <p>若数据处理方式发生变化，本页会更新并修改生效日期。由于项目开源，每一次改动都能在公开的提交历史中查到，重大变更会写进发行说明。</p>
+
+    <h2>联系方式</h2>
+    <p>疑问、更正或关切：<strong>johnmelodymel@qq.com</strong>。源码与议题：<a href="https://github.com/ctkqiang/BurpSuiteRemote" target="_blank" rel="noopener">github.com/ctkqiang/BurpSuiteRemote</a>。</p>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-rule"></div>
+    <p class="footer-mark">Burpsuite Remote — Privacy Policy</p>
+    <p class="footer-sub">Burp Suite is a trademark of PortSwigger. This project is independent and unofficial.</p>
+    <p class="footer-links">
+      <a href="index.html">Documentation</a>
+      <a href="../README.md">README</a>
+      <a href="https://github.com/ctkqiang/BurpSuiteRemote" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </footer>
+
+</body>
+</html>
