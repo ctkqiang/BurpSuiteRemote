@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Burp Remote — a Burp Suite extension and Android client that streams proxy history, intercept decisions and Repeater entries to your phone in real time.">
+  <title>Burp Remote — Documentation</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0b0d'/%3E%3Cpath d='M8 22V10h6.4c2.6 0 4.2 1.3 4.2 3.5 0 1.7-.9 2.8-2.4 3.2 1.8.3 2.9 1.5 2.9 3.4 0 2.4-1.8 3.9-4.7 3.9H8Zm3-7.2h2.9c1 0 1.6-.5 1.6-1.3 0-.9-.6-1.3-1.6-1.3H11v2.6Zm0 5.1h3.1c1.1 0 1.7-.5 1.7-1.4 0-1-.6-1.5-1.7-1.5H11v2.9Z' fill='%23ff6b35'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <header class="topbar" id="topbar">
+    <a class="brand" href="#top">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="var(--mark-bg)"/>
+        <path d="M8 22V10h6.4c2.6 0 4.2 1.3 4.2 3.5 0 1.7-.9 2.8-2.4 3.2 1.8.3 2.9 1.5 2.9 3.4 0 2.4-1.8 3.9-4.7 3.9H8Zm3-7.2h2.9c1 0 1.6-.5 1.6-1.3 0-.9-.6-1.3-1.6-1.3H11v2.6Zm0 5.1h3.1c1.1 0 1.7-.5 1.7-1.4 0-1-.6-1.5-1.7-1.5H11v2.9Z" fill="var(--accent)"/>
+      </svg>
+      <span class="brand-text">
+        <strong>Burp Remote</strong>
+        <em>v0.1.0</em>
+      </span>
+    </a>
+
+    <nav class="quicknav" aria-label="Primary">
+      <a href="#overview" data-i18n="nav.overview">Positioning</a>
+      <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#protocol" data-i18n="nav.protocol">Protocol</a>
+      <a href="#quickstart" data-i18n="nav.quickstart">Quick Start</a>
+    </nav>
+
+    <div class="controls">
+      <button type="button" class="ctl" id="lang-toggle" aria-label="Switch language">
+        <span class="ctl-mono" id="lang-label">EN</span>
+      </button>
+      <button type="button" class="ctl ctl-icon" id="theme-toggle" aria-label="Switch theme">
+        <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>
+        <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z"/></svg>
+      </button>
+      <button type="button" class="ctl ctl-icon ctl-menu" id="toc-toggle" aria-label="Toggle contents" aria-expanded="false" aria-controls="toc">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell" id="top">
+    <aside class="toc" id="toc" aria-label="Contents">
+      <p class="toc-title" data-i18n="toc.title">Contents</p>
+      <ol class="toc-list" id="toc-list"></ol>
+      <div class="toc-foot">
+        <a class="toc-link" href="../README.md" data-i18n="toc.readme">Full README</a>
+        <a class="toc-link" href="https://github.com/ctkqiang/BurpsuiteRemote" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </aside>
+
+    <main id="main">
+      <section class="hero" id="hero">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="hero.eyebrow">Burp Suite extension + Android client</p>
+          <h1><span class="grad">Burp Remote</span></h1>
+          <p class="hero-tag" data-i18n="hero.tagline">Red Team Remote Control Framework</p>
+          <p class="lede" data-i18n="hero.lede">A Burp Suite extension and an Android app that stream proxy history, intercept decisions and Repeater entries to your phone in real time — so the engagement keeps moving while you are away from the desk.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="../README.md" data-i18n="hero.ctaReadme">Read the README</a>
+            <a class="btn btn-ghost" href="https://github.com/ctkqiang/BurpsuiteRemote" target="_blank" rel="noopener" data-i18n="hero.ctaGithub">View on GitHub</a>
+          </div>
+          <ul class="chips">
+            <li>Kotlin 2.2.0</li>
+            <li>Android API 26+</li>
+            <li>Burp Suite 2025.x</li>
+            <li>MIT</li>
+          </ul>
+        </div>
+
+        <figure class="terminal" aria-label="Event stream pipeline">
+          <figcaption class="terminal-head">
+            <span class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="terminal-name">burp-remote &mdash; event stream</span>
+          </figcaption>
+          <ol class="pipeline">
+            <li><span class="glyph">01</span><span data-i18n="pipeline.proxy">Burp proxy</span></li>
+            <li><span class="glyph">02</span><span data-i18n="pipeline.sourcing">Event sourcing</span></li>
+            <li><span class="glyph">03</span><span data-i18n="pipeline.ws">WebSocket push</span></li>
+            <li><span class="glyph">04</span><span data-i18n="pipeline.projection">Mobile projection</span></li>
+            <li><span class="glyph">05</span><span data-i18n="pipeline.render">Compose render</span></li>
+          </ol>
+          <div class="terminal-foot">
+            <span class="pulse" aria-hidden="true"></span>
+            <code>ws://&lt;ip&gt;:9000/v1/events</code>
+          </div>
+        </figure>
+      </section>
+
+      <section class="section" id="legal" data-nav="01">
+        <p class="eyebrow"><span class="num">01</span><span data-i18n="sec.legal">Legal Notice</span></p>
+        <div class="legal-box">
+          <p data-i18n="legal.body">This tool is intended solely for security researchers conducting authorised security assessments, red/blue exercises, and CTF competitions. Scanning, attacking or intercepting systems without authorisation is illegal and the user bears full legal responsibility. The developer is not responsible for any unlawful use under any circumstances.</p>
+        </div>
+      </section>
+
+      <section class="section" id="overview" data-nav="02">
+        <p class="eyebrow"><span class="num">02</span><span data-i18n="sec.overview">Positioning</span></p>
+        <h2 data-i18n="overview.title">Burp Suite stays the engine. The phone becomes the console.</h2>
+        <p class="body" data-i18n="overview.body">Burp Remote is a remote-control framework for Burp Suite aimed at red teamers and security researchers. It carries three Burp workflows — proxy history, the intercept queue and Repeater — onto an Android phone, so the assessment does not stop when you step away from the machine. All computation stays inside Burp; the phone issues commands and renders results.</p>
+        <figure class="code">
+          <figcaption class="code-head">
+            <span class="code-label" data-i18n="overview.dataflow">data flow</span>
+            <button type="button" class="copy" data-copy data-i18n="ui.copy">Copy</button>
+          </figcaption>
+          <pre><code data-i18n="overview.pipeline">Burp proxy → event sourcing → WebSocket push → mobile projection → Compose render</code></pre>
+        </figure>
+
+        <h3 data-i18n="overview.diffTitle">How it differs</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="diff-table"></table>
+        </div>
+      </section>
+
+      <section class="section" id="architecture" data-nav="03">
+        <p class="eyebrow"><span class="num">03</span><span data-i18n="sec.architecture">Architecture</span></p>
+        <h2 data-i18n="arch.title">One event stream, one sequence, one snapshot fallback.</h2>
+        <p class="body" data-i18n="arch.body">Proxy observations, intercept decisions and Repeater actions are all stamped with a monotonically increasing sequence number and pushed over WebSocket. Sequence numbers are allocated centrally by <code>InMemoryRemoteEventStream</code> — the history, intercept and Repeater publishers share a single <code>AtomicLong</code>. Independent counters previously collided, causing the mobile sync coordinator to treat live events as duplicates and drop them silently.</p>
+
+        <figure class="diagram" id="topology">
+          <svg viewBox="0 0 920 306" role="img" aria-labelledby="topology-title">
+            <title id="topology-title">Burp Remote topology</title>
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 10 5 0 10z" class="svg-arrow-head"/>
+              </marker>
+            </defs>
+
+            <g class="svg-node">
+              <rect x="24" y="60" width="216" height="146" rx="10"/>
+              <text class="svg-title" x="44" y="92" data-i18n="arch.svgClient">Android client</text>
+              <text class="svg-line" x="44" y="120">Jetpack Compose</text>
+              <text class="svg-line" x="44" y="142">MVI projection</text>
+              <text class="svg-line" x="44" y="164">Room cache</text>
+              <text class="svg-line" x="44" y="186">Haze liquid glass</text>
+            </g>
+
+            <g class="svg-node accent">
+              <rect x="352" y="60" width="216" height="146" rx="10"/>
+              <text class="svg-title" x="372" y="92" data-i18n="arch.svgServer">Burp extension</text>
+              <text class="svg-line" x="372" y="120">Ktor HTTP + WS</text>
+              <text class="svg-line" x="372" y="142">Event stream (ring 1024)</text>
+              <text class="svg-line" x="372" y="164">Adapters &middot; pairing</text>
+              <text class="svg-line" x="372" y="186">Token-bucket limiter</text>
+            </g>
+
+            <g class="svg-node">
+              <rect x="680" y="60" width="216" height="146" rx="10"/>
+              <text class="svg-title" x="700" y="92" data-i18n="arch.svgBurp">Burp Suite</text>
+              <text class="svg-line" x="700" y="120">Proxy history</text>
+              <text class="svg-line" x="700" y="142">Intercept handler</text>
+              <text class="svg-line" x="700" y="164">Repeater</text>
+              <text class="svg-line" x="700" y="186">Scope writer</text>
+            </g>
+
+            <path class="svg-wire" d="M240 112 H352" marker-end="url(#arrow)"/>
+            <path class="svg-wire" d="M352 158 H240" marker-end="url(#arrow)"/>
+            <text class="svg-tag" x="248" y="104">REST</text>
+            <text class="svg-tag" x="248" y="178">WS</text>
+            <path class="svg-wire" d="M568 133 H680" marker-end="url(#arrow)"/>
+            <text class="svg-tag" x="586" y="126">Montoya API</text>
+
+            <rect class="svg-frame" x="222" y="34" width="376" height="252" rx="14"/>
+            <text class="svg-frame-label" x="410" y="24" data-i18n="arch.svgLan">same LAN &middot; plain HTTP &middot; no TLS</text>
+
+            <text class="svg-note" x="24" y="272" data-i18n="arch.svgNote">Brief disconnects resume from the last sequence number; if the 1024-event ring has scrolled past, the server asks the client for /v1/snapshot.</text>
+          </svg>
+          <figcaption data-i18n="arch.svgCaption">Extension owns the engine and the state; the client owns presentation and offline cache.</figcaption>
+        </figure>
+
+        <div class="diagram-grid">
+          <button type="button" class="shot" data-zoom data-diagram="architecture">
+            <img alt="" loading="lazy" decoding="async" src="images/diagrams/architecture-en.png">
+            <span class="shot-cap" data-i18n="arch.diagramArchitecture">Architecture overview</span>
+          </button>
+          <button type="button" class="shot" data-zoom data-diagram="pairing">
+            <img alt="" loading="lazy" decoding="async" src="images/diagrams/pairing-en.png">
+            <span class="shot-cap" data-i18n="arch.diagramPairing">Pairing flow</span>
+          </button>
+          <button type="button" class="shot" data-zoom data-diagram="connection">
+            <img alt="" loading="lazy" decoding="async" src="images/diagrams/connection-en.png">
+            <span class="shot-cap" data-i18n="arch.diagramConnection">Connection lifecycle</span>
+          </button>
+          <button type="button" class="shot" data-zoom data-diagram="event-sync">
+            <img alt="" loading="lazy" decoding="async" src="images/diagrams/event-sync-en.png">
+            <span class="shot-cap" data-i18n="arch.diagramSync">Event synchronisation</span>
+          </button>
+        </div>
+
+        <h3 data-i18n="arch.lifecycleTitle">Connection lifecycle</h3>
+        <p class="body" data-i18n="arch.lifecycleBody">Disconnection is symmetric. The client sends a WebSocket Close frame wrapped in <code>NonCancellable</code> so delivery cannot be abandoned mid-flight, while the plugin concurrently reads <code>incoming</code> frames to notice it immediately — tearing down the session, releasing the connection slot and disassociating the device without waiting for the 30-second ping timeout.</p>
+      </section>
+
+      <section class="section" id="screenshots" data-nav="04">
+        <p class="eyebrow"><span class="num">04</span><span data-i18n="sec.screenshots">Screenshots</span></p>
+        <h3 data-i18n="shots.extension">Burp extension</h3>
+        <div class="strip strip-plugin">
+          <button type="button" class="shot" data-zoom>
+            <img alt="" loading="lazy" decoding="async" src="images/plugins_screenshot/1.png">
+            <span class="shot-cap" data-i18n="shots.extLoaded">Extension loaded</span>
+          </button>
+          <button type="button" class="shot" data-zoom>
+            <img alt="" loading="lazy" decoding="async" src="images/plugins_screenshot/2.png">
+            <span class="shot-cap" data-i18n="shots.extJar">Selecting the JAR</span>
+          </button>
+          <button type="button" class="shot" data-zoom>
+            <img alt="" loading="lazy" decoding="async" src="images/plugins_screenshot/3.png">
+            <span class="shot-cap" data-i18n="shots.extPairing">Pairing screen</span>
+          </button>
+        </div>
+
+        <h3 data-i18n="shots.mobile">Android client</h3>
+        <div class="strip strip-mobile">
+          <button type="button" class="shot shot-device" data-zoom>
+            <img alt="" loading="lazy" decoding="async" src="images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-45-590_xin.ctkqiang.burpsuite.remote.mobileapp.jpg">
+            <span class="shot-cap" data-i18n="shots.mobileDashboard">Mobile dashboard</span>
+          </button>
+          <button type="button" class="shot shot-device" data-zoom>
+            <img alt="" loading="lazy" decoding="async" src="images/mobile_app_screenshot/Screenshot_2026-09-15-13-00-53-661_xin.ctkqiang.burpsuite.remote.mobileapp.jpg">
+            <span class="shot-cap" data-i18n="shots.mobileConnection">Connection screen</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="section" id="features" data-nav="05">
+        <p class="eyebrow"><span class="num">05</span><span data-i18n="sec.features">Core Features</span></p>
+        <h2 data-i18n="features.title">Three Burp workflows, plus what only a phone can do.</h2>
+        <div class="cards" id="feature-cards"></div>
+      </section>
+
+      <section class="section" id="protocol" data-nav="06">
+        <p class="eyebrow"><span class="num">06</span><span data-i18n="sec.protocol">Protocol Reference</span></p>
+        <h2 data-i18n="protocol.title">Sixteen REST endpoints and one WebSocket stream.</h2>
+        <p class="body" data-i18n="protocol.body">The extension serves REST on <code>http://&lt;your-IP&gt;:9000</code> and pushes events on <code>ws://&lt;your-IP&gt;:9000/v1/events</code>.</p>
+
+        <h3 data-i18n="protocol.endpoints">Endpoints</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="endpoint-table"></table>
+        </div>
+
+        <h3 data-i18n="protocol.events">Event types</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="event-table"></table>
+        </div>
+
+        <figure class="code">
+          <figcaption class="code-head">
+            <span class="code-label" data-i18n="protocol.handshake">handshake</span>
+            <button type="button" class="copy" data-copy data-i18n="ui.copy">Copy</button>
+          </figcaption>
+          <pre><code>CONNECT → AUTHENTICATE → RESUME → event stream</code></pre>
+        </figure>
+        <p class="note" data-i18n="protocol.handshakeNote">The handshake order is fixed. Concurrent connections are capped; connections over the limit receive <code>TRY_AGAIN_LATER</code>.</p>
+      </section>
+
+      <section class="section" id="pairing" data-nav="07">
+        <p class="eyebrow"><span class="num">07</span><span data-i18n="sec.pairing">Pairing</span></p>
+        <h2 data-i18n="pairing.title">Scan once, stay registered.</h2>
+        <ol class="steps">
+          <li><span class="step-idx">01</span><p data-i18n="pairing.step1">Load the extension JAR — it listens on <code>0.0.0.0:9000</code>.</p></li>
+          <li><span class="step-idx">02</span><p data-i18n="pairing.step2">Open the <b>Burp Remote</b> tab in Burp to read the QR code and pairing code.</p></li>
+          <li><span class="step-idx">03</span><p data-i18n="pairing.step3">Install the APK, then scan the QR code or type the code manually.</p></li>
+          <li><span class="step-idx">04</span><p data-i18n="pairing.step4">Connected — events begin syncing immediately.</p></li>
+        </ol>
+        <p class="note" data-i18n="pairing.note">The pairing code is 8 characters and valid for 5 minutes, drawn from a confusable-free alphabet with no I/O/0/1/L/U. One scan registers the device identity, so reconnecting never requires another scan.</p>
+      </section>
+
+      <section class="section" id="security" data-nav="08">
+        <p class="eyebrow"><span class="num">08</span><span data-i18n="sec.security">Security Design</span></p>
+        <h2 data-i18n="security.title">LAN-scoped, identity-checked, idempotent.</h2>
+        <div class="table-wrap">
+          <table class="data-table" id="security-table"></table>
+        </div>
+      </section>
+
+      <section class="section" id="themes" data-nav="09">
+        <p class="eyebrow"><span class="num">09</span><span data-i18n="sec.themes">Theme System</span></p>
+        <h2 data-i18n="themes.title">Mode sets the luminance. Flavour sets the character.</h2>
+        <p class="body" data-i18n="themes.body">Light/dark mode and flavour are orthogonal: the mode controls base luminance, the flavour controls accent and tone. There are three modes — follow system, light, dark — crossed with eight flavours.</p>
+        <div class="swatches" id="theme-swatches"></div>
+        <p class="note" data-i18n="themes.note">Semantic colours (success, warning, error, info) and syntax highlighting stay constant across every flavour. The bottom navigation bar uses Haze real-time blur with a translucent surface, a top highlight gradient, a bottom inner shadow and elevation — tuned separately for light and dark.</p>
+      </section>
+
+      <section class="section" id="quickstart" data-nav="10">
+        <p class="eyebrow"><span class="num">10</span><span data-i18n="sec.quickstart">Quick Start</span></p>
+        <h2 data-i18n="quickstart.title">Two scripts, two artefacts.</h2>
+
+        <h3 data-i18n="quickstart.requirements">Requirements</h3>
+        <ul class="plain-list">
+          <li data-i18n="quickstart.req1">JDK 17 — Burp 2025.x runs on 17, and higher bytecode is rejected at load time.</li>
+          <li data-i18n="quickstart.req2">Burp Suite Community or Professional, 2025.x or later.</li>
+          <li data-i18n="quickstart.req3">An Android device on API 26 (Android 8.0) or above.</li>
+          <li data-i18n="quickstart.req4">Both devices on the same LAN — the extension listens on <code>0.0.0.0:9000</code> by default.</li>
+        </ul>
+
+        <div class="build-grid">
+          <figure class="code">
+            <figcaption class="code-head">
+              <span class="code-label" data-i18n="quickstart.jarLabel">extension JAR</span>
+              <button type="button" class="copy" data-copy data-i18n="ui.copy">Copy</button>
+            </figcaption>
+            <pre><code>scripts/build-burp-extension.sh
+# build/plugins/burp-remote-extension/libs/
+#   burp-remote-extension-0.1.0.jar</code></pre>
+          </figure>
+          <figure class="code">
+            <figcaption class="code-head">
+              <span class="code-label" data-i18n="quickstart.apkLabel">Android APK</span>
+              <button type="button" class="copy" data-copy data-i18n="ui.copy">Copy</button>
+            </figcaption>
+            <pre><code>scripts/build-mobile-app.sh
+adb install -r build/mobileapp/app/outputs/
+  apk/debug/app-debug.apk</code></pre>
+          </figure>
+        </div>
+        <p class="note" data-i18n="quickstart.note">Both scripts accept <code>JAVA_HOME_FOR_BUILD</code> to point at JDK 17 and pass extra arguments through to Gradle. Load the JAR via <b>Extensions → Installed → Add → Java</b>.</p>
+
+        <h3 data-i18n="quickstart.release">Release</h3>
+        <figure class="code">
+          <figcaption class="code-head">
+            <span class="code-label">bash</span>
+            <button type="button" class="copy" data-copy data-i18n="ui.copy">Copy</button>
+          </figcaption>
+          <pre><code>git tag v0.1.0
+git push origin v0.1.0</code></pre>
+        </figure>
+        <p class="note" data-i18n="quickstart.releaseNote">Pushing a tag triggers GitHub Actions, which builds the JAR through the quality gates and the APK on JDK 17, then attaches both to a GitHub Release.</p>
+      </section>
+
+      <section class="section" id="structure" data-nav="11">
+        <p class="eyebrow"><span class="num">11</span><span data-i18n="sec.structure">Directory Structure</span></p>
+        <h2 data-i18n="structure.title">Where things live.</h2>
+        <figure class="code">
+          <figcaption class="code-head">
+            <span class="code-label" data-i18n="structure.label">repository tree</span>
+            <button type="button" class="copy" data-copy data-i18n="ui.copy">Copy</button>
+          </figcaption>
+          <pre><code id="structure-tree"></code></pre>
+        </figure>
+      </section>
+
+      <section class="section" id="scenarios" data-nav="12">
+        <p class="eyebrow"><span class="num">12</span><span data-i18n="sec.scenarios">Real-world Scenarios</span></p>
+        <div class="cards cards-scenario" id="scenario-cards"></div>
+      </section>
+
+      <section class="section" id="faq" data-nav="13">
+        <p class="eyebrow"><span class="num">13</span><span data-i18n="sec.faq">FAQ</span></p>
+        <div class="faq" id="faq-list"></div>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-rule"></div>
+        <p class="footer-mark" data-i18n="footer.line">Built with Kotlin · Compose liquid glass UI · event-sourced design · ctkqiang</p>
+        <p class="footer-sub">Made in China · 红队利器，为国护网</p>
+        <p class="footer-links">
+          <a href="../README.md">README</a>
+          <a href="../README.en.md">README (English)</a>
+          <a href="https://github.com/ctkqiang/BurpsuiteRemote" target="_blank" rel="noopener">GitHub</a>
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+    <button type="button" class="lightbox-nav prev" id="lightbox-prev" aria-label="Previous">&#8249;</button>
+    <img id="lightbox-img" alt="">
+    <button type="button" class="lightbox-nav next" id="lightbox-next" aria-label="Next">&#8250;</button>
+    <p class="lightbox-cap" id="lightbox-cap"></p>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
