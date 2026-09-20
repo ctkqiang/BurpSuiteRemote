@@ -1,0 +1,54 @@
+Burpsuite Remote turns your phone into a remote control for Burp Suite, so you can keep testing while you are away from your desk.
+
+The desktop extension does all the work. The Android app only sends commands and renders results. Nothing is re-implemented on the phone, and nothing is sent to any third-party service.
+
+WHAT YOU CAN DO
+
+• Live proxy history — every request Burp sees reaches your phone in milliseconds, with method, URL, status code and timestamp. Tap an entry to read the full request and response.
+
+• Intercept decisions from anywhere — when Burp intercepts a request, it appears on your phone. Forward it, drop it, or edit it and forward. Burp executes the decision.
+
+• Repeater on your phone — send any history entry to Repeater in one tap, adjust the request, execute it, and read the response. Status code, duration and body come back to the app.
+
+• Home screen and lock screen widgets — a connection status widget and a live stats widget showing the target host, live request count, intercept count and saved count. Widgets read a cached snapshot, so no background service is kept alive.
+
+• Share and export — export archived traffic to a redacted copy. The stored originals stay byte-exact.
+
+• 8 themes with liquid glass — 3 light/dark modes (follow system, light, dark) crossed with 8 colour flavours. The bottom navigation bar uses real-time blur, with separately tuned light and dark parameters.
+
+• 5 languages — English, Simplified Chinese, German, Japanese and Mongolian. The app follows your device language by default, and you can override it per app.
+
+HOW IT WORKS
+
+1. Load the Burp Remote extension into Burp Suite on your computer.
+2. Open the Burp Remote tab in Burp and show the pairing QR code.
+3. Scan it with the app. Pairing codes are single use and expire after five minutes.
+4. Both devices must be on the same local network.
+
+The connection is event-sourced: every change Burp makes is pushed over a WebSocket stream and projected into the app, so the phone does not poll and history does not need to be refreshed by hand.
+
+REQUIREMENTS
+
+• The Burp Remote extension loaded into Burp Suite (Community or Professional, 2025.x or later) on your computer. The app does nothing on its own without it.
+• Android 8.0 (API 26) or later
+• Both devices on the same local network
+
+SECURITY AND PRIVACY
+
+This app is built for a trusted local network. Traffic between the phone and Burp is plain HTTP with no TLS, and it is deliberately not meant to be exposed to the internet. Do not forward the extension port to the public internet.
+
+Every connection carries a device identity, and unregistered devices are rejected. Control commands are rate limited per device and deduplicated by operation ID, so a retry returns the first result instead of running twice. Every command is written to an audit log with the device, type, operation ID and result. Archived originals are never rewritten; redaction applies to exported copies only.
+
+There is no analytics SDK, no advertising SDK and no crash reporting service in this app. QR pairing runs entirely on-device. The app talks to your own Burp instance and to nothing else. No data is collected by the developer.
+
+OPEN SOURCE
+
+Burpsuite Remote is free and open source under the MIT licence. The full source, the extension and the documentation are on GitHub. Issues and pull requests are welcome.
+
+Please note that the desktop extension must be built or downloaded separately; the app alone cannot proxy anything.
+
+LEGAL
+
+For authorised security testing only. Scanning, attacking or intercepting systems without authorisation is illegal, and you are responsible for how you use this tool.
+
+Burp Suite is a trademark of PortSwigger. This app is an independent, unofficial client and is not affiliated with, endorsed by or sponsored by PortSwigger.
