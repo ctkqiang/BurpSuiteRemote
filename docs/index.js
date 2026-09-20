@@ -148,7 +148,7 @@
 
       'footer.line': 'Built with Kotlin · Compose liquid glass UI · event-sourced design · ctkqiang',
 
-      'meta.title': 'Burp Remote — Documentation',
+      'meta.title': 'Burp Remote — Burp Suite remote control for Android',
       'meta.description': 'Burp Remote — a Burp Suite extension and Android client that streams proxy history, intercept decisions and Repeater entries to your phone in real time.',
 
       'ui.copy': 'Copy',
@@ -258,7 +258,7 @@
 
       'footer.line': '基于 Kotlin 构建 · Compose 液态玻璃 UI · 事件溯源设计 · ctkqiang',
 
-      'meta.title': 'Burp Remote — 文档',
+      'meta.title': 'Burp Remote — Android 端 Burp Suite 远程控制',
       'meta.description': 'Burp Remote——一个 Burp Suite 扩展 + Android 客户端，把代理历史、拦截决策与 Repeater 条目实时推送到手机。',
 
       'ui.copy': '复制',
