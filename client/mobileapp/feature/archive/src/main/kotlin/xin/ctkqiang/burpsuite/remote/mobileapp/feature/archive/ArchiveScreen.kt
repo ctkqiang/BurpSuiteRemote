@@ -53,6 +53,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSta
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.localisation.localisedDateTimeFormatter
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteMotion
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
@@ -63,7 +64,6 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTok
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.burpRemoteStaggeredEntry
 import java.time.Duration
 import java.time.Instant
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -554,8 +554,8 @@ private const val LOADING_KEY = "loading"
 private const val ERROR_KEY = "error"
 
 // 时刻按设备时区与当前语言格式化；归档要能跟插件上的记录对上，因此精确到秒。
-private val RECORD_TIME_FORMATTER: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault())
+private val RECORD_TIME_FORMATTER: DateTimeFormatter
+    get() = localisedDateTimeFormatter(FormatStyle.MEDIUM)
 
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。
 @Preview(name = "已保存浅色", showBackground = true)

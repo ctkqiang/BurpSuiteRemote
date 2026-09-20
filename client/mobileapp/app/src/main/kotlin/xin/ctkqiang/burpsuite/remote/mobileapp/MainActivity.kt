@@ -46,6 +46,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.domain.settings.ThemeMode
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguagePreference
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LanguagePreferenceRepository
 import xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings.LocalLanguagePreferenceRepository
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.localisation.systemLocale
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.NavigationDependencies
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteMotion
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
@@ -127,12 +128,15 @@ class MainActivity : ComponentActivity() {
 }
 
 private fun Context.withLanguage(language: LanguagePreference): Context {
-    val languageTag = language.languageTag ?: return this
-    val locale = Locale.forLanguageTag(languageTag)
-    // 全局默认语言也要跟着走：日期时间格式化器在构造时就读它，只改 Configuration 不够。
-    Locale.setDefault(locale)
+    val resolvedLocale = language.languageTag?.let(Locale::forLanguageTag) ?: systemLocale()
+    // 全局默认语言每次都要定下来：日期时间格式化器在构造时读它（见 localisedDateTimeFormatter），
+    // 只改 Configuration 不够。切回「跟随系统」时必须复位成系统语言，否则进程里会残留上一次选的语言：
+    // 界面文案跟着系统走了，日期时间却还停在旧语言。
+    Locale.setDefault(resolvedLocale)
+    // 跟随系统时不覆写 Configuration：让系统 locale 原样生效，系统语言在运行期变化也能照常处理。
+    if (language == LanguagePreference.Automatic) return this
     val configuration = Configuration(resources.configuration)
-    configuration.setLocales(LocaleList(locale))
+    configuration.setLocales(LocaleList(resolvedLocale))
     return createConfigurationContext(configuration)
 }
 

@@ -59,13 +59,13 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSca
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteText
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTextField
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.localisation.localisedDateTimeFormatter
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSizing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import java.time.Instant
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -575,8 +575,8 @@ private class BarcodeDecodingGuard {
 }
 
 // 票据失效时刻按设备时区与当前语言格式化：用户要拿它跟插件界面上显示的时间对齐。
-private val TICKET_EXPIRY_FORMATTER: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault())
+private val TICKET_EXPIRY_FORMATTER: DateTimeFormatter
+    get() = localisedDateTimeFormatter(FormatStyle.MEDIUM)
 
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。
 // 相机那一支会真的去开相机，因此预览只覆盖手输与票据被拒两种可以安全渲染的处境。

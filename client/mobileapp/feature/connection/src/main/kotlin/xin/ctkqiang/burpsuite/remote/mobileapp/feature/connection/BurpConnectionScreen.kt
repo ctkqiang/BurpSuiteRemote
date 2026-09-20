@@ -35,12 +35,12 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTex
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTextField
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.technical.colourIn
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.localisation.localisedDateTimeFormatter
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.navigation.RemotePairingConclusion
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import java.time.Instant
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -517,8 +517,8 @@ private fun pairingRejectionResourceOf(reason: PairingRejectionReason?): Int =
     }
 
 // 票据失效时刻按设备时区与当前语言格式化：用户要拿它跟插件界面上显示的时间对齐。
-private val TICKET_EXPIRY_FORMATTER: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault())
+private val TICKET_EXPIRY_FORMATTER: DateTimeFormatter
+    get() = localisedDateTimeFormatter(FormatStyle.MEDIUM)
 
 @get:StringRes
 internal val ConnectionState.labelResource: Int

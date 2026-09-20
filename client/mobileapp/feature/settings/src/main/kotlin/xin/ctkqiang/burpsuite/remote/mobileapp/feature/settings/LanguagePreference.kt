@@ -1,5 +1,7 @@
 package xin.ctkqiang.burpsuite.remote.mobileapp.feature.settings
 
+import java.util.Locale
+
 /**
  * 界面语言（plan §46）。
  *
@@ -54,5 +56,17 @@ enum class LanguagePreference {
         fun fromStorageValue(storageValue: String?): LanguagePreference =
             entries.firstOrNull { language -> language.storageValue.equals(storageValue, ignoreCase = true) }
                 ?: Automatic
+
+        /**
+         * 由设备语言推断界面会实际使用哪一种。
+         *
+         * 「跟随系统」这一行要用它：用户在点它之前应该知道它此刻会解析成什么，否则那四个字没有传达
+         * 任何信息。只比语言代码不比地区——`zh-TW` 与 `zh-CN` 都落在 [Chinese]；认不出的语言回落
+         * [English]，与资源层的回落规则一致（`values/` 就是英文）。
+         */
+        fun fromSystemLocale(systemLocale: Locale): LanguagePreference =
+            entries.firstOrNull { language ->
+                language != Automatic && language.storageValue.equals(systemLocale.language, ignoreCase = true)
+            } ?: English
     }
 }

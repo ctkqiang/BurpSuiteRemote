@@ -33,11 +33,11 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTex
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.technical.BurpRemoteCodeBlock
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.technical.BurpRemoteCodeLanguage
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.localisation.localisedDateTimeFormatter
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTokens
 import java.time.Instant
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -546,8 +546,8 @@ private const val JSON_OBJECT_OPEN = '{'
 private const val JSON_ARRAY_OPEN = '['
 
 // 时刻按设备时区与当前语言格式化；同一秒内的多条记录靠秒级时间区分，所以这里带日期。
-private val RECORD_TIME_FORMATTER: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault())
+private val RECORD_TIME_FORMATTER: DateTimeFormatter
+    get() = localisedDateTimeFormatter(FormatStyle.SHORT)
 
 // rules.md §8.3：每个屏幕都要有浅色与深色两套预览，否则深色下配色失衡只有装到机器上才发现。
 @Preview(name = "浅色", showBackground = true)

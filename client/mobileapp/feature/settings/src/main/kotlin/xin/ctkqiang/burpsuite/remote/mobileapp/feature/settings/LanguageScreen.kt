@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,6 +19,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSec
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.rememberBurpRemoteHaptics
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.localisation.systemLocale
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
 
@@ -28,7 +30,8 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpsuiteRemoteTheme
  * （rules.md §8.1：一次性动作走效果，不进状态）。
  *
  * 语言名一律用各自的语言书写：用户不确定「Nederlands 是哪个」时，看到的就是它自己的写法。
- * 行里不再补说明文字 —— 语言名本身已经说完了这一行要说的全部内容，凑一句话只会拉长列表。
+ * 因此具体语言那几行不补说明文字——语言名本身已经说完了这一行要说的全部内容。
+ * 只有「跟随系统」是例外：它不写明自己会解析成哪一种，那四个字就等于什么都没说。
  */
 @Composable
 fun LanguageScreen(
@@ -37,6 +40,8 @@ fun LanguageScreen(
     modifier: Modifier = Modifier,
 ) {
     val haptics = rememberBurpRemoteHaptics()
+    // 设备语言不是当前界面语言：界面可能正被用户选的另一种语言覆写着。
+    val deviceLanguage = remember { LanguagePreference.fromSystemLocale(systemLocale()) }
 
     Column(
         modifier =
@@ -63,6 +68,15 @@ fun LanguageScreen(
                 LanguagePreference.entries.forEachIndexed { index, language ->
                     BurpRemoteListItem(
                         title = stringResource(language.labelResource),
+                        subtitle =
+                            if (language == LanguagePreference.Automatic) {
+                                stringResource(
+                                    R.string.settings_language_automatic_resolved,
+                                    stringResource(deviceLanguage.labelResource),
+                                )
+                            } else {
+                                null
+                            },
                         trailing = {
                             if (language == uiState.language) {
                                 BurpRemoteStatusPill(

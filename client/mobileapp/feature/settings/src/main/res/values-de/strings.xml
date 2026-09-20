@@ -37,6 +37,8 @@
     <string name="settings_language_selected">Ausgewählt</string>
     <!-- 语言名按各自的语言书写，三种语言里都一样。 -->
     <string name="settings_language_automatic">Systemeinstellung folgen</string>
+    <!-- 只有「跟随系统」这一行需要写出它解析成什么；其余行的语言名自己就写明了是什么语言。 -->
+    <string name="settings_language_automatic_resolved">Folgt dem Gerät · derzeit %1$s</string>
     <string name="settings_language_english">English</string>
     <string name="settings_language_chinese">简体中文</string>
     <string name="settings_language_german">Deutsch</string>

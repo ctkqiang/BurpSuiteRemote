@@ -40,6 +40,7 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteSke
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusPill
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteStatusTone
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.design.component.BurpRemoteTechnicalValue
+import xin.ctkqiang.burpsuite.remote.mobileapp.ui.localisation.localisedDateTimeFormatter
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteColourScheme
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteRadius
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.BurpRemoteSpacing
@@ -48,7 +49,6 @@ import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.LocalBurpRemoteDesignTok
 import xin.ctkqiang.burpsuite.remote.mobileapp.ui.theme.burpRemoteStaggeredEntry
 import java.time.Duration
 import java.time.Instant
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -367,8 +367,8 @@ internal val InterceptState.isWaiting: Boolean
     get() = this == InterceptState.Pending || this == InterceptState.Modified
 
 // 时刻按设备时区与当前语言格式化；队列里两次操作可能只差几秒，因此带秒。
-private val RECORD_TIME_FORMATTER: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault())
+private val RECORD_TIME_FORMATTER: DateTimeFormatter
+    get() = localisedDateTimeFormatter(FormatStyle.MEDIUM)
 
 private val METHOD_MARKER_WIDTH = 4.dp
 private val METHOD_MARKER_HEIGHT = 20.dp
