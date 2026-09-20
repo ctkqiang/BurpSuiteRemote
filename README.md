@@ -363,12 +363,6 @@ Burp 在笔记本跑代理，起身离开时拦截到请求——手机弹出，
 
 ---
 
-## 支持
-
-如果您觉得本项目对您有帮助，欢迎 Star / Fork，您的支持是我持续维护和改进的动力。
-
----
-
 ## 贡献
 
 欢迎提交 Issue 与 Pull Request。动手之前请先读两份文件：
@@ -414,6 +408,28 @@ MIT，全文见 [LICENSE](LICENSE)。可自由使用、修改、分发（含商�
 
 本项目仅供**获得授权**的安全测试使用。未经授权对他人系统进行扫描、攻击或拦截测试属违法行为，
 使用者自行承担全部法律责任——见文首[法律声明](#法律声明)。
+
+---
+
+<div align="center">
+
+<h2>支持</h2>
+
+<p>如果您觉得本项目对您有帮助，欢迎 Star / Fork，也欢迎请我喝杯咖啡</p>
+<p><sub>您的支持是我持续维护和改进的动力</sub></p>
+
+<br/>
+
+<strong>微信扫码捐赠</strong><br/><br/>
+<img src="https://raw.gitcode.com/ctkqiang_sr/ctkqiang_sr/raw/main/mm_reward_qrcode_1778988737577.png"
+     alt="微信扫码捐赠"
+     width="240"
+     style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+
+<br/>
+<br/>
+
+</div>
 
 ---
 

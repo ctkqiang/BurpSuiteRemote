@@ -363,12 +363,6 @@ With the network down, you can still browse already-synced history; reconnect an
 
 ---
 
-## Support
-
-If you find this project useful, Star / Fork welcome — your support keeps it maintained and improving.
-
----
-
 ## Contributing
 
 Issues and pull requests are welcome. Two files to read before you start:
@@ -419,6 +413,28 @@ commercially, provided the copyright and permission notice are retained.
 This project is for **authorised** security testing only. Scanning, attacking or intercepting
 systems without authorisation is illegal and the user bears full legal responsibility — see the
 [Legal Notice](#legal-notice) at the top.
+
+---
+
+<div align="center">
+
+<h2>Support</h2>
+
+<p>If this project helps you, Star / Fork are welcome — or buy me a coffee</p>
+<p><sub>Your support keeps it maintained and improving</sub></p>
+
+<br/>
+
+<strong>Scan to donate via WeChat</strong><br/><br/>
+<img src="https://raw.gitcode.com/ctkqiang_sr/ctkqiang_sr/raw/main/mm_reward_qrcode_1778988737577.png"
+     alt="WeChat donation QR code"
+     width="240"
+     style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+
+<br/>
+<br/>
+
+</div>
 
 ---
 
