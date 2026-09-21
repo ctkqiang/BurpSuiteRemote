@@ -1,0 +1,12 @@
+First public release (0.1.0).
+
+• Live proxy history with the full request and response
+• Intercept: forward, drop, or edit and forward
+• Repeater on your phone: replay and read the response
+• Home screen and lock screen widgets
+• Redacted export, originals left untouched
+• 8 theme flavours, liquid glass bottom bar
+• 5 languages, following your device by default
+• QR pairing with single-use codes
+
+Needs the Burp Remote extension in Burp Suite and a shared local network.
